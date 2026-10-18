@@ -13,7 +13,8 @@ Highlights: per-key and per-button remapping with a Shift layer and factory rese
 (recorded, edited, stored on the PC or on the device); DPI stages, polling rate, scroll-wheel modes;
 a profile library like Synapse's (any number of profiles per device on the PC; switching writes only what
 differs into an on-board slot; up to 5 can be pinned to the device's slots for its profile button); hardware lighting effects plus Lighting Studio (layered per-LED effects including
-Ambient screen colours and an Audio Meter); linked games that switch profiles when a game starts (with a
+gradients, pictures, Ambient screen colours and an Audio Meter with a source picker; a shared canvas
+where one effect runs across keyboard and mouse placed together; profile files to import and export); linked games that switch profiles when a game starts (with a
 Steam / Lutris / Heroic / Bottles game scanner); power and idle settings; **Import from Synapse** (reads
 the profiles, macros and lighting effects of a Windows Synapse 4 install on a mounted drive);
 your own device pictures; and game lighting.
@@ -34,6 +35,9 @@ Games that support Razer Chroma can light your devices: `tsubad` runs a small lo
 engines and browser-based lighting apps that use it work unchanged. While a game shows an effect it
 takes over the matching devices (keyboard, mouse, …); when it stops, closes or goes quiet for 15 s, your
 own lighting (Lighting Studio profile or hardware effect) comes back. Untested devices stay read-only.
+The **Game lighting** page lists every program that connects and lets you allow or block each one (programs
+are told apart by their process name, a convenience rather than a security boundary), and shows who controls
+each device's lighting right now.
 Games that load Razer's native library instead get Tsuba's bridge DLL (`shim/`, built with mingw-w64):
 the **Game lighting** page installs it into each Wine/Proton prefix (it never replaces a file it didn't
 install) and it forwards the game's calls to the same local server. Games that ship their own copy of

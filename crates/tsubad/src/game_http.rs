@@ -979,7 +979,8 @@ mod tests {
         let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
         let id = v["sessionid"].as_u64().unwrap();
         let key = gl.status()["sessions"][0]["app"].as_str().unwrap().to_string();
-        assert!(!key.is_empty());
+        // The connecting process was found from the socket (this test process), not guessed from the title.
+        assert!(!key.is_empty() && !key.starts_with("title:"), "{key}");
         // The application was recorded so the user can pick a rule for it later.
         assert!(gl.rules_json()["apps"].as_array().unwrap().iter().any(|a| a["key"] == key.as_str() && a["rule"] == "default" && a["connected"] == true));
         gl.set_app_rule(&key, "block").unwrap();

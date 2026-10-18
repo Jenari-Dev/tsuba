@@ -2,7 +2,7 @@
 //! the on-board copies in step (a renamed macro shows its new name on the device).
 
 use anyhow::{ensure, Context, Result};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::macros as mac;
 
 use crate::manager::{Manager, MACROS_LOCK};
@@ -32,13 +32,15 @@ impl Manager {
                     for id in mac::ids(dev)? {
                         if mac::hex(&mac::read_name(dev, id)?.guid) == guid {
                             mac::write_name(dev, id, &m)?;
-                            info!("{pid}: renamed macro 0x{id:04x} to {}", m.name);
+                            info!("{pid}: renamed macro 0x{id:04x}");
+                            debug!("{pid}: macro 0x{id:04x} is now {}", m.name);
                         }
                     }
                     Ok(())
                 });
                 if let Err(e) = r {
-                    warn!("{pid}: renaming the on-board copy of {:?}: {e:#}", m.name);
+                    warn!("{pid}: renaming the on-board copy of a macro: {e:#}");
+                    debug!("{pid}: the macro is {:?}", m.name);
                 }
             }
         }

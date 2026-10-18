@@ -11,7 +11,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::config::slot_keys;
 use zbus::blocking::{Connection, MessageIterator};
 use zbus::message::Type;
@@ -113,7 +113,8 @@ fn kde_register(conn: &Connection, entries: &[SlotEntry]) -> Result<()> {
         let reply = conn.call_method(Some(SERVICE), "/kglobalaccel", Some("org.kde.KGlobalAccel"), "setShortcut", &(id, vec![qt_key(e.code)], 6u32))?;
         let got: Vec<i32> = reply.body().deserialize()?;
         if got != vec![qt_key(e.code)] {
-            warn!("shortcut for {} is taken in KDE (got {got:?})", e.label);
+            warn!("a shortcut is taken in KDE (got {got:?})");
+            debug!("shortcut for {} is taken", e.label);
         }
     }
     Ok(())

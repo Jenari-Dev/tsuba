@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::{Context, Result};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::app_links::{self, AppLink, AppLinks, ProfileRef};
 use tsuba_core::chroma_profiles as cp;
 use tsuba_core::library::{self, DeviceLibrary};
@@ -65,7 +65,10 @@ impl Manager {
         if let Some(name) = &link.chroma {
             match self.chroma_live(name) {
                 Ok(()) => st.chroma_applied = true,
-                Err(e) => warn!("linked lighting profile {name:?}: {e:#}"),
+                Err(e) => {
+                    warn!("linked lighting profile: {e:#}");
+                    debug!("linked lighting profile {name:?}");
+                },
             }
         }
     }
@@ -223,11 +226,13 @@ impl Manager {
             return;
         }
         if let Some(old) = st.current.take() {
-            info!("linked game closed: {old}");
+            info!("linked game closed");
+            debug!("linked game closed: {old}");
             self.link_restore(&mut st);
         }
         if let (Some(link), Some(k)) = (want, key) {
-            info!("linked game running: {k}");
+            info!("linked game running");
+            debug!("linked game running: {k}");
             self.link_apply(&link, &mut st);
             st.current = Some(k);
         }
@@ -290,7 +295,7 @@ impl Manager {
                 match r {
                     ProfileRef::Slot(s) => {
                         if let Some(p) = l.pinned(*s).or_else(|| l.holder(*s)) {
-                            info!("linked game {name:?}: {pid} profile {s} → library profile {:?}", p.name);
+                            debug!("linked game {name:?}: {pid} profile {s} → library profile {:?}", p.name);
                             *r = ProfileRef::Library(p.id.clone());
                         }
                         true
@@ -298,7 +303,7 @@ impl Manager {
                     ProfileRef::Library(id) => {
                         let keep = l.get(id).is_some();
                         if !keep {
-                            info!("linked game {name:?}: {pid} profile {id} is no longer in the library");
+                            debug!("linked game {name:?}: {pid} profile {id} is no longer in the library");
                         }
                         keep
                     }

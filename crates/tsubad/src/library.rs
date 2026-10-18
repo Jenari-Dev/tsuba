@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 use anyhow::{anyhow, bail, ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::app_links::ProfileRef;
 use tsuba_core::config::{ActionConfig, DialSlotConfig, EffectConfig, Lighting};
 use tsuba_core::library::{self as lib, ActionBinding, DeviceLibrary, LibraryProfile, MacroBinding, Op};
@@ -220,7 +220,8 @@ impl Manager {
             }
             p.dial = dial.as_ref().map(|d| d.iter().map(|k| DialSlotConfig { function: k.function.clone(), colour: k.colour.clone(), enabled: k.enabled }).collect());
             p.pinned_slot = Some(slot);
-            info!("{pid}: on-board profile {slot} ({shown}) copied into the profile library");
+            info!("{pid}: on-board profile {slot} copied into the profile library");
+            debug!("{pid}: on-board profile {slot} is “{shown}”");
             added.push(format!("{shown} (slot {slot})"));
             l.set_holds(slot, &p.id);
             l.put(p)?;
@@ -302,7 +303,8 @@ impl Manager {
         // Macros Tsuba uploaded for profiles no slot runs any more go when memory runs low.
         a.macros_removed = self.gc_macros(pid, &mut l, &[], false);
         a.ms = t0.elapsed().as_millis() as u64;
-        info!("{pid}: library profile {:?} active in slot {slot} ({} write(s), {} ms{})", p.name, a.writes, a.ms, if a.warnings.is_empty() { String::new() } else { format!(", {} failed", a.warnings.len()) });
+        info!("{pid}: library profile active in slot {slot} ({} write(s), {} ms{})", a.writes, a.ms, if a.warnings.is_empty() { String::new() } else { format!(", {} failed", a.warnings.len()) });
+        debug!("{pid}: library profile {:?} is the one active in slot {slot}", p.name);
         drop(_g);
         self.library_changed(pid);
         Ok(a)
@@ -482,7 +484,8 @@ impl Manager {
                         match r {
                             Ok(()) => {
                                 let name = on_device.get(&id).map(|x| x.1.clone()).unwrap_or_default();
-                                info!("{pid}: removed unused macro {name:?} (0x{id:04x}) Tsuba had uploaded for a library profile");
+                                info!("{pid}: removed unused macro 0x{id:04x} Tsuba had uploaded for a library profile");
+                                debug!("{pid}: macro 0x{id:04x} was {name:?}");
                                 removed.push(name);
                                 l.state.uploaded_macros.remove(&id);
                                 dirty = true;
@@ -581,14 +584,18 @@ impl Manager {
                 if let Some(owner) = l.pinned(w).cloned() {
                     match self.write_into(pid, &owner, w, &on, &mut l) {
                         Ok(_) => l.set_holds(w, &owner.id),
-                        Err(e) => warn!("{pid}: restoring “{}” in slot {w}: {e:#}", owner.name),
+                        Err(e) => {
+                            warn!("{pid}: restoring a profile in slot {w}: {e:#}");
+                            debug!("{pid}: the profile was “{}”", owner.name);
+                        }
                     }
                 }
                 l.save_state()?;
             }
             Ok(a)
         })?;
-        info!("{pid}: “{}” pinned to slot {slot} ({} write(s))", p.name, a.writes);
+        info!("{pid}: profile pinned to slot {slot} ({} write(s))", a.writes);
+        debug!("{pid}: “{}” is pinned to slot {slot}", p.name);
         drop(g);
         self.library_changed(pid);
         Ok(slot)
@@ -749,13 +756,15 @@ impl Manager {
                 let on = self.onboard(pid)?;
                 for s in held {
                     if let Err(e) = self.write_into(pid, &p, s, &on, &mut l) {
-                        warn!("{pid}: updating slot {s} with “{}”: {e:#}", p.name);
+                        warn!("{pid}: updating slot {s} with a profile: {e:#}");
+                        debug!("{pid}: the profile is “{}”", p.name);
                     }
                 }
                 Ok(())
             });
             if let Err(e) = r {
-                warn!("{pid}: updating the slots holding “{}”: {e:#}", p.name);
+                warn!("{pid}: updating the slots holding a profile: {e:#}");
+                debug!("{pid}: the profile is “{}”", p.name);
             }
         }
         drop(g);

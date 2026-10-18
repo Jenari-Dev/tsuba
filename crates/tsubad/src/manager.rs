@@ -557,7 +557,8 @@ impl Manager {
                 for id in tsuba_core::macros::ids(dev)? {
                     if tsuba_core::macros::hex(&tsuba_core::macros::read_name(dev, id)?.guid) == guid {
                         tsuba_core::macros::ensure_on_device(dev, &mac)?;
-                        tracing::info!("{pid}: updated macro {} (0x{id:04x})", mac.name);
+                        tracing::info!("{pid}: updated macro 0x{id:04x}");
+                        tracing::debug!("{pid}: macro 0x{id:04x} is {}", mac.name);
                     }
                 }
                 Ok(())

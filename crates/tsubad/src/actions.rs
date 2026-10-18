@@ -7,7 +7,7 @@ use std::process::{Command, Stdio};
 use std::sync::Mutex;
 
 use anyhow::{bail, Context, Result};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::config::{Action, DeviceOp, DpiConfig};
 use tsuba_core::{apply, percent_to_level, profiles, state};
 use tsuba_proto::{chroma, commands as c, decode};
@@ -172,7 +172,8 @@ impl Manager {
         let actions = self.config.lock().unwrap().device(pid).map(|d| d.actions.clone()).unwrap_or_default();
         for a in actions.iter().filter(|a| a.code == code) {
             if let Err(e) = self.run_action(&a.action, down) {
-                warn!("{pid}: action {}: {e:#}", a.action.label());
+                warn!("{pid}: an action failed: {e:#}");
+                debug!("{pid}: action {}: {e:#}", a.action.label());
             }
         }
     }
@@ -212,7 +213,7 @@ impl Manager {
                         Ok(true)
                     })?;
                     if fixed {
-                        info!("{pid}: key {k} now sends shortcut slot {} for {}", a.code, a.action.label());
+                        debug!("{pid}: key {k} now sends shortcut slot {} for {}", a.code, a.action.label());
                     }
                 }
                 if cfg.devices[di].actions[ai] != a {
@@ -253,13 +254,13 @@ impl Manager {
     fn run_action(&self, action: &Action, down: bool) -> Result<()> {
         match action {
             Action::Launch { command } if down => {
-                info!("launch: {command}");
+                debug!("launch: {command}");
                 let mut cmd = Command::new("sh");
                 cmd.arg("-c").arg(command);
                 spawn_detached(cmd)
             }
             Action::Url { url } if down => {
-                info!("open: {url}");
+                debug!("open: {url}");
                 let mut cmd = Command::new("xdg-open");
                 cmd.arg(url);
                 spawn_detached(cmd)
@@ -470,7 +471,8 @@ impl Manager {
         match command {
             Some(command) => {
                 if let Err(e) = self.run_action(&Action::Launch { command: command.clone() }, true) {
-                    warn!("macro command {command:?}: {e:#}");
+                    warn!("a macro command failed: {e:#}");
+                    debug!("macro command {command:?}: {e:#}");
                 }
             }
             None => warn!("a macro played shortcut slot {code}, but no macro has a command for it"),
@@ -504,7 +506,8 @@ impl Manager {
         // The action is saved either way; a desktop that doesn't answer gets the list again at
         // the next start.
         if let Err(e) = crate::shortcuts::register(&self.slot_entries()) {
-            warn!("registering the shortcut for {label}: {e:#}");
+            warn!("registering a shortcut: {e:#}");
+            debug!("registering the shortcut for {label}: {e:#}");
         }
         Ok(label)
     }

@@ -41,6 +41,8 @@ pub struct Manager {
     pub(crate) link_state: Mutex<crate::applinks::LinkState>,
     /// The linked game currently applied (a copy of `link_state.current`, short-held).
     pub(crate) link_active: Mutex<Option<String>>,
+    /// Wakes the app-links thread early (the focus changed); the flag coalesces bursts.
+    pub(crate) link_wake: (Mutex<bool>, std::sync::Condvar),
     /// The single writer of `app-links.json` inside the daemon: every load → change → save
     /// of the linked games list holds it (see [`crate::applinks`]).
     pub(crate) links_lock: Mutex<()>,
@@ -77,7 +79,7 @@ pub enum GameRestore {
 impl Manager {
     pub fn new(read_only: bool, config_path: PathBuf, events: EventTx) -> Result<Self> {
         let config = Config::load(&config_path)?;
-        Ok(Self { read_only, config_path, config: Mutex::new(config), devices: Mutex::new(BTreeMap::new()), studios: Mutex::new(HashMap::new()), events, actions: Default::default(), idle_since: Mutex::new(None), dimmed: Mutex::new(HashMap::new()), link_state: Mutex::new(Default::default()), link_active: Mutex::new(None), links_lock: Mutex::new(()), gm_lock: Mutex::new(()), cache: Default::default(), warming: Default::default(), game_held: Mutex::new(HashMap::new()), lib_lock: Mutex::new(()), library_tx: Mutex::new(None) })
+        Ok(Self { read_only, config_path, config: Mutex::new(config), devices: Mutex::new(BTreeMap::new()), studios: Mutex::new(HashMap::new()), events, actions: Default::default(), idle_since: Mutex::new(None), dimmed: Mutex::new(HashMap::new()), link_state: Mutex::new(Default::default()), link_active: Mutex::new(None), link_wake: (Mutex::new(false), std::sync::Condvar::new()), links_lock: Mutex::new(()), gm_lock: Mutex::new(()), cache: Default::default(), warming: Default::default(), game_held: Mutex::new(HashMap::new()), lib_lock: Mutex::new(()), library_tx: Mutex::new(None) })
     }
 
     /// Attach new devices, drop vanished ones. Returns (added, removed) pids.

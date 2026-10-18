@@ -108,3 +108,57 @@ mod lighting {
         assert!(mgr.config.lock().unwrap().device("028d").unwrap().zones.is_empty());
     }
 }
+
+#[test]
+fn focus_changes_wake_the_link_thread_instead_of_spawning_one_each() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
+    let dir = std::env::temp_dir().join(format!("tsuba-wake-test-{}", std::process::id()));
+    let mgr = crate::manager::Manager::new(false, dir.join("config.toml"), tx).unwrap();
+    for i in 0..200 {
+        mgr.focus_changed(tsuba_core::app_links::FocusInfo { pid: i, ..Default::default() });
+    }
+    assert!(mgr.link_wait(std::time::Duration::from_secs(5)), "woken by the focus change");
+    assert!(!mgr.link_wait(std::time::Duration::from_millis(10)), "a burst is one wake-up");
+    assert_eq!(mgr.actions.focus.lock().unwrap().as_ref().map(|f| f.pid), Some(199));
+}
+
+mod resets {
+    use super::*;
+    use tsuba_core::config::GameModeConfig;
+    use tsuba_core::library::{self as lib, DeviceLibrary};
+
+
+    #[test]
+    fn resets_resync_the_library_and_game_mode() {
+        let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        let (mgr, sim) = rig("028d", 1);
+        mgr.library_migrate("028d").unwrap();
+        let id = mgr.library_create("028d", "Game", "").unwrap();
+        mgr.library_activate("028d", &id).unwrap();
+        mgr.set_game_mode("028d", GameModeConfig { disable_win: true, block_shortcuts: false, active: true, ..Default::default() }).unwrap();
+        assert_eq!(sim.lock().unwrap().profiles[&1].tables[0][&127].0, 0, "Win key off");
+        let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
+        assert_eq!(l.holder(1).map(|p| p.id.clone()), Some(id.clone()));
+        let phrase = crate::dbus_device::profile_reset_phrase(1);
+        mgr.reset_profile("028d", 1, &phrase).unwrap();
+        let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
+        assert!(l.holder(1).is_none(), "the slot no longer holds the profile");
+        let gm = mgr.game_mode("028d");
+        assert!(gm.active);
+        // Game Mode keeps the key off in the reset slot and records the reset slot's binding.
+        assert_eq!(sim.lock().unwrap().profiles[&1].tables[0][&127].0, 0);
+        assert_eq!(gm.saved.len(), 1);
+        // Factory reset: all bookkeeping goes, and Game Mode is turned off in the new slot 1 again.
+        let name = crate::dbus_device::factory_reset_phrase(&mgr.model_for("028d").unwrap());
+        mgr.factory_reset("028d", &name).unwrap();
+        let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
+        assert!(l.state.holds.is_empty() && l.state.seen.is_empty());
+        let gm = mgr.game_mode("028d");
+        assert!(gm.active && gm.saved.len() == 1);
+        assert_eq!(sim.lock().unwrap().profiles[&1].tables[0][&127].0, 0);
+        // The library learns the device again.
+        mgr.library_migrate("028d").unwrap();
+        assert!(!DeviceLibrary::load(&lib::root(), "028d").unwrap().state.seen.is_empty());
+    }
+}

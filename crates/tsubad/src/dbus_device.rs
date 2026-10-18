@@ -38,7 +38,7 @@ pub fn profile_reset_phrase(slot: u8) -> String {
 }
 
 impl Manager {
-    fn model_for(&self, pid: &str) -> Result<tsuba_hid::Model> {
+    pub(crate) fn model_for(&self, pid: &str) -> Result<tsuba_hid::Model> {
         self.devices.lock().unwrap().get(pid).map(|a| a.model).ok_or_else(|| anyhow!("no device {pid}"))
     }
 
@@ -105,7 +105,14 @@ impl Manager {
         ensure!(confirm == profile_reset_phrase(slot), "type \"{}\" to confirm the reset", profile_reset_phrase(slot));
         let msg = {
             let _held = self.lib_lock.lock().unwrap();
-            self.with_device(pid, |dev, model| features::reset_profile(dev, model, slot))?
+            // Game Mode's keys go back first and are turned off again in the reset slot, so
+            // its saved bindings never describe a slot that no longer has them.
+            let msg = self.with_game_mode_keys_given_back(pid, || self.with_device(pid, |dev, model| features::reset_profile(dev, model, slot)))?;
+            // The slot no longer holds the library profile that was in it.
+            self.forget_library_state(pid, |st| {
+                st.holds.remove(&slot);
+            });
+            msg
         };
         warn!("{pid}: {msg}");
         self.refresh_cache(pid);
@@ -122,12 +129,30 @@ impl Manager {
         self.stop_studio(pid);
         let msg = {
             let _held = self.lib_lock.lock().unwrap();
-            self.with_device(pid, |dev, model| features::factory_reset(dev, model))?
+            let msg = self.with_game_mode_keys_given_back(pid, || self.with_device(pid, |dev, model| features::factory_reset(dev, model)))?;
+            // Every on-board profile and macro is gone: the library learns the device again.
+            self.forget_library_state(pid, |st| {
+                st.holds.clear();
+                st.seen.clear();
+                st.uploaded_macros.clear();
+            });
+            msg
         };
         warn!("{pid}: {msg}");
         self.refresh_cache(pid);
         self.library_changed(pid);
         Ok(msg)
+    }
+
+    /// Change the library's bookkeeping about the device (call with `lib_lock` held).
+    fn forget_library_state(&self, pid: &str, f: impl FnOnce(&mut tsuba_core::library::LibraryState)) {
+        let r = tsuba_core::library::DeviceLibrary::load(&tsuba_core::library::root(), pid).and_then(|mut l| {
+            f(&mut l.state);
+            l.save_state()
+        });
+        if let Err(e) = r {
+            warn!("{pid}: updating the profile library after the reset: {e:#}");
+        }
     }
 
     pub(crate) fn edit_device_config(&self, pid: &str, f: impl FnOnce(&mut tsuba_core::DeviceConfig)) -> Result<()> {

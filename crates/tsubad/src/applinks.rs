@@ -118,14 +118,23 @@ impl Manager {
     }
 
     /// The window with the keyboard focus changed (reported by the KWin script): links that
-    /// only apply while their game has the focus follow it at once.
-    pub fn focus_changed(self: &Arc<Self>, info: app_links::FocusInfo) {
+    /// only apply while their game has the focus follow it at once. Only wakes the app-links
+    /// thread, so a burst of focus changes costs one check, not one thread each.
+    pub fn focus_changed(&self, info: app_links::FocusInfo) {
         *self.actions.focus.lock().unwrap() = Some(info);
         if self.read_only {
             return;
         }
-        let m = self.clone();
-        std::thread::spawn(move || m.link_tick());
+        *self.link_wake.0.lock().unwrap() = true;
+        self.link_wake.1.notify_one();
+    }
+
+    /// Wait up to `max` for [`Self::focus_changed`]; true when woken by it.
+    pub(crate) fn link_wait(&self, max: Duration) -> bool {
+        let (flag, cv) = &self.link_wake;
+        let g = flag.lock().unwrap();
+        let (mut g, _) = cv.wait_timeout_while(g, max, |woken| !*woken).unwrap();
+        std::mem::take(&mut *g)
     }
 
     /// `pid` if attached, else its attached wired/wireless twin.
@@ -304,7 +313,7 @@ pub fn spawn(mgr: Arc<Manager>) {
         .name("app-links".into())
         .spawn(move || loop {
             mgr.link_tick();
-            std::thread::sleep(Duration::from_secs(2));
+            mgr.link_wait(Duration::from_secs(2));
         })
         .ok();
 }

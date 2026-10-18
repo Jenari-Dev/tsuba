@@ -50,6 +50,11 @@ fn main() {
                 "qml/ApproxNote.qml",
                 "qml/UntestedBanner.qml",
                 "qml/DeviceInfoPage.qml",
+                "qml/SettingsPage.qml",
+                "qml/AboutPage.qml",
+                "qml/FirstRunPanel.qml",
+                "qml/DeviceStateBanner.qml",
+                "qml/SetupGuide.qml",
                 "qml/SupportedDevicesPage.qml",
             ]),
     )

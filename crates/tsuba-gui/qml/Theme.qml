@@ -3,8 +3,9 @@ pragma Singleton
 import QtQuick
 import QtCore
 
-// Dark palette and metrics. The accent is Tsuba's own jade by default and each user can pick
-// any colour in Appearance (stored in ~/.config/tsuba/app.ini).
+// Palette and metrics. Dark, light or automatic (follows the desktop's colour scheme); the accent is
+// Tsuba's own jade by default and each user can pick any colour in Settings (all of it is stored in
+// ~/.config/tsuba/app.ini).
 QtObject {
     readonly property color defaultAccent: "#1fc9a7"
     property Settings prefs: Settings {
@@ -13,7 +14,28 @@ QtObject {
         property string accent: "#1fc9a7"
         // "builtin" = always Tsuba's line-art device drawings; "auto" = a personal picture pack if present.
         property string art: "auto"
+        // "auto" follows the desktop colour scheme; "dark" / "light" force one.
+        property string themeMode: "auto"
     }
+    // App behaviour (Settings page): [app] group of the same file.
+    property Settings app: Settings {
+        location: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/tsuba/app.ini"
+        category: "app"
+        // "system" or a language code such as "ja"; read by the app at start (restart to change).
+        property string language: "system"
+        // Close button hides the window to the tray (only used while a tray exists).
+        property bool closeToTray: true
+        // Which page the app opens on: "home" or "last" (the page open when it was closed).
+        property string startPage: "home"
+        property string lastPage: ""
+        property bool showTips: true
+        // Welcome screen shown once; reset from Settings.
+        property bool onboarded: false
+        // Conflict banners the user dismissed (JSON array of ids).
+        property string dismissedConflicts: "[]"
+    }
+    // The scheme actually in use. Unknown (headless / no portal) counts as dark, Tsuba's original look.
+    readonly property bool dark: prefs.themeMode === "dark" || (prefs.themeMode !== "light" && Qt.styleHints.colorScheme !== Qt.Light)
     // Where a pack view's picture sits in the drawing's coordinate space: [x, y, w, h].
     // `imageRect` is set when the user placed their own picture over Tsuba's drawing.
     function imageRect(view) {
@@ -37,32 +59,48 @@ QtObject {
         prefs.accent = String(c);
     }
 
-    readonly property color bg: "#212121"
-    readonly property color sidebar: "#000000"
-    readonly property color bar: "#222222"
-    readonly property color panel: "#1a1a1a"
-    readonly property color card: "#1a1a1a"
-    readonly property color sliderRest: Qt.rgba(accent.r * 0.38, accent.g * 0.38, accent.b * 0.38, 1)
-    readonly property color accentText: "#101010"
-    readonly property color chrome: "#000000"
-    readonly property color panelRaised: "#2d2d2d"
-    readonly property color line: "#000000"
-    readonly property color border: "#5d5d5d"
-    readonly property color borderSoft: "#383838"
-    readonly property color text: "#d3d3d3"
-    readonly property color textBright: "#ffffff"
-    readonly property color textDim: "#707070"
-    readonly property color textMuted: "#5d5d5d"
-    readonly property color accent: prefs.accent
+    // ---- colours: [dark, light]
+    readonly property color bg: dark ? "#212121" : "#f1f3f4"
+    readonly property color sidebar: dark ? "#000000" : "#e2e6e8"
+    readonly property color bar: dark ? "#222222" : "#e6e9eb"
+    readonly property color panel: dark ? "#1a1a1a" : "#ffffff"
+    readonly property color card: dark ? "#1a1a1a" : "#ffffff"
+    readonly property color sliderRest: dark ? Qt.rgba(accent.r * 0.38, accent.g * 0.38, accent.b * 0.38, 1) : Qt.rgba(accent.r * 0.25 + 0.65, accent.g * 0.25 + 0.65, accent.b * 0.25 + 0.65, 1)
+    // Text on a filled accent surface.
+    readonly property color accentText: dark ? "#101010" : "#ffffff"
+    readonly property color chrome: dark ? "#000000" : "#dde1e3"
+    readonly property color panelRaised: dark ? "#2d2d2d" : "#e9edef"
+    readonly property color line: dark ? "#000000" : "#cfd5d8"
+    readonly property color border: dark ? "#5d5d5d" : "#8d979c"
+    readonly property color borderSoft: dark ? "#383838" : "#d3d9dc"
+    readonly property color text: dark ? "#d3d3d3" : "#2b3135"
+    readonly property color textBright: dark ? "#ffffff" : "#000000"
+    readonly property color textDim: dark ? "#707070" : "#5b666c"
+    readonly property color textMuted: dark ? "#5d5d5d" : "#78838a"
+    // Greyed switch / checkbox and hover surfaces shared by the Syn* controls.
+    readonly property color inactive: dark ? "#4a4a4a" : "#b4bcc1"
+    readonly property color knob: dark ? "#d3d3d3" : "#ffffff"
+    readonly property color hoverFill: dark ? "#2d2d2d" : "#e2e7e9"
+    readonly property color hoverTint: dark ? "#1affffff" : "#14000000"
+    readonly property color navText: dark ? "#a0a0a0" : "#4a5358"
+    // In the light scheme a pale accent gets darker so it stays readable as text on white.
+    readonly property color userAccent: prefs.accent
+    readonly property color accent: dark ? userAccent : Qt.hsla(userAccent.hslHue, userAccent.hslSaturation, Math.min(userAccent.hslLightness, 0.36), 1)
     readonly property color accentHover: Qt.darker(accent, 1.12)
     // Translucent accent for selected rows / chips.
     readonly property color accentTint: Qt.rgba(accent.r, accent.g, accent.b, 0.10)
     readonly property color accentTintMid: Qt.rgba(accent.r, accent.g, accent.b, 0.13)
     readonly property color accentTintStrong: Qt.rgba(accent.r, accent.g, accent.b, 0.20)
-    readonly property color warn: "#fd8611"
-    readonly property color danger: "#c8323c"
-    readonly property color keyFace: "#1d1d1d"
-    readonly property color keyEdge: "#3a3a3a"
+    readonly property color warn: dark ? "#fd8611" : "#b85a00"
+    readonly property color danger: dark ? "#c8323c" : "#b3202b"
+    readonly property color keyFace: dark ? "#1d1d1d" : "#eceff1"
+    readonly property color keyEdge: dark ? "#3a3a3a" : "#b9c1c5"
+
+    // Where the project lives (the one place this address is written in QML).
+    readonly property string projectUrl: "https://github.com/JenAriDev/tsuba"
+    function docsUrl(name) {
+        return projectUrl + "/blob/main/docs/" + name;
+    }
 
     readonly property string font: "Roboto"
     // Razer's title face is proprietary and not shipped; Qt falls back to Roboto / the system sans.

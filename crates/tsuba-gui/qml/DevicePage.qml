@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Dialogs
 import QtQuick.Layouts
 
 // One device: header, CUSTOMIZE / PERFORMANCE / LIGHTING tabs (Synapse layout).
@@ -29,6 +30,97 @@ Rectangle {
         return (lib.profiles || []).find(p => p.id === id) || null;
     }
 
+    // The helper for the Library interface (import / export, factory template, lighting).
+    property alias lp: provider
+    LibProvider {
+        id: provider
+    }
+    // Linked games per library profile id: names of the apps that switch to it on this device.
+    property var linkedApps: ({})
+    function loadLinks() {
+        const s = backend.app_links ? backend.app_links() : "";
+        const map = {};
+        if (s !== "") {
+            JSON.parse(s).links.forEach(l => {
+                const ref = l.device_profiles ? l.device_profiles[pid] : undefined;
+                if (typeof ref === "string") {
+                    (map[ref] = map[ref] || []).push(l.name || l.matches);
+                }
+            });
+        }
+        linkedApps = map;
+    }
+    // Profile file names: "<name>.tsuba-profile.json".
+    function fileNameFor(p) {
+        return (p.name.replace(/[^\w .-]+/g, "_").trim() || "profile") + ".tsuba-profile.json";
+    }
+    function importFiles(urls) {
+        let ok = 0;
+        const failed = [];
+        urls.forEach(u => {
+            const path = lp.pathOfUrl(u);
+            if (lp.call("Tsuba1.ImportLibraryProfile", [pid, path]) !== null) {
+                ok++;
+            } else {
+                failed.push(path.split("/").pop() + ": " + lp.error);
+            }
+        });
+        profileStatus = (ok > 0 ? "Imported " + ok + (ok === 1 ? " profile" : " profiles") : "") + (failed.length ? (ok > 0 ? "; " : "Failed: ") + failed.join("; ") : "");
+        loadProfiles();
+        Theme.profilesRev++;
+    }
+    function exportOne(url) {
+        const p = current;
+        const path = lp.pathOfUrl(url);
+        profileStatus = lp.call("Tsuba1.ExportLibraryProfile", [pid, p.id, path]) !== null ? "Exported “" + p.name + "”" : "Failed: " + lp.error;
+    }
+    function exportMany(url) {
+        const ids = Object.keys(exportSel).filter(k => exportSel[k]);
+        const r = lp.json("ExportLibraryProfiles", [pid, JSON.stringify(ids), lp.pathOfUrl(url)], null);
+        profileStatus = r ? "Exported " + r.length + (r.length === 1 ? " profile" : " profiles") : "Failed: " + lp.error;
+    }
+    // Profiles ticked in the "Export…" list.
+    property var exportSel: ({})
+    function selectAllForExport(on) {
+        const m = {};
+        (lib.profiles || []).forEach(p => m[p.id] = on);
+        exportSel = m;
+    }
+    readonly property int exportCount: Object.keys(exportSel).filter(k => exportSel[k]).length
+    // Lighting that follows the profile.
+    function setProfileLighting(on) {
+        const p = current;
+        if (!p) {
+            return;
+        }
+        const ok = lp.call("SetProfileLighting", [pid, p.id, on ? "current" : "off"]) !== null;
+        profileAction(ok, on ? "“" + p.name + "” now keeps its own lighting" : "“" + p.name + "” no longer changes the lighting");
+        if (!ok) {
+            profileStatus = "Failed: " + lp.error;
+        }
+    }
+
+    FileDialog {
+        id: importDlg
+        title: "Import profiles"
+        fileMode: FileDialog.OpenFiles
+        nameFilters: ["Tsuba profiles (*.tsuba-profile.json *.json)", "All files (*)"]
+        onAccepted: page.importFiles(selectedFiles)
+    }
+    FileDialog {
+        id: exportDlg
+        title: "Export profile"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "json"
+        nameFilters: ["Tsuba profiles (*.tsuba-profile.json)", "All files (*)"]
+        onAccepted: page.exportOne(selectedFile)
+    }
+    FolderDialog {
+        id: exportDirDlg
+        title: "Export the chosen profiles to a folder"
+        onAccepted: page.exportMany(selectedFolder)
+    }
+
     function currentName() {
         if (current) {
             return current.name;
@@ -46,6 +138,7 @@ Rectangle {
         const before = lib.active;
         const beforeSlot = lib.active_slot;
         lib = JSON.parse(s);
+        loadLinks();
         if (lib.active_slot) {
             profile = lib.active_slot;
         }
@@ -137,6 +230,52 @@ Rectangle {
             anchors.centerIn: parent
             text: "SLOT " + parent.slot
             color: parent.held ? Theme.textDim : Theme.borderSoft
+            font.family: Theme.font
+            font.pixelSize: 9
+            font.letterSpacing: 1
+        }
+    }
+
+    // Small padlock (our own drawing): the profile is stored on the device itself, so it works
+    // without Tsuba.
+    component LockIcon: Item {
+        property bool held: true
+        implicitWidth: 12
+        implicitHeight: 15
+        Rectangle {
+            x: 2
+            y: 0
+            width: 8
+            height: 9
+            radius: 4
+            color: "transparent"
+            border.width: 1.5
+            border.color: parent.held ? Theme.textDim : Theme.borderSoft
+        }
+        Rectangle {
+            x: 0
+            y: 6
+            width: 12
+            height: 9
+            radius: 2
+            color: parent.held ? Theme.textDim : Theme.borderSoft
+        }
+    }
+    // Names of the games linked to a profile.
+    component LinkBadge: Rectangle {
+        property var apps: []
+        implicitWidth: lbt.implicitWidth + 10
+        implicitHeight: 16
+        radius: 2
+        color: Theme.accentTint
+        border.color: Theme.accent
+        Text {
+            id: lbt
+            anchors.centerIn: parent
+            width: Math.min(implicitWidth, 130)
+            elide: Text.ElideRight
+            text: parent.apps.length === 1 ? parent.apps[0].toUpperCase() : parent.apps.length + " GAMES"
+            color: Theme.accent
             font.family: Theme.font
             font.pixelSize: 9
             font.letterSpacing: 1
@@ -403,6 +542,16 @@ Rectangle {
                                             font.pixelSize: Theme.fontSize
                                             elide: Text.ElideRight
                                         }
+                                        LinkBadge {
+                                            objectName: "linkBadge"
+                                            visible: !!page.linkedApps[modelData.id]
+                                            apps: page.linkedApps[modelData.id] || []
+                                        }
+                                        LockIcon {
+                                            objectName: "lockIcon"
+                                            visible: modelData.pinned_slot !== null && modelData.pinned_slot !== undefined
+                                            held: modelData.in_slot
+                                        }
                                         SlotBadge {
                                             visible: modelData.pinned_slot !== null && modelData.pinned_slot !== undefined
                                             slot: modelData.pinned_slot || 0
@@ -534,6 +683,16 @@ Rectangle {
                                 }
                             }
                             MenuRow {
+                                objectName: "menuFactory"
+                                caption: "New from factory defaults"
+                                enabled: !page.writesBlocked && page.switching === ""
+                                onPicked: {
+                                    nameField.text = "Factory defaults";
+                                    page.nameMode = "factory";
+                                    nameField.forceActiveFocus();
+                                }
+                            }
+                            MenuRow {
                                 caption: "Rename"
                                 enabled: !!page.current
                                 onPicked: {
@@ -576,6 +735,49 @@ Rectangle {
                                     }
                                 }
                             }
+                            MenuRow {
+                                objectName: "menuLighting"
+                                readonly property bool has: !!page.current && !!page.current.lighting
+                                caption: has ? "✓ Lighting follows this profile (" + page.current.lighting.effect + ")" : "Lighting follows this profile"
+                                enabled: !!page.current && !page.writesBlocked && page.switching === ""
+                                onPicked: page.setProfileLighting(!has)
+                            }
+                            Rectangle {
+                                visible: page.nameMode === ""
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+                                color: Theme.borderSoft
+                            }
+                            MenuRow {
+                                objectName: "menuImport"
+                                caption: "Import…"
+                                enabled: !page.writesBlocked
+                                onPicked: {
+                                    moreMenu.close();
+                                    importDlg.currentFolder = page.lp.homeUrl();
+                                    importDlg.open();
+                                }
+                            }
+                            MenuRow {
+                                objectName: "menuExport"
+                                caption: "Export…"
+                                enabled: !!page.current
+                                onPicked: {
+                                    moreMenu.close();
+                                    exportDlg.currentFolder = page.lp.homeUrl();
+                                    exportDlg.currentFile = page.lp.homeUrl() + "/" + page.fileNameFor(page.current);
+                                    exportDlg.open();
+                                }
+                            }
+                            MenuRow {
+                                objectName: "menuExportMany"
+                                caption: "Export several…"
+                                enabled: (page.lib.profiles || []).length > 0
+                                onPicked: {
+                                    page.exportSel = ({});
+                                    page.nameMode = "exportmany";
+                                }
+                            }
                             Rectangle {
                                 visible: page.nameMode === ""
                                 Layout.fillWidth: true
@@ -596,6 +798,61 @@ Rectangle {
                                 onPicked: {
                                     moreMenu.close();
                                     synapseDlg.open("device:" + page.pid);
+                                }
+                            }
+                            // Export several profiles: tick them, then choose a folder.
+                            ColumnLayout {
+                                objectName: "exportManyPanel"
+                                visible: page.nameMode === "exportmany"
+                                Layout.fillWidth: true
+                                Layout.margins: 12
+                                spacing: 6
+                                Text {
+                                    text: "Export profiles"
+                                    color: Theme.textDim
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.small
+                                }
+                                SynCheckBox {
+                                    objectName: "exportAll"
+                                    text: "Select all"
+                                    checked: page.exportCount === (page.lib.profiles || []).length && page.exportCount > 0
+                                    onToggled: page.selectAllForExport(checked)
+                                }
+                                Repeater {
+                                    model: page.lib.profiles || []
+                                    delegate: SynCheckBox {
+                                        required property var modelData
+                                        objectName: "export_" + modelData.id
+                                        text: modelData.name
+                                        checked: !!page.exportSel[modelData.id]
+                                        onToggled: {
+                                            const m = Object.assign({}, page.exportSel);
+                                            m[modelData.id] = checked;
+                                            page.exportSel = m;
+                                        }
+                                    }
+                                }
+                                RowLayout {
+                                    spacing: 8
+                                    SynButton {
+                                        text: "Cancel"
+                                        implicitWidth: 80
+                                        onClicked: page.nameMode = ""
+                                    }
+                                    SynButton {
+                                        objectName: "exportChosen"
+                                        text: "Export…"
+                                        primary: true
+                                        implicitWidth: 90
+                                        enabled: page.exportCount > 0
+                                        onClicked: {
+                                            page.nameMode = "";
+                                            moreMenu.close();
+                                            exportDirDlg.currentFolder = page.lp.homeUrl();
+                                            exportDirDlg.open();
+                                        }
+                                    }
                                 }
                             }
                             // Delete confirmation.
@@ -634,12 +891,12 @@ Rectangle {
                             }
                             // Name entry for new / duplicate / rename.
                             ColumnLayout {
-                                visible: page.nameMode !== "" && page.nameMode !== "delete"
+                                visible: ["new", "rename", "duplicate", "factory"].indexOf(page.nameMode) >= 0
                                 Layout.fillWidth: true
                                 Layout.margins: 12
                                 spacing: 8
                                 Text {
-                                    text: page.nameMode === "rename" ? "Rename profile" : (page.nameMode === "duplicate" ? "Duplicate as" : "New profile")
+                                    text: page.nameMode === "rename" ? "Rename profile" : (page.nameMode === "duplicate" ? "Duplicate as" : (page.nameMode === "factory" ? "New profile with factory settings" : "New profile"))
                                     color: Theme.textDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
@@ -668,6 +925,14 @@ Rectangle {
                                             const n = nameField.text.trim();
                                             if (page.nameMode === "rename") {
                                                 page.profileAction(page.backend.rename_library_profile(page.pid, page.current.id, n), "Renamed");
+                                            } else if (page.nameMode === "factory") {
+                                                const id = page.lp.call("CreateFactoryProfile", [page.pid, n]);
+                                                page.profileAction(id !== null, "Created “" + n + "” with factory settings");
+                                                if (id !== null) {
+                                                    page.activate(id);
+                                                } else {
+                                                    page.profileStatus = "Failed: " + page.lp.error;
+                                                }
                                             } else {
                                                 const id = page.nameMode === "duplicate" ? page.backend.duplicate_library_profile(page.pid, page.current.id, n) : page.backend.create_library_profile(page.pid, n, "");
                                                 page.profileAction(id !== "", "Created “" + n + "”");
@@ -757,6 +1022,8 @@ Rectangle {
                     backend: page.backend
                     pid: page.pid
                     profile: page.profile
+                    profileId: page.lib.active || ""
+                    profileCount: (page.lib.profiles || []).length
                     rev: page.libRev
                     isMouse: page.isMouse
                     readOnly: page.writesBlocked

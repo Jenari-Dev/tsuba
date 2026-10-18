@@ -1622,6 +1622,7 @@ dependencies = [
  "cxx-qt",
  "cxx-qt-build",
  "cxx-qt-lib",
+ "dirs",
  "serde",
  "serde_json",
  "tsuba-core",

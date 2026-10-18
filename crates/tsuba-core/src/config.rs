@@ -472,6 +472,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn game_mode_combos_match_the_gui_list() {
+        let qml = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../tsuba-gui/qml/GameModeCombos.qml")).unwrap();
+        for (name, _, _) in GAME_MODE_COMBOS {
+            assert!(qml.contains(&format!("[\"{name}\",")), "GameModeCombos.qml lacks {name}");
+        }
+        assert_eq!(qml.matches("[\"").count(), GAME_MODE_COMBOS.len(), "GameModeCombos.qml lists other combinations than the daemon knows");
+        // Key codes: Alt+Tab, Meta alone and with letters, Ctrl+Esc.
+        let n = |s: &str| vec![s.to_string()];
+        assert!(combo_blocks(&n("alt_tab"), 0x0900_0001) && !combo_blocks(&n("alt_tab"), 0x1100_0001));
+        assert!(combo_blocks(&n("meta"), 0x1100_0001) && combo_blocks(&n("meta"), 0x0100_0022) && !combo_blocks(&n("meta"), 0x0900_0033));
+        assert!(!combo_blocks(&[], 0x0900_0001));
+    }
+
+    #[test]
     fn toml_roundtrip() {
         let c = Config {
             devices: vec![DeviceConfig {

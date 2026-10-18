@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 use anyhow::{anyhow, bail, ensure, Context, Result};
 use serde::Serialize;
 use serde_json::{json, Value};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::app_links::ProfileRef;
 use tsuba_core::config::{ActionConfig, DialSlotConfig, EffectConfig, Lighting};
 use tsuba_core::library::{self as lib, ActionBinding, DeviceLibrary, LibraryProfile, MacroBinding, Op};
@@ -220,7 +220,8 @@ impl Manager {
             }
             p.dial = dial.as_ref().map(|d| d.iter().map(|k| DialSlotConfig { function: k.function.clone(), colour: k.colour.clone(), enabled: k.enabled }).collect());
             p.pinned_slot = Some(slot);
-            info!("{pid}: on-board profile {slot} ({shown}) copied into the profile library");
+            info!("{pid}: on-board profile {slot} copied into the profile library");
+            debug!("{pid}: on-board profile {slot} is “{shown}”");
             added.push(format!("{shown} (slot {slot})"));
             l.set_holds(slot, &p.id);
             l.put(p)?;
@@ -302,7 +303,8 @@ impl Manager {
         // Macros Tsuba uploaded for profiles no slot runs any more go when memory runs low.
         a.macros_removed = self.gc_macros(pid, &mut l, &[], false);
         a.ms = t0.elapsed().as_millis() as u64;
-        info!("{pid}: library profile {:?} active in slot {slot} ({} write(s), {} ms{})", p.name, a.writes, a.ms, if a.warnings.is_empty() { String::new() } else { format!(", {} failed", a.warnings.len()) });
+        info!("{pid}: library profile active in slot {slot} ({} write(s), {} ms{})", a.writes, a.ms, if a.warnings.is_empty() { String::new() } else { format!(", {} failed", a.warnings.len()) });
+        debug!("{pid}: library profile {:?} is the one active in slot {slot}", p.name);
         drop(_g);
         self.library_changed(pid);
         Ok(a)
@@ -482,7 +484,8 @@ impl Manager {
                         match r {
                             Ok(()) => {
                                 let name = on_device.get(&id).map(|x| x.1.clone()).unwrap_or_default();
-                                info!("{pid}: removed unused macro {name:?} (0x{id:04x}) Tsuba had uploaded for a library profile");
+                                info!("{pid}: removed unused macro 0x{id:04x} Tsuba had uploaded for a library profile");
+                                debug!("{pid}: macro 0x{id:04x} was {name:?}");
                                 removed.push(name);
                                 l.state.uploaded_macros.remove(&id);
                                 dirty = true;
@@ -581,14 +584,18 @@ impl Manager {
                 if let Some(owner) = l.pinned(w).cloned() {
                     match self.write_into(pid, &owner, w, &on, &mut l) {
                         Ok(_) => l.set_holds(w, &owner.id),
-                        Err(e) => warn!("{pid}: restoring “{}” in slot {w}: {e:#}", owner.name),
+                        Err(e) => {
+                            warn!("{pid}: restoring a profile in slot {w}: {e:#}");
+                            debug!("{pid}: the profile was “{}”", owner.name);
+                        }
                     }
                 }
                 l.save_state()?;
             }
             Ok(a)
         })?;
-        info!("{pid}: “{}” pinned to slot {slot} ({} write(s))", p.name, a.writes);
+        info!("{pid}: profile pinned to slot {slot} ({} write(s))", a.writes);
+        debug!("{pid}: “{}” is pinned to slot {slot}", p.name);
         drop(g);
         self.library_changed(pid);
         Ok(slot)
@@ -749,13 +756,15 @@ impl Manager {
                 let on = self.onboard(pid)?;
                 for s in held {
                     if let Err(e) = self.write_into(pid, &p, s, &on, &mut l) {
-                        warn!("{pid}: updating slot {s} with “{}”: {e:#}", p.name);
+                        warn!("{pid}: updating slot {s} with a profile: {e:#}");
+                        debug!("{pid}: the profile is “{}”", p.name);
                     }
                 }
                 Ok(())
             });
             if let Err(e) = r {
-                warn!("{pid}: updating the slots holding “{}”: {e:#}", p.name);
+                warn!("{pid}: updating the slots holding a profile: {e:#}");
+                debug!("{pid}: the profile is “{}”", p.name);
             }
         }
         drop(g);
@@ -769,9 +778,26 @@ impl Manager {
         std::fs::write(path, text).with_context(|| format!("writing {path}"))
     }
 
-    pub fn library_import(&self, pid: &str, path: &str) -> Result<String> {
-        let text = std::fs::read_to_string(path).with_context(|| format!("reading {path}"))?;
-        let mut p = lib::import(pid, &text)?;
+    /// What importing `path` would bring along that runs things on this computer (Launch, Open
+    /// URL and Type actions): `{"name", "software": [{"layer", "key", "kind", "text"}],
+    /// "digest"}`. The app shows the list and passes `digest` to [`Self::library_import`] to
+    /// approve exactly these.
+    pub fn library_import_preview(&self, pid: &str, path: &str) -> Result<serde_json::Value> {
+        let text = lib::read_import_file(path)?;
+        let imp = lib::import(pid, &text, "")?;
+        Ok(serde_json::json!({ "name": imp.profile.name, "software": imp.software, "digest": lib::approval_digest(&imp.software) }))
+    }
+
+    /// Add a profile from a file. Software actions in it are dropped unless `approved` is the
+    /// digest [`Self::library_import_preview`] gave for the file as it is now.
+    pub fn library_import(&self, pid: &str, path: &str, approved: &str) -> Result<String> {
+        let text = lib::read_import_file(path)?;
+        let imp = lib::import(pid, &text, approved)?;
+        ensure!(approved.is_empty() || imp.approved, "the file changed since it was shown: its commands are not what was approved");
+        if !imp.software.is_empty() && !imp.approved {
+            info!("{pid}: imported a profile without its {} software action(s) (not approved)", imp.software.len());
+        }
+        let mut p = imp.profile;
         let _g = self.lib_lock.lock().unwrap();
         let mut l = self.lib_load(pid)?;
         p.name = l.unique_name(&p.name, None);
@@ -804,7 +830,12 @@ impl Manager {
         if saved.as_ref() == Some(light) {
             return Ok(false);
         }
-        self.store_lighting(pid, light.clone())?;
+        // The profile's lighting covers every zone: per-zone effects from before would
+        // otherwise come back over it at the next restore.
+        self.edit_device_config(pid, |dc| {
+            dc.lighting = Some(light.clone());
+            dc.zones.clear();
+        })?;
         // A game is lighting the device: this is what to put back afterwards.
         if self.game_defer(pid, crate::manager::GameRestore::Lighting(light.clone())) {
             return Ok(true);
@@ -1631,13 +1662,13 @@ pub(crate) mod tests {
         let id = mgr.library_save("00aa", &serde_json::to_string(&p).unwrap()).unwrap();
         let file = temp_config().join("exported.tsuba-profile.json");
         mgr.library_export("00aa", &id, file.to_str().unwrap()).unwrap();
-        let copy = mgr.library_import("00aa", file.to_str().unwrap()).unwrap();
+        let copy = mgr.library_import("00aa", file.to_str().unwrap(), "").unwrap();
         let l = mgr.lib_load("00aa").unwrap();
         assert_eq!(l.get(&copy).unwrap().synapse_guid, None, "two profiles with one Synapse GUID");
         assert_eq!(l.by_synapse("syn-exp").unwrap().id, id);
         // Into a library without it (e.g. another computer), the GUID comes along.
         mgr.library_delete("00aa", &id).unwrap();
-        let again = mgr.library_import("00aa", file.to_str().unwrap()).unwrap();
+        let again = mgr.library_import("00aa", file.to_str().unwrap(), "").unwrap();
         assert_eq!(mgr.lib_load("00aa").unwrap().get(&again).unwrap().synapse_guid.as_deref(), Some("syn-exp"));
     }
 

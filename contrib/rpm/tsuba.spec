@@ -13,12 +13,12 @@ ExclusiveArch:  x86_64
 
 BuildRequires:  cargo, rust, clang, pkgconf-pkg-config, gettext, systemd-rpm-macros
 BuildRequires:  qt6-qtbase-devel, qt6-qtdeclarative-devel, qt6-qtsvg-devel, kf6-ki18n-devel
-BuildRequires:  pipewire-devel, pulseaudio-libs-devel, mingw64-gcc, mingw32-gcc
+BuildRequires:  pipewire-devel, pulseaudio-libs-devel, libxkbcommon-devel, mingw64-gcc, mingw32-gcc
 Requires:       qt6-qtdeclarative, qt6-qtsvg, kf6-ki18n, qqc2-breeze-style
-Requires:       pipewire-libs, pulseaudio-libs, pulseaudio-utils, xdg-desktop-portal, xdg-utils
+Requires:       libxkbcommon, xkeyboard-config, pipewire-libs, pulseaudio-libs, pulseaudio-utils, xdg-desktop-portal, xdg-utils
 Requires:       google-roboto-fonts, systemd-udev
 Recommends:     kf6-kglobalaccel
-Suggests:       wine
+Suggests:       wine, wtype, ydotool, xdotool
 
 %description
 Remap keys and buttons, record macros, set DPI and lighting, and use Lighting Studio, without

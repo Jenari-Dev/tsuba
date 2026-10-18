@@ -93,7 +93,13 @@ impl AppRules {
 
     /// May the application with this key control the lighting?
     pub fn allowed(&self, key: &str) -> bool {
-        self.rules.get(key).copied().unwrap_or(!self.only_allowed)
+        match self.rules.get(key) {
+            Some(false) => false,
+            // A title is whatever the client says it is: in allow-list mode only a process
+            // name can earn access, so a program can't pass for an allowed game by naming itself.
+            Some(true) => !(self.only_allowed && key.starts_with("title:")),
+            None => !self.only_allowed,
+        }
     }
 
     /// Remember that an application connected.
@@ -147,7 +153,7 @@ fn tcp_inode(listing: &str, port: u16) -> Option<u64> {
         let f: Vec<&str> = line.split_whitespace().collect();
         let local = f.get(1)?;
         let (addr, p) = local.rsplit_once(':')?;
-        let loopback = addr == "0100007F" || addr == "00000000000000000000000001000000" || addr.ends_with("0000FFFF0100007F");
+        let loopback = addr == "0100007F" || addr == "00000000000000000000000001000000" || addr == "0000000000000000FFFF00000100007F";
         if loopback && u16::from_str_radix(p, 16).ok() == Some(port) {
             return f.get(9)?.parse().ok().filter(|i: &u64| *i != 0);
         }
@@ -1103,6 +1109,21 @@ mod app_rules_tests {
     }
 
     #[test]
+    fn a_title_never_earns_access_in_allow_list_mode() {
+        let mut r = AppRules { only_allowed: true, ..Default::default() };
+        r.set_rule("title:my game", Some(true)).unwrap();
+        assert!(!r.allowed("title:my game"), "titles are client-supplied");
+        r.set_rule("game.exe", Some(true)).unwrap();
+        assert!(r.allowed("game.exe"));
+        // Outside allow-list mode a title rule works, and a block always wins.
+        r.only_allowed = false;
+        assert!(r.allowed("title:my game"));
+        r.set_rule("title:my game", Some(false)).unwrap();
+        r.only_allowed = true;
+        assert!(!r.allowed("title:my game"));
+    }
+
+    #[test]
     fn keys_prefer_the_process_name() {
         assert_eq!(app_key("Game.EXE", "My Game"), "game.exe");
         assert_eq!(app_key("", " My Game "), "title:my game");
@@ -1138,6 +1159,12 @@ mod app_rules_tests {
         let listing = "  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode\n   0: 0100007F:D431 0100007F:D3DB 01 00000000:00000000 00:00000000 00000000  1000        0 424242 1 0000000000000000 100 0 0 10 0\n   1: 0100007F:D3DB 0100007F:D431 01 00000000:00000000 00:00000000 00000000  1000        0 777 1 0000000000000000 100 0 0 10 0\n";
         assert_eq!(tcp_inode(listing, 0xD431), Some(424242));
         assert_eq!(tcp_inode(listing, 0x1234), None);
+        // /proc/net/tcp6 shows 127.0.0.1 on a dual-stack socket as a mapped address, and ::1.
+        let six = "  sl  local_address rem_address\n   0: 0000000000000000FFFF00000100007F:BA79 0000000000000000FFFF00000100007F:BACE 01 0:0 0:0 0 1000 0 555 1\n   1: 00000000000000000000000001000000:BA7A 00000000000000000000000001000000:BACF 01 0:0 0:0 0 1000 0 556 1\n   2: 20010DB8000000000000000000000001:BA7B 0000000000000000FFFF00000100007F:BACF 01 0:0 0:0 0 1000 0 557 1\n   3: 12345678ABCDEF000000FFFF0100007F:BA7C 0000000000000000FFFF00000100007F:BACF 01 0:0 0:0 0 1000 0 558 1\n";
+        assert_eq!(tcp_inode(six, 0xBA79), Some(555));
+        assert_eq!(tcp_inode(six, 0xBA7A), Some(556));
+        assert_eq!(tcp_inode(six, 0xBA7B), None, "a global address is not loopback");
+        assert_eq!(tcp_inode(six, 0xBA7C), None, "only the exact mapped form");
     }
 
     #[test]

@@ -28,7 +28,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 use serde_json::{json, Value};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::game_lighting::{result, Target};
 
 use crate::game_lighting::{self as gl, lock, AppInfo, GameLighting};
@@ -516,7 +516,8 @@ fn create_session(gl: &Arc<GameLighting>, sh: &Arc<Shared>, body: &Value, peer_p
     info.exe = if peer_port == 0 { String::new() } else { tsuba_core::game_lighting::peer_process(peer_port).unwrap_or_default() };
     // The user's allow / block list (per application).
     if !gl.admit(&info) {
-        info!("game lighting: refused {:?} ({:?}): blocked by the user", info.title, info.exe);
+        info!("game lighting: refused a program: blocked by the user");
+        debug!("game lighting: refused {:?} ({:?})", info.title, info.exe);
         return Response::result(result::ACCESS_DENIED);
     }
     let Some(id) = lock(&gl.engine).create(info.clone(), 0, Instant::now()) else {
@@ -536,7 +537,8 @@ fn create_session(gl: &Arc<GameLighting>, sh: &Arc<Shared>, body: &Value, peer_p
     lock(&gl.engine).set_port(id, port);
     lock(&sh.sessions).insert(id, listener);
     // Debug formatting: the strings come from the client (no control characters in the log).
-    info!("game lighting: session {id} for {:?} ({:?}) on port {port}", info.title, if info.author.is_empty() { "unknown author" } else { &info.author });
+    info!("game lighting: session {id} on port {port}");
+    debug!("game lighting: session {id} is for {:?} ({:?})", info.title, if info.author.is_empty() { "unknown author" } else { &info.author });
     gl.notify();
     // "devices" is a Tsuba extension (clients ignore unknown fields): which device classes are
     // attached, so the native bridge can answer QueryDevice truthfully.

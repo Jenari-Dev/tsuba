@@ -7,10 +7,11 @@
 //! GlobalShortcuts interface (GNOME, others — see [`crate::portal_shortcuts`]). KDE is used
 //! when it is there; the portal otherwise.
 
+use std::sync::atomic::{AtomicU8, Ordering};
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 use tsuba_core::config::slot_keys;
 use zbus::blocking::{Connection, MessageIterator};
 use zbus::message::Type;
@@ -34,17 +35,52 @@ pub struct SlotEntry {
 
 enum Backend {
     Kde(Connection),
-    Portal(crate::portal_shortcuts::Portal),
+    Portal(Arc<crate::portal_shortcuts::Portal>),
 }
 
-static ACTIVE: Mutex<Option<Backend>> = Mutex::new(None);
+/// The active backend. The lock is only held to clone the handle out: a registration (which
+/// can take a while on the portal) never blocks the other users of the backend.
+static ACTIVE: Mutex<Option<Arc<Backend>>> = Mutex::new(None);
+/// [`backend_name`] without taking any lock (0 none, 1 kde, 2 portal).
+static KIND: AtomicU8 = AtomicU8::new(0);
 
-/// Which backend registers the shortcuts: "kde", "portal" or "none".
+fn active() -> Option<Arc<Backend>> {
+    ACTIVE.lock().unwrap().clone()
+}
+
+fn set_active(b: Option<Backend>) {
+    KIND.store(
+        match &b {
+            None => 0,
+            Some(Backend::Kde(_)) => 1,
+            Some(Backend::Portal(_)) => 2,
+        },
+        Ordering::SeqCst,
+    );
+    *ACTIVE.lock().unwrap() = b.map(Arc::new);
+}
+
+/// Which backend registers the shortcuts: "kde", "portal" or "none". Never blocks.
 pub fn backend_name() -> &'static str {
-    match ACTIVE.lock().unwrap().as_ref() {
-        Some(Backend::Kde(_)) => "kde",
-        Some(Backend::Portal(_)) => "portal",
+    match KIND.load(Ordering::SeqCst) {
+        1 => "kde",
+        2 => "portal",
+        _ => "none",
+    }
+}
+
+/// How binding the shortcuts went: "none" (no backend), "ready", "pending" (the portal waits
+/// for the desktop, e.g. an approval dialog) or "failed" (see the log).
+pub fn backend_state() -> &'static str {
+    use crate::portal_shortcuts::{BIND_FAILED, BIND_PENDING};
+    match active().as_deref() {
         None => "none",
+        Some(Backend::Kde(_)) => "ready",
+        Some(Backend::Portal(p)) => match p.bind_state() {
+            BIND_PENDING => "pending",
+            BIND_FAILED => "failed",
+            _ => "ready",
+        },
     }
 }
 
@@ -77,7 +113,8 @@ fn kde_register(conn: &Connection, entries: &[SlotEntry]) -> Result<()> {
         let reply = conn.call_method(Some(SERVICE), "/kglobalaccel", Some("org.kde.KGlobalAccel"), "setShortcut", &(id, vec![qt_key(e.code)], 6u32))?;
         let got: Vec<i32> = reply.body().deserialize()?;
         if got != vec![qt_key(e.code)] {
-            warn!("shortcut for {} is taken in KDE (got {got:?})", e.label);
+            warn!("a shortcut is taken in KDE (got {got:?})");
+            debug!("shortcut for {} is taken", e.label);
         }
     }
     Ok(())
@@ -86,16 +123,20 @@ fn kde_register(conn: &Connection, entries: &[SlotEntry]) -> Result<()> {
 /// Register every slot in `entries` with the active backend (idempotent). Without a backend
 /// this does nothing: the key still sends its combination, nothing listens for it.
 pub fn register(entries: &[SlotEntry]) -> Result<()> {
-    match ACTIVE.lock().unwrap().as_ref() {
+    match active().as_deref() {
         Some(Backend::Kde(conn)) => kde_register(conn, entries),
-        Some(Backend::Portal(p)) => p.bind(entries),
+        // The desktop may ask the user first: bound in the background, the state is reported.
+        Some(Backend::Portal(p)) => {
+            p.bind_async(entries);
+            Ok(())
+        }
         None => Ok(()),
     }
 }
 
 /// Forget the shortcuts registered under these ids.
 pub fn unregister(ids: &[String]) {
-    match ACTIVE.lock().unwrap().as_ref() {
+    match active().as_deref() {
         Some(Backend::Kde(conn)) => {
             for id in ids {
                 let _ = conn.call_method(Some(SERVICE), "/kglobalaccel", Some("org.kde.KGlobalAccel"), "unregister", &(COMPONENT, id.as_str()));
@@ -110,7 +151,7 @@ pub fn unregister(ids: &[String]) {
 /// with run-command events were saved or deleted).
 pub fn sync(mgr: &Manager) {
     let entries = mgr.slot_entries();
-    if let Some(Backend::Kde(conn)) = ACTIVE.lock().unwrap().as_ref() {
+    if let Some(Backend::Kde(conn)) = active().as_deref() {
         if let Err(e) = kde_drop_stale(conn, &entries) {
             warn!("shortcuts: {e:#}");
         }
@@ -174,12 +215,12 @@ fn run(mgr: &Arc<Manager>) -> Result<()> {
 
 #[cfg(test)]
 pub(crate) fn clear_backend() {
-    *ACTIVE.lock().unwrap() = None;
+    set_active(None);
 }
 
 /// The portal backend publishes itself as the active one.
-pub(crate) fn set_portal(p: crate::portal_shortcuts::Portal) {
-    *ACTIVE.lock().unwrap() = Some(Backend::Portal(p));
+pub(crate) fn set_portal(p: Arc<crate::portal_shortcuts::Portal>) {
+    set_active(Some(Backend::Portal(p)));
 }
 
 fn run_kde(mgr: &Arc<Manager>, conn: Connection) -> Result<()> {
@@ -187,8 +228,9 @@ fn run_kde(mgr: &Arc<Manager>, conn: Connection) -> Result<()> {
     // Drop registrations left by earlier versions (e.g. the F13/Tools slot KDE uses itself).
     kde_drop_stale(&conn, &entries)?;
     kde_register(&conn, &entries)?;
-    *ACTIVE.lock().unwrap() = Some(Backend::Kde(conn.clone()));
-    let rule = MatchRule::builder().msg_type(Type::Signal).interface("org.kde.kglobalaccel.Component")?.build();
+    set_active(Some(Backend::Kde(conn.clone())));
+    // Only kglobalaccel's own signals count: anyone else on the bus could otherwise fire actions.
+    let rule = MatchRule::builder().msg_type(Type::Signal).sender(SERVICE)?.interface("org.kde.kglobalaccel.Component")?.build();
     info!("listening for Tsuba global shortcuts (KDE)");
     for msg in MessageIterator::for_match_rule(rule, &conn, None)? {
         let Ok(msg) = msg else { continue };

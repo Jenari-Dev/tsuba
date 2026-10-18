@@ -199,6 +199,11 @@ pub fn decide(s: &Settings, st: &mut State, now: Instant, input: &Input) -> Opti
 }
 
 /// Marketing-free display name for a device pid (hex string like "028d").
+/// `text` as plain text inside notification markup: `&`, `<` and `>` escaped.
+pub fn markup_escape(text: &str) -> String {
+    text.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+}
+
 pub fn device_name(pid: &str) -> String {
     u16::from_str_radix(pid, 16).ok().and_then(tsuba_hid::model).map(|m| m.name.to_string()).unwrap_or_else(|| pid.to_string())
 }
@@ -283,13 +288,15 @@ impl Sink for DBusSink {
                 hints.insert("suppress-sound", Value::from(true));
             }
             let timeout: i32 = if note.critical { 8000 } else { 3000 };
+            // Notification servers read the text as markup: a profile named "<b>x" or "A & B" is shown as typed.
+            let (title, body) = (markup_escape(&note.title), markup_escape(&note.body));
             let r = conn
                 .call_method(
                     Some("org.freedesktop.Notifications"),
                     "/org/freedesktop/Notifications",
                     Some("org.freedesktop.Notifications"),
                     "Notify",
-                    &("Tsuba", replaces, note.icon, note.title.as_str(), note.body.as_str(), Vec::<&str>::new(), hints, timeout),
+                    &("Tsuba", replaces, note.icon, title.as_str(), body.as_str(), Vec::<&str>::new(), hints, timeout),
                 )
                 .await;
             match r.and_then(|m| m.body().deserialize::<u32>()) {
@@ -436,6 +443,13 @@ mod tests {
         let mut st = State::default();
         assert_eq!(decide(&s, &mut st, t, &b).unwrap().body, "Battery full");
         assert!(decide(&s, &mut st, t + Duration::from_secs(5), &b).is_none());
+    }
+
+    #[test]
+    fn names_are_escaped_for_notification_markup() {
+        assert_eq!(markup_escape("A & B <b>x</b>"), "A &amp; B &lt;b&gt;x&lt;/b&gt;");
+        assert_eq!(markup_escape("&lt;"), "&amp;lt;", "no double-decoding surprises");
+        assert_eq!(markup_escape("Work"), "Work");
     }
 
     #[test]

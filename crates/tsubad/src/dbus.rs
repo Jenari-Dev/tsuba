@@ -194,7 +194,12 @@ impl Tsuba {
     async fn save_chroma_profile(&self, profile: String, apply: bool) -> fdo::Result<Vec<String>> {
         use tsuba_core::chroma_profiles as cp;
         self.mgr.ensure_writable().map_err(err)?;
-        let p: cp::ChromaProfile = serde_json::from_str(&profile).map_err(|e| fdo::Error::InvalidArgs(e.to_string()))?;
+        let mut p: cp::ChromaProfile = serde_json::from_str(&profile).map_err(|e| fdo::Error::InvalidArgs(e.to_string()))?;
+        // The same limits as for an imported file: layer counts, numbers, colours, pictures.
+        p.sanitise();
+        if p.name.is_empty() {
+            return Err(fdo::Error::InvalidArgs("the lighting profile needs a name".into()));
+        }
         let name = p.name.clone();
         let mgr = self.mgr.clone();
         logged(
@@ -412,10 +417,19 @@ impl Tsuba {
         logged(&format!("{pid}: export library profile"), blocking(move || mgr.library_export(&pid, &id, &path)).await)
     }
 
-    /// Add a profile from a file written by ExportLibraryProfile. Returns its id.
-    async fn import_library_profile(&self, pid: String, path: String) -> fdo::Result<String> {
+    /// What a profile file would bring along that runs on this computer (JSON, see the
+    /// daemon's `library_import_preview`): the app lists it for the user's approval.
+    async fn get_library_import_preview(&self, pid: String, path: String) -> fdo::Result<String> {
         let mgr = self.mgr.clone();
-        logged(&format!("{pid}: import library profile"), blocking(move || mgr.library_import(&pid, &path)).await)
+        Ok(blocking(move || mgr.library_import_preview(&pid, &path)).await?.to_string())
+    }
+
+    /// Add a profile from a file written by ExportLibraryProfile. Returns its id. Commands,
+    /// URLs and typed text in the file are left out unless `approved` is the digest the
+    /// preview gave for them.
+    async fn import_library_profile(&self, pid: String, path: String, approved: String) -> fdo::Result<String> {
+        let mgr = self.mgr.clone();
+        logged(&format!("{pid}: import library profile"), blocking(move || mgr.library_import(&pid, &path, &approved)).await)
     }
 
     /// The on-board slot unpinned profiles are written into (0 = whichever slot is active).

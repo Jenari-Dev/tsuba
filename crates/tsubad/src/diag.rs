@@ -218,7 +218,7 @@ pub struct Redactor {
 impl Redactor {
     pub fn new() -> Self {
         let home = std::env::var("HOME").ok().filter(|h| h.len() > 1);
-        let user = std::env::var("USER").ok().or_else(|| home.as_ref().and_then(|h| h.rsplit('/').next().map(str::to_string))).filter(|u| u.len() >= 3);
+        let user = std::env::var("USER").ok().or_else(|| home.as_ref().and_then(|h| h.rsplit('/').next().map(str::to_string))).filter(|u| !u.is_empty() && u != "root");
         let host = fs::read_to_string("/proc/sys/kernel/hostname").ok().map(|h| h.trim().to_string()).filter(|h| h.len() >= 3);
         Self { home, user, host }
     }
@@ -231,15 +231,54 @@ impl Redactor {
     pub fn apply(&self, text: &str) -> String {
         let mut s = text.to_string();
         if let Some(h) = &self.home {
-            s = s.replace(h.as_str(), "~");
+            s = replace_whole(&s, h, "~");
         }
         if let Some(h) = &self.host {
             s = s.replace(h.as_str(), "<host>");
         }
         if let Some(u) = &self.user {
-            s = s.replace(u.as_str(), "<user>");
+            if u.len() >= 3 {
+                s = s.replace(u.as_str(), "<user>");
+            } else {
+                // A short name would hit unrelated words: only where it is a path component.
+                s = replace_whole(&s, &format!("/{u}"), "/<user>");
+            }
         }
         s.lines().map(redact_line).collect::<Vec<_>>().join("\n") + if text.ends_with('\n') { "\n" } else { "" }
+    }
+}
+
+/// Replace `needle` by `repl` where it ends a path component (followed by `/`, the end of the
+/// text or a character that cannot be part of a name).
+fn replace_whole(text: &str, needle: &str, repl: &str) -> String {
+    let mut out = String::new();
+    let mut rest = text;
+    while let Some(i) = rest.find(needle) {
+        let after = &rest[i + needle.len()..];
+        let whole = after.chars().next().is_none_or(|c| !(c.is_alphanumeric() || c == '_' || c == '-' || c == '.'));
+        out.push_str(&rest[..i]);
+        out.push_str(if whole { repl } else { needle });
+        rest = after;
+    }
+    out.push_str(rest);
+    out
+}
+
+/// Phrases of log lines that carry names of programs, profiles, macros or commands. The daemon
+/// logs those at debug level only; this is the second lock on the door for lines from older
+/// versions or paths nobody thought of.
+const PRIVATE_LOG_MARKERS: &[&str] = &["launch:", "open:", "macro command", "renamed macro", "linked game", "linked lighting", "game lighting", "library profile", "pinned", "profile “", "“", "action:", "an action failed"];
+
+/// A journal line without its message when the message may name something private.
+pub fn redact_log_line(line: &str) -> String {
+    let lower = line.to_lowercase();
+    if !PRIVATE_LOG_MARKERS.iter().any(|m| lower.contains(m)) {
+        return line.to_string();
+    }
+    const NOTE: &str = "<message withheld: may name a program, profile or command>";
+    match line.find("]: ") {
+        Some(i) => format!("{}{NOTE}", &line[..i + 3]),
+        None => NOTE.to_string(),
     }
 }
 
@@ -408,6 +447,7 @@ pub fn collect(secs: u64) -> Vec<(String, Vec<u8>)> {
     let env = env_report();
     let mut files: Vec<(String, Vec<u8>)> = Vec::new();
     let mut add = |name: &str, text: String| files.push((name.to_string(), red.apply(&text).into_bytes()));
+    let log_lines = |text: String| text.lines().map(redact_log_line).collect::<Vec<_>>().join("\n") + "\n";
 
     let mut summary = String::new();
     summary.push_str("Tsuba diagnostics\n=================\n");
@@ -453,9 +493,9 @@ pub fn collect(secs: u64) -> Vec<(String, Vec<u8>)> {
     add("config-shape.txt", cfg.map(|c| config_summary(&c)).unwrap_or_else(|| "configuration could not be read\n".into()));
 
     let unit = systemctl_user(&["status", "tsubad", "--no-pager", "-n", "0"]).unwrap_or_default();
-    add("service-status.txt", unit);
+    add("service-status.txt", log_lines(unit));
     let log = run("journalctl", &["--user", "-u", "tsubad", "-n", "300", "--no-pager", "-o", "short-iso"]).unwrap_or_default();
-    add("tsubad-log.txt", log);
+    add("tsubad-log.txt", log_lines(log));
     // Kernel messages about Razer hardware, when the user may read them.
     let k = run("journalctl", &["-k", "--no-pager", "-n", "2000", "-o", "short-iso"]).unwrap_or_default();
     let k: String = k.lines().filter(|l| { let l = l.to_lowercase(); l.contains("razer") || l.contains("1532") || l.contains("hidraw") }).map(|l| format!("{l}\n")).collect();
@@ -544,6 +584,39 @@ mod tests {
         assert!(!o.contains("XX1234567890"));
         assert!(o.contains("<mac>") && !o.contains("AA:BB:CC"));
         assert!(o.contains("normal line") && o.ends_with('\n'));
+    }
+
+    #[test]
+    fn short_user_names_are_removed_from_paths_only() {
+        let r = Redactor::with("/home/jo", "jo", "mybox");
+        let o = r.apply("cfg /home/jo/x and /srv/jo/y; job done, /home/joe/z, path /tmp/jo\n");
+        assert!(!o.contains("/jo/") && !o.contains("/home/jo/") && !o.contains("/srv/jo"), "{o}");
+        assert!(o.contains("job done") && o.contains("/home/joe/z"), "unrelated words stay: {o}");
+        assert!(o.contains("/srv/<user>/y") && o.contains("/tmp/<user>"), "{o}");
+        // A user name from the environment with no home match still goes.
+        let r = Redactor { home: None, user: Some("al".into()), host: None };
+        assert_eq!(r.apply("/home/al/.cache/x"), "/home/<user>/.cache/x");
+    }
+
+    #[test]
+    fn log_lines_naming_programs_profiles_or_commands_are_withheld() {
+        let ok = "2026-10-18T10:00:00+0000 box tsubad[12]: INFO tsubad::manager: attached Basilisk (00aa)";
+        assert_eq!(redact_log_line(ok), ok);
+        for secret in [
+            "launch: steam -applaunch 1245620 --token=SECRET",
+            "open: https://example.org/SECRET",
+            "macro command \"SECRET\": spawn failed",
+            "linked game running: SECRET.exe",
+            "game lighting: session 3 is for \"SECRET\"",
+            "00aa: \u{201c}SECRET\u{201d} pinned to slot 2",
+            "library profile \"SECRET\" is the one active",
+        ] {
+            let line = format!("2026-10-18T10:00:00+0000 box tsubad[12]: DEBUG tsubad: {secret}");
+            let out = redact_log_line(&line);
+            assert!(!out.contains("SECRET"), "{out}");
+            assert!(out.starts_with("2026-10-18T10:00:00+0000 box tsubad[12]: "), "{out}");
+        }
+        assert!(!redact_log_line("launch: SECRET").contains("SECRET"), "lines without a journal prefix too");
     }
 
     #[test]

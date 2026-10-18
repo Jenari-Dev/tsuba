@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
 "Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 21:49+0900\n"
+"POT-Creation-Date: 2026-10-18 22:04+0900\n"
 "PO-Revision-Date: 2026-10-18 22:00+0900\n"
 "Last-Translator: Claude (machine translation, needs native review)\n"
 "Language-Team: Japanese\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:21 crates/tsuba-gui/qml/HomePage.qml:451
+#: crates/tsuba-gui/qml/AboutPage.qml:21 crates/tsuba-gui/qml/HomePage.qml:472
 msgid ""
 "Tsuba is an independent open-source project, not affiliated with or endorsed "
 "by Razer Inc. Razer, Synapse, Chroma, HyperShift, BlackWidow and Basilisk "
@@ -195,13 +195,13 @@ msgstr "マクロ: %1"
 #: crates/tsuba-gui/qml/BatteryLightingCard.qml:37
 #: crates/tsuba-gui/qml/CustomizeTab.qml:62
 #: crates/tsuba-gui/qml/CustomizeTab.qml:129
-#: crates/tsuba-gui/qml/DevicePage.qml:79
-#: crates/tsuba-gui/qml/DevicePage.qml:88
-#: crates/tsuba-gui/qml/DevicePage.qml:93
-#: crates/tsuba-gui/qml/DevicePage.qml:112
-#: crates/tsuba-gui/qml/DevicePage.qml:171
-#: crates/tsuba-gui/qml/DevicePage.qml:391
-#: crates/tsuba-gui/qml/DevicePage.qml:966
+#: crates/tsuba-gui/qml/DevicePage.qml:101
+#: crates/tsuba-gui/qml/DevicePage.qml:116
+#: crates/tsuba-gui/qml/DevicePage.qml:121
+#: crates/tsuba-gui/qml/DevicePage.qml:140
+#: crates/tsuba-gui/qml/DevicePage.qml:254
+#: crates/tsuba-gui/qml/DevicePage.qml:474
+#: crates/tsuba-gui/qml/DevicePage.qml:1049
 #: crates/tsuba-gui/qml/DeviceResetCard.qml:19
 #: crates/tsuba-gui/qml/DialEditor.qml:91
 #: crates/tsuba-gui/qml/DialEditor.qml:107
@@ -301,7 +301,7 @@ msgstr "感度"
 
 #: crates/tsuba-gui/qml/AssignmentPanel.qml:206
 #: crates/tsuba-gui/qml/AssignmentPanel.qml:737
-#: crates/tsuba-gui/qml/HomePage.qml:388 crates/tsuba-gui/qml/Main.qml:477
+#: crates/tsuba-gui/qml/HomePage.qml:409 crates/tsuba-gui/qml/Main.qml:477
 #: crates/tsuba-gui/qml/StudioPage.qml:174
 msgid "Macro"
 msgstr "マクロ"
@@ -1393,72 +1393,96 @@ msgstr "電源オンアニメーション"
 msgid "Profile colour"
 msgstr "プロファイルの色"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:75
+#: crates/tsuba-gui/qml/DevicePage.qml:97
 msgid "Imported %1 profile"
 msgid_plural "Imported %1 profiles"
 msgstr[0] "%1 個のプロファイルをインポートしました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:77
+#: crates/tsuba-gui/qml/DevicePage.qml:99
 msgid "Imported %1 profile; %2"
 msgid_plural "Imported %1 profiles; %2"
 msgstr[0] "%1 個のプロファイルをインポートしました。%2"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:88
+#: crates/tsuba-gui/qml/DevicePage.qml:116
 msgid "Exported “%1”"
 msgstr "「%1」をエクスポートしました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:93
+#: crates/tsuba-gui/qml/DevicePage.qml:121
 msgid "Exported %1 profile"
 msgid_plural "Exported %1 profiles"
 msgstr[0] "%1 個のプロファイルをエクスポートしました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:110
+#: crates/tsuba-gui/qml/DevicePage.qml:138
 msgid "“%1” no longer changes the lighting"
 msgstr "「%1」はライティングを変更しなくなりました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:110
+#: crates/tsuba-gui/qml/DevicePage.qml:138
 msgid "“%1” now keeps its own lighting"
 msgstr "「%1」が独自のライティングを保持するようになりました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:118
+#: crates/tsuba-gui/qml/DevicePage.qml:146
 msgid "Import profiles"
 msgstr "プロファイルをインポート"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:120
-#: crates/tsuba-gui/qml/DevicePage.qml:128
+#: crates/tsuba-gui/qml/DevicePage.qml:148
+#: crates/tsuba-gui/qml/DevicePage.qml:211
 msgid "All files (*)"
 msgstr "すべてのファイル (*)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:120
+#: crates/tsuba-gui/qml/DevicePage.qml:148
 msgid "Tsuba profiles (*.tsuba-profile.json *.json)"
 msgstr "Tsuba プロファイル (*.tsuba-profile.json *.json)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:125
+#: crates/tsuba-gui/qml/DevicePage.qml:160
+msgid "Run commands from “%1”?"
+msgstr "「%1」のコマンドを実行しますか？"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:166
+msgid ""
+"This profile file would run the following on your computer when its keys are "
+"pressed. Only keep them if you trust where the file came from."
+msgstr ""
+"このプロファイルファイルは、キーを押すと次の内容をこのコンピューターで実行します。"
+"ファイルの入手元を信頼できる場合のみ残してください。"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:177
+msgid "Key %1: %2"
+msgstr "キー %1: %2"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:188
+msgid "Keep the commands"
+msgstr "コマンドを残す"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:196
+msgid "Import without them"
+msgstr "コマンドなしでインポート"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:208
 msgid "Export profile"
 msgstr "プロファイルをエクスポート"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:128
+#: crates/tsuba-gui/qml/DevicePage.qml:211
 msgid "Tsuba profiles (*.tsuba-profile.json)"
 msgstr "Tsuba プロファイル (*.tsuba-profile.json)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:133
+#: crates/tsuba-gui/qml/DevicePage.qml:216
 msgid "Export the chosen profiles to a folder"
 msgstr "選択したプロファイルをフォルダーにエクスポート"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:142
-#: crates/tsuba-gui/qml/HomePage.qml:246
+#: crates/tsuba-gui/qml/DevicePage.qml:225
+#: crates/tsuba-gui/qml/HomePage.qml:267
 msgid "On-board profile %1"
 msgstr "オンボードプロファイル %1"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:196
+#: crates/tsuba-gui/qml/DevicePage.qml:279
 msgid "Deleted “%1”"
 msgstr "「%1」を削除しました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:221
+#: crates/tsuba-gui/qml/DevicePage.qml:304
 msgid "What Tsuba knows about this model."
 msgstr "このモデルについて Tsuba が把握している情報です。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:222
+#: crates/tsuba-gui/qml/DevicePage.qml:305
 msgid ""
 "Click a key or button to see what it does and change it. Changes are saved "
 "in the active profile and written to the device's on-board memory, so they "
@@ -1469,7 +1493,7 @@ msgstr ""
 "Tsuba がなくても動作します。再割り当てしたキーはアクセントカラーで表示されま"
 "す。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:223
+#: crates/tsuba-gui/qml/DevicePage.qml:306
 msgid ""
 "Settings that change how the device behaves: sensitivity, polling rate, "
 "scrolling, Game Mode and similar. Most are stored on the device's current "
@@ -1478,7 +1502,7 @@ msgstr ""
 "感度、ポーリングレート、スクロール、ゲームモードなど、デバイスの動作に関する"
 "設定です。ほとんどはデバイスの現在のプロファイルに保存されます。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:224
+#: crates/tsuba-gui/qml/DevicePage.qml:307
 msgid ""
 "Pick a colour and effect for this device, set its brightness, or play a "
 "Lighting Studio profile across all your devices."
@@ -1486,60 +1510,60 @@ msgstr ""
 "このデバイスの色とエフェクトの選択、明るさの設定、すべてのデバイスでのライ"
 "ティングスタジオのプロファイルの再生ができます。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:225
+#: crates/tsuba-gui/qml/DevicePage.qml:308
 msgid ""
 "Battery level, charging state and power-saving options for this wireless "
 "device."
 msgstr ""
 "このワイヤレスデバイスのバッテリー残量、充電状態、省電力オプションです。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:246
+#: crates/tsuba-gui/qml/DevicePage.qml:329
 msgid "SLOT %1"
 msgstr "スロット %1"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:292
+#: crates/tsuba-gui/qml/DevicePage.qml:375
 msgid "%1 GAMES"
 msgstr "ゲーム %1 件"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:381
+#: crates/tsuba-gui/qml/DevicePage.qml:464
 msgid "The profile"
 msgstr "このプロファイル"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:386
-#: crates/tsuba-gui/qml/DevicePage.qml:409
+#: crates/tsuba-gui/qml/DevicePage.qml:469
+#: crates/tsuba-gui/qml/DevicePage.qml:492
 msgid "%1 is active"
 msgstr "%1 が有効です"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:386
+#: crates/tsuba-gui/qml/DevicePage.qml:469
 msgid "%2 is active (%1 change written)"
 msgid_plural "%2 is active (%1 changes written)"
 msgstr[0] "%2 が有効です (%1 件の変更を書き込みました)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:388
+#: crates/tsuba-gui/qml/DevicePage.qml:471
 msgid "%1 setting couldn't be written: %2"
 msgid_plural "%1 settings couldn't be written: %2"
 msgstr[0] "%1 件の設定を書き込めませんでした: %2"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:389
+#: crates/tsuba-gui/qml/DevicePage.qml:472
 msgctxt "profile is active; followed by a warning"
 msgid "%1; %2"
 msgstr "%1。%2"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:476
+#: crates/tsuba-gui/qml/DevicePage.qml:559
 msgid "Switching to %1…"
 msgstr "%1 に切り替え中…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:495
+#: crates/tsuba-gui/qml/DevicePage.qml:578
 msgid "ON-BOARD"
 msgstr "オンボード"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:581
+#: crates/tsuba-gui/qml/DevicePage.qml:664
 #: crates/tsuba-gui/qml/DialEditor.qml:289
 #: crates/tsuba-gui/qml/StudioPage.qml:1046
 msgid "ACTIVE"
 msgstr "有効"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:605
+#: crates/tsuba-gui/qml/DevicePage.qml:688
 msgid ""
 "The device runs on-board profile %1, which isn't in the library. Pick a "
 "profile to switch."
@@ -1547,183 +1571,183 @@ msgstr ""
 "デバイスはライブラリにないオンボードプロファイル %1 で動作しています。切り替"
 "えるプロファイルを選択してください。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:615
+#: crates/tsuba-gui/qml/DevicePage.qml:698
 msgid "Tsuba may not change this device, so profiles can't be switched here."
 msgstr ""
 "Tsuba はこのデバイスを変更できないため、ここではプロファイルを切り替えられま"
 "せん。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:696
+#: crates/tsuba-gui/qml/DevicePage.qml:779
 msgctxt "menu item"
 msgid "Add"
 msgstr "追加"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:699
+#: crates/tsuba-gui/qml/DevicePage.qml:782
 msgid "Profile %1"
 msgstr "プロファイル %1"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:706
+#: crates/tsuba-gui/qml/DevicePage.qml:789
 msgid "New from factory defaults"
 msgstr "工場出荷時の設定から新規作成"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:709
+#: crates/tsuba-gui/qml/DevicePage.qml:792
 msgid "Factory defaults"
 msgstr "工場出荷時の設定"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:715
+#: crates/tsuba-gui/qml/DevicePage.qml:798
 msgctxt "menu item"
 msgid "Rename"
 msgstr "名前を変更"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:724
+#: crates/tsuba-gui/qml/DevicePage.qml:807
 msgctxt "menu item"
 msgid "Duplicate"
 msgstr "複製"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:727
+#: crates/tsuba-gui/qml/DevicePage.qml:810
 #: crates/tsuba-gui/qml/MacroList.qml:133
 #: crates/tsuba-gui/qml/StudioPage.qml:386
 #: crates/tsuba-gui/qml/StudioPage.qml:1081
 msgid "%1 copy"
 msgstr "%1 のコピー"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:734
+#: crates/tsuba-gui/qml/DevicePage.qml:817
 msgctxt "menu item"
 msgid "Delete"
 msgstr "削除"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:742
+#: crates/tsuba-gui/qml/DevicePage.qml:825
 msgid "Unpin from slot %1"
 msgstr "スロット %1 から固定を解除"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:743
+#: crates/tsuba-gui/qml/DevicePage.qml:826
 msgid "Pin to device (no free slot)"
 msgstr "デバイスに固定 (空きスロットなし)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:743
+#: crates/tsuba-gui/qml/DevicePage.qml:826
 msgid "Pin to device (slot %1)"
 msgstr "デバイスに固定 (スロット %1)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:748
+#: crates/tsuba-gui/qml/DevicePage.qml:831
 msgid "“%1” is no longer pinned"
 msgstr "「%1」の固定を解除しました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:750
+#: crates/tsuba-gui/qml/DevicePage.qml:833
 msgid "Writing “%1” to the device…"
 msgstr "「%1」をデバイスに書き込み中…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:752
+#: crates/tsuba-gui/qml/DevicePage.qml:835
 msgid ""
 "“%1” pinned to on-board slot %2: the profile button reaches it without Tsuba"
 msgstr ""
 "「%1」をオンボードスロット %2 に固定しました。Tsuba がなくてもプロファイルボ"
 "タンで切り替えられます"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:760
+#: crates/tsuba-gui/qml/DevicePage.qml:843
 msgid "Lighting follows this profile"
 msgstr "ライティングをこのプロファイルに連動"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:760
+#: crates/tsuba-gui/qml/DevicePage.qml:843
 msgid "✓ Lighting follows this profile (%1)"
 msgstr "✓ ライティングをこのプロファイルに連動 (%1)"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:772
+#: crates/tsuba-gui/qml/DevicePage.qml:855
 msgid "Import…"
 msgstr "インポート…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:782
-#: crates/tsuba-gui/qml/DevicePage.qml:864
+#: crates/tsuba-gui/qml/DevicePage.qml:865
+#: crates/tsuba-gui/qml/DevicePage.qml:947
 msgid "Export…"
 msgstr "エクスポート…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:793
+#: crates/tsuba-gui/qml/DevicePage.qml:876
 msgid "Export several…"
 msgstr "複数をエクスポート…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:808
-#: crates/tsuba-gui/qml/HomePage.qml:393
+#: crates/tsuba-gui/qml/DevicePage.qml:891
+#: crates/tsuba-gui/qml/HomePage.qml:414
 #: crates/tsuba-gui/qml/LinkedGamesPage.qml:158
 #: crates/tsuba-gui/qml/Main.qml:122 crates/tsuba-gui/qml/Main.qml:483
 msgid "Linked games"
 msgstr "ゲーム連携"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:816
+#: crates/tsuba-gui/qml/DevicePage.qml:899
 #: crates/tsuba-gui/qml/MacrosPage.qml:571
 #: crates/tsuba-gui/qml/StudioPage.qml:1098
 msgid "Import from Synapse…"
 msgstr "Synapse からインポート…"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:830
+#: crates/tsuba-gui/qml/DevicePage.qml:913
 msgid "Export profiles"
 msgstr "プロファイルをエクスポート"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:837
+#: crates/tsuba-gui/qml/DevicePage.qml:920
 #: crates/tsuba-gui/qml/GameScanDialog.qml:113
 msgid "Select all"
 msgstr "すべて選択"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:858
-#: crates/tsuba-gui/qml/DevicePage.qml:908
-#: crates/tsuba-gui/qml/DevicePage.qml:945
+#: crates/tsuba-gui/qml/DevicePage.qml:941
+#: crates/tsuba-gui/qml/DevicePage.qml:991
+#: crates/tsuba-gui/qml/DevicePage.qml:1028
 #: crates/tsuba-gui/qml/UntestedBanner.qml:181
 msgctxt "button"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:890
+#: crates/tsuba-gui/qml/DevicePage.qml:973
 #: crates/tsuba-gui/qml/MacroList.qml:473
 msgid "Delete “%1”?"
 msgstr "「%1」を削除しますか？"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:893
+#: crates/tsuba-gui/qml/DevicePage.qml:976
 msgid "Tsuba switches to “%1” first."
 msgstr "先に「%1」へ切り替えます。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:896
+#: crates/tsuba-gui/qml/DevicePage.qml:979
 msgid "Its on-board slot is freed."
 msgstr "オンボードのスロットは解放されます。"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:898
+#: crates/tsuba-gui/qml/DevicePage.qml:981
 msgctxt "space between two sentences"
 msgid " "
 msgstr " "
 
-#: crates/tsuba-gui/qml/DevicePage.qml:914
+#: crates/tsuba-gui/qml/DevicePage.qml:997
 msgctxt "button"
 msgid "Delete"
 msgstr "削除"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "Duplicate as"
 msgstr "複製して名前を付ける"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 #: crates/tsuba-gui/qml/StudioPage.qml:1062
 msgid "New profile"
 msgstr "新規プロファイル"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "New profile with factory settings"
 msgstr "初期設定で新規プロファイルを作成"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "Rename profile"
 msgstr "プロファイル名の変更"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:952
+#: crates/tsuba-gui/qml/DevicePage.qml:1035
 msgctxt "button"
 msgid "Save"
 msgstr "保存"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:959
+#: crates/tsuba-gui/qml/DevicePage.qml:1042
 msgid "Renamed"
 msgstr "名前を変更しました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:962
+#: crates/tsuba-gui/qml/DevicePage.qml:1045
 msgid "Created “%1” with factory settings"
 msgstr "「%1」を初期設定で作成しました"
 
-#: crates/tsuba-gui/qml/DevicePage.qml:970
+#: crates/tsuba-gui/qml/DevicePage.qml:1053
 msgid "Created “%1”"
 msgstr "「%1」を作成しました"
 
@@ -2416,19 +2440,19 @@ msgctxt "button: show help"
 msgid "Help"
 msgstr "ヘルプ"
 
-#: crates/tsuba-gui/qml/HomePage.qml:122
+#: crates/tsuba-gui/qml/HomePage.qml:143
 msgid "WIRED"
 msgstr "有線"
 
-#: crates/tsuba-gui/qml/HomePage.qml:122
+#: crates/tsuba-gui/qml/HomePage.qml:143
 msgid "WIRELESS"
 msgstr "ワイヤレス"
 
-#: crates/tsuba-gui/qml/HomePage.qml:162
+#: crates/tsuba-gui/qml/HomePage.qml:183
 msgid "UNTESTED"
 msgstr "未検証"
 
-#: crates/tsuba-gui/qml/HomePage.qml:288
+#: crates/tsuba-gui/qml/HomePage.qml:309
 msgid ""
 "Hold a button's Shift layer key to reach a second set of assignments on the "
 "same device."
@@ -2436,7 +2460,7 @@ msgstr ""
 "シフトレイヤーキーを押している間は、同じデバイスで 2 つ目の割り当てを使えま"
 "す。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:289
+#: crates/tsuba-gui/qml/HomePage.qml:310
 msgid ""
 "Linked games switches profiles for you when a game starts and puts them back "
 "when it closes."
@@ -2444,28 +2468,28 @@ msgstr ""
 "ゲーム連携を使うと、ゲームの起動時にプロファイルが自動で切り替わり、終了時に"
 "元に戻ります。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:290
+#: crates/tsuba-gui/qml/HomePage.qml:311
 msgid ""
 "Lighting Studio can layer several effects on a keyboard, each on its own set "
 "of keys."
 msgstr ""
-"ライティングスタジオ では、キーボード上で複数のエフェクトを、それぞれ別のキーに重"
-"ねて設定できます。"
+"ライティングスタジオ では、キーボード上で複数のエフェクトを、それぞれ別のキー"
+"に重ねて設定できます。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:291
+#: crates/tsuba-gui/qml/HomePage.qml:312
 msgid "Game lighting lets games that support Razer Chroma light your devices."
 msgstr ""
 "ゲームライティングを使うと、Razer Chroma に対応したゲームがデバイスのライティ"
 "ングを制御できます。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:292
+#: crates/tsuba-gui/qml/HomePage.qml:313
 msgid ""
 "With the tray icon you can switch a device's profile without opening Tsuba."
 msgstr ""
 "トレイアイコンから、Tsuba を開かずにデバイスのプロファイルを切り替えられま"
 "す。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:293
+#: crates/tsuba-gui/qml/HomePage.qml:314
 msgid ""
 "If something doesn't work, Settings has a diagnostics export you can attach "
 "to a bug report."
@@ -2473,43 +2497,43 @@ msgstr ""
 "うまく動かないときは、設定の診断情報のエクスポートを不具合報告に添付できま"
 "す。"
 
-#: crates/tsuba-gui/qml/HomePage.qml:310
+#: crates/tsuba-gui/qml/HomePage.qml:331
 #: crates/tsuba-gui/qml/StudioPage.qml:1878
 msgid "Devices"
 msgstr "デバイス"
 
-#: crates/tsuba-gui/qml/HomePage.qml:373
+#: crates/tsuba-gui/qml/HomePage.qml:394
 msgid "Modules"
 msgstr "モジュール"
 
-#: crates/tsuba-gui/qml/HomePage.qml:381
+#: crates/tsuba-gui/qml/HomePage.qml:402
 #: crates/tsuba-gui/qml/LightingOwnerChip.qml:20
 #: crates/tsuba-gui/qml/Main.qml:117
 msgid "Lighting Studio"
 msgstr "ライティングスタジオ"
 
-#: crates/tsuba-gui/qml/HomePage.qml:382
+#: crates/tsuba-gui/qml/HomePage.qml:403
 msgid "Needs a per-LED device"
 msgstr "LED を個別に制御できるデバイスが必要です"
 
-#: crates/tsuba-gui/qml/HomePage.qml:399 crates/tsuba-gui/qml/Main.qml:126
+#: crates/tsuba-gui/qml/HomePage.qml:420 crates/tsuba-gui/qml/Main.qml:126
 msgid "Game lighting"
 msgstr "ゲームライティング"
 
-#: crates/tsuba-gui/qml/HomePage.qml:400
+#: crates/tsuba-gui/qml/HomePage.qml:421
 msgid "Games light up your devices"
 msgstr "ゲームがデバイスを光らせます"
 
-#: crates/tsuba-gui/qml/HomePage.qml:406 crates/tsuba-gui/qml/Main.qml:130
+#: crates/tsuba-gui/qml/HomePage.qml:427 crates/tsuba-gui/qml/Main.qml:130
 #: crates/tsuba-gui/qml/Main.qml:635 crates/tsuba-gui/qml/SetupGuide.qml:155
 msgid "Supported devices"
 msgstr "対応デバイス"
 
-#: crates/tsuba-gui/qml/HomePage.qml:407
+#: crates/tsuba-gui/qml/HomePage.qml:428
 msgid "Browse every model Tsuba knows"
 msgstr "Tsuba が知っているすべてのモデルを見る"
 
-#: crates/tsuba-gui/qml/HomePage.qml:429
+#: crates/tsuba-gui/qml/HomePage.qml:450
 msgid "Tip: %1"
 msgstr "ヒント: %1"
 
@@ -6745,19 +6769,19 @@ msgstr "フィット"
 msgid "Reset zoom and position"
 msgstr "ズームと位置をリセット"
 
-#: crates/tsuba-gui/src/app_backend.rs:253
+#: crates/tsuba-gui/src/app_backend.rs:276
 msgid "Could not run tsubad: %1"
 msgstr "tsubad を実行できませんでした: %1"
 
-#: crates/tsuba-gui/src/app_backend.rs:380
+#: crates/tsuba-gui/src/app_backend.rs:403
 msgid "Started"
 msgstr "起動しました"
 
-#: crates/tsuba-gui/src/app_backend.rs:391
+#: crates/tsuba-gui/src/app_backend.rs:414
 msgid "Started without the systemd service"
 msgstr "systemd サービスを使わずに起動しました"
 
-#: crates/tsuba-gui/src/app_backend.rs:393
+#: crates/tsuba-gui/src/app_backend.rs:416
 msgid "Could not start tsubad: %1"
 msgstr "tsubad を起動できませんでした: %1"
 

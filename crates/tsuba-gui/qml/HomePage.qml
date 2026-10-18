@@ -23,6 +23,26 @@ Rectangle {
     signal openUrl(string url)
     signal exportDiagnostics()
     property int tick: 0
+    // Daemon helper for the firmware's own "wired" / "wireless" answer (GetFeatures).
+    property var devb: null
+    function connectionOf(item) {
+        tick;
+        if (!devb) {
+            try {
+                devb = Qt.createQmlObject("import io.github.jenaridev.tsuba\nDeviceBackend {}", page, "DeviceBackend");   // i18n-ok
+            } catch (e) {
+                devb = null;
+            }
+        }
+        const s = devb ? devb.features(item.pid, 1) : "";
+        const c = s !== "" ? JSON.parse(s).connection : "";
+        if (c === "wired" || c === "wireless") {
+            return c;
+        }
+        // The daemon doesn't know (yet): the device name and a battery reading hint at it.
+        const pw = item.kind === "mouse" ? JSON.parse(backend.power(item.pid) || "{}") : ({});
+        return item.name.indexOf("(wired)") >= 0 ? "wired" : (pw.battery_percent !== undefined ? "wireless" : "");
+    }
     property int tipIndex: Math.floor(Date.now() / 86400000)
 
     Timer {
@@ -110,6 +130,7 @@ Rectangle {
             anchors.margins: 8
             spacing: 4
             Rectangle {
+                objectName: "connectionBadge"
                 visible: card.connection !== ""
                 width: connText.implicitWidth + 12
                 height: 18
@@ -352,7 +373,7 @@ Rectangle {
                                 subtitle: { page.tick; return page.activeProfileName(modelData.pid); }
                                 untested: { page.tick; return page.isUntested(modelData.pid); }
                                 detail: DeviceKinds.kindLabel(modelData.kind)
-                                connection: modelData.name.indexOf("(wired)") >= 0 ? "wired" : (pw.battery_percent !== undefined ? "wireless" : "")
+                                connection: page.connectionOf(modelData)
                                 battery: pw.battery_percent !== undefined ? pw.battery_percent : -1
                                 charging: !!pw.charging
                                 image: page.imageFor(modelData.pid)

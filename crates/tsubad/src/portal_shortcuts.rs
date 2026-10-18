@@ -7,6 +7,7 @@
 //! can't fire the action, so that is reported in the log.
 
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, AtomicU8, Ordering::SeqCst};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::Duration;
 
@@ -29,10 +30,28 @@ const APP_ID: &str = "io.github.JenAriDev.Tsubad";
 /// Waiting for the desktop's approval dialog can take a while.
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(180);
 
+/// One portal answer: the response code and its results.
+type Answer = (u32, HashMap<String, OwnedValue>);
+/// Requests waiting for their `Response`, by request path.
+type Waiters = Arc<Mutex<HashMap<String, mpsc::Sender<Answer>>>>;
+
+/// How the last bind went (see [`Portal::bind_state`]).
+pub const BIND_IDLE: u8 = 0;
+pub const BIND_PENDING: u8 = 1;
+pub const BIND_FAILED: u8 = 2;
+
 pub struct Portal {
     conn: Connection,
     session: OwnedObjectPath,
+    waiters: Waiters,
+    /// How long a request waits for the desktop's answer.
+    timeout: Duration,
+    /// What the desktop has been given successfully.
     bound: Mutex<Vec<SlotEntry>>,
+    /// The latest list wanted, picked up by the binding thread.
+    wanted: Mutex<Option<Vec<SlotEntry>>>,
+    working: AtomicBool,
+    state: AtomicU8,
 }
 
 /// The portal's trigger string for shortcut slot `slot` (XKB key names, CTRL/ALT/SHIFT).
@@ -57,24 +76,46 @@ fn portal_call(conn: &Connection, method: &str, body: &(impl serde::Serialize + 
     Ok(conn.call_method(Some(PORTAL), PORTAL_PATH, Some(IFACE), method, body)?)
 }
 
-/// Call a portal method that answers through a `Request` object: subscribe to its `Response`
-/// signal first (the path is known from our bus name and the handle token), call, wait.
-fn request(conn: &Connection, token: &str, call: impl FnOnce() -> Result<zbus::Message>) -> Result<HashMap<String, OwnedValue>> {
+/// One thread listens to every `Response` the portal sends and hands it to whoever waits for
+/// that request path, so a request that times out leaves nothing behind but a map entry,
+/// which its caller removes. Only the portal's own signals count: another client could
+/// otherwise answer in its place.
+fn spawn_router(conn: &Connection, waiters: &Waiters) -> Result<()> {
+    let rule = MatchRule::builder().msg_type(Type::Signal).sender(PORTAL)?.interface("org.freedesktop.portal.Request")?.member("Response")?.build();
+    let responses = MessageIterator::for_match_rule(rule, conn, None)?;
+    let waiters = waiters.clone();
+    std::thread::Builder::new()
+        .name("portal-responses".into())
+        .spawn(move || {
+            for msg in responses {
+                let Ok(msg) = msg else { continue };
+                let Some(path) = msg.header().path().map(|p| p.to_string()) else { continue };
+                let Ok(answer) = msg.body().deserialize::<Answer>() else { continue };
+                if let Some(tx) = waiters.lock().unwrap().remove(&path) {
+                    let _ = tx.send(answer);
+                }
+            }
+        })?;
+    Ok(())
+}
+
+/// Call a portal method that answers through a `Request` object: register for its `Response`
+/// first (the path is known from our bus name and the handle token), call, wait.
+fn request(conn: &Connection, waiters: &Waiters, token: &str, timeout: Duration, call: impl FnOnce() -> Result<zbus::Message>) -> Result<HashMap<String, OwnedValue>> {
     let me = conn.unique_name().context("no bus name")?.as_str().trim_start_matches(':').replace('.', "_");
     let path = format!("/org/freedesktop/portal/desktop/request/{me}/{token}");
-    let rule = MatchRule::builder().msg_type(Type::Signal).interface("org.freedesktop.portal.Request")?.member("Response")?.path(path.as_str())?.build();
-    let mut responses = MessageIterator::for_match_rule(rule, conn, None)?;
     let (tx, rx) = mpsc::channel();
-    std::thread::spawn(move || {
-        let _ = tx.send(responses.next());
-    });
-    let handle: OwnedObjectPath = call()?.body().deserialize()?;
-    if handle.as_str() != path {
-        // An older portal that doesn't honour the token: its Response goes to another path.
-        bail!("the portal answered on {} instead of {path}", handle.as_str());
-    }
-    let msg = rx.recv_timeout(REQUEST_TIMEOUT).context("the desktop didn't answer the shortcut request in time")?.context("no response")??;
-    let (code, results): (u32, HashMap<String, OwnedValue>) = msg.body().deserialize()?;
+    waiters.lock().unwrap().insert(path.clone(), tx);
+    let result = (|| {
+        let handle: OwnedObjectPath = call()?.body().deserialize()?;
+        if handle.as_str() != path {
+            // An older portal that doesn't honour the token: its Response goes to another path.
+            bail!("the portal answered on {} instead of {path}", handle.as_str());
+        }
+        rx.recv_timeout(timeout).context("the desktop didn't answer the shortcut request in time")
+    })();
+    waiters.lock().unwrap().remove(&path);
+    let (code, results) = result?;
     match code {
         0 => Ok(results),
         1 => bail!("the shortcut request was declined"),
@@ -102,24 +143,23 @@ impl Portal {
         let mut opts: HashMap<&str, Value> = HashMap::new();
         opts.insert("handle_token", Value::from(t.as_str()));
         opts.insert("session_handle_token", Value::from(t.as_str()));
-        let results = request(&conn, &t, || portal_call(&conn, "CreateSession", &(opts,)))?;
+        let waiters: Waiters = Arc::default();
+        spawn_router(&conn, &waiters)?;
+        let results = request(&conn, &waiters, &t, REQUEST_TIMEOUT, || portal_call(&conn, "CreateSession", &(opts,)))?;
         let session = results.get("session_handle").context("the portal returned no session")?;
         let session = String::try_from(session.try_clone()?).context("session handle")?;
         let session = OwnedObjectPath::try_from(session)?;
-        Ok(Self { conn, session, bound: Mutex::new(Vec::new()) })
+        Ok(Self { conn, session, waiters, timeout: REQUEST_TIMEOUT, bound: Mutex::new(Vec::new()), wanted: Mutex::new(None), working: AtomicBool::new(false), state: AtomicU8::new(BIND_IDLE) })
     }
 
     /// Bind (or re-bind) the shortcut list. A portal replaces its list on every bind, so this
     /// always sends all of `entries`.
     pub fn bind(&self, entries: &[SlotEntry]) -> Result<()> {
-        {
-            let mut bound = self.bound.lock().unwrap();
-            if *bound == entries {
-                return Ok(());
-            }
-            *bound = entries.to_vec();
+        if *self.bound.lock().unwrap() == entries {
+            return Ok(());
         }
         if entries.is_empty() {
+            *self.bound.lock().unwrap() = Vec::new();
             return Ok(());
         }
         let list: Vec<(String, HashMap<&str, Value>)> = entries
@@ -134,7 +174,10 @@ impl Portal {
         let t = token("bind");
         let mut opts: HashMap<&str, Value> = HashMap::new();
         opts.insert("handle_token", Value::from(t.as_str()));
-        let results = request(&self.conn, &t, || portal_call(&self.conn, "BindShortcuts", &(&self.session, list, "", opts)))?;
+        let results = request(&self.conn, &self.waiters, &t, self.timeout, || portal_call(&self.conn, "BindShortcuts", &(&self.session, list, "", opts)))?;
+        // Only now does the desktop have this list; a failed or declined bind is tried again
+        // the next time the list is registered.
+        *self.bound.lock().unwrap() = entries.to_vec();
         // The desktop reports the triggers it actually assigned.
         if let Some(v) = results.get("shortcuts") {
             if let Ok(got) = <Vec<(String, HashMap<String, OwnedValue>)>>::try_from(v.try_clone()?) {
@@ -149,6 +192,50 @@ impl Portal {
     }
 }
 
+impl Portal {
+    /// Bind `entries` on a background thread: the desktop's approval dialog can stay open for
+    /// minutes and callers (assigning an action, saving a macro) must not wait for it. Newer
+    /// lists replace older ones that were not sent yet.
+    pub fn bind_async(self: &Arc<Self>, entries: &[SlotEntry]) {
+        *self.wanted.lock().unwrap() = Some(entries.to_vec());
+        if self.working.swap(true, SeqCst) {
+            return;
+        }
+        let p = self.clone();
+        let spawned = std::thread::Builder::new().name("portal-bind".into()).spawn(move || loop {
+            let next = p.wanted.lock().unwrap().take();
+            match next {
+                Some(list) => {
+                    p.state.store(BIND_PENDING, SeqCst);
+                    match p.bind(&list) {
+                        Ok(()) => p.state.store(BIND_IDLE, SeqCst),
+                        Err(e) => {
+                            p.state.store(BIND_FAILED, SeqCst);
+                            warn!("binding shortcuts through the desktop portal: {e:#}");
+                        }
+                    }
+                }
+                None => {
+                    p.working.store(false, SeqCst);
+                    if p.wanted.lock().unwrap().is_some() && !p.working.swap(true, SeqCst) {
+                        continue;
+                    }
+                    break;
+                }
+            }
+        });
+        if spawned.is_err() {
+            self.working.store(false, SeqCst);
+        }
+    }
+
+    /// [`BIND_IDLE`] (everything asked for is bound), [`BIND_PENDING`] (waiting for the
+    /// desktop, e.g. its approval dialog) or [`BIND_FAILED`].
+    pub fn bind_state(&self) -> u8 {
+        self.state.load(SeqCst)
+    }
+}
+
 /// Connect, bind the configured actions and run them on the portal's Activated / Deactivated
 /// signals. Returns when the signal stream ends.
 pub fn run(mgr: &Arc<Manager>, conn: Connection) -> Result<()> {
@@ -157,9 +244,10 @@ pub fn run(mgr: &Arc<Manager>, conn: Connection) -> Result<()> {
         return Ok(());
     }
     // Listen before binding so no early press is lost.
-    let rule = MatchRule::builder().msg_type(Type::Signal).interface(IFACE)?.build();
+    // Only the portal's own signals count (not another client's look-alikes).
+    let rule = MatchRule::builder().msg_type(Type::Signal).sender(PORTAL)?.interface(IFACE)?.build();
     let signals = MessageIterator::for_match_rule(rule, &conn, None)?;
-    let portal = Portal::connect(conn.clone()).context("opening a shortcut session with the desktop portal")?;
+    let portal = Arc::new(Portal::connect(conn.clone()).context("opening a shortcut session with the desktop portal")?);
     let session = portal.session.clone();
     crate::shortcuts::set_portal(portal);
     if let Err(e) = crate::shortcuts::register(&mgr.slot_entries()) {
@@ -226,6 +314,8 @@ mod tests {
 
     // The mock needs the caller's unique name inside the request path; a shared slot carries it.
     static CALLER: Mutex<String> = Mutex::new(String::new());
+    /// How long the mock desktop takes to answer (an approval dialog).
+    static DELAY_MS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(80);
 
     #[zbus::interface(name = "org.freedesktop.portal.GlobalShortcuts")]
     impl Mock {
@@ -262,7 +352,7 @@ mod tests {
                 results.insert("session_handle", Value::from(s.as_str().replace("SENDER", &caller)));
             }
             std::thread::spawn(move || {
-                std::thread::sleep(Duration::from_millis(80));
+                std::thread::sleep(Duration::from_millis(DELAY_MS.load(std::sync::atomic::Ordering::SeqCst)));
                 let _ = conn.emit_signal(None::<&str>, p.as_str(), "org.freedesktop.portal.Request", "Response", &(0u32, results));
             });
             OwnedObjectPath::try_from(path).unwrap()
@@ -320,7 +410,44 @@ mod tests {
             std::thread::sleep(Duration::from_millis(50));
         }
         assert!(marker.exists(), "the Launch action didn't run");
+
+        // Signals from anyone but the portal are ignored.
+        std::fs::remove_file(&marker).unwrap();
+        let spoof = build().build().unwrap();
+        let body = (OwnedObjectPath::try_from(format!("/org/freedesktop/portal/desktop/session/{}/mock", CALLER.lock().unwrap())).unwrap(), "028d-7".to_string(), 2u64, HashMap::<String, Value>::new());
+        spoof.emit_signal(None::<&str>, PORTAL_PATH, IFACE, "Activated", &body).unwrap();
+        std::thread::sleep(Duration::from_millis(500));
+        assert!(!marker.exists(), "a signal from another client ran an action");
+
+        // A slow approval dialog doesn't hold up whoever registers shortcuts, and the state says so.
+        DELAY_MS.store(1200, std::sync::atomic::Ordering::SeqCst);
+        let more = [SlotEntry { id: "028d-7".into(), code: 7, label: "a".into() }, SlotEntry { id: "028d-8".into(), code: 8, label: "b".into() }];
+        let t0 = std::time::Instant::now();
+        crate::shortcuts::register(&more).unwrap();
+        assert!(t0.elapsed() < Duration::from_millis(300), "registering waited for the desktop: {:?}", t0.elapsed());
+        let t0 = std::time::Instant::now();
+        assert_eq!(crate::shortcuts::backend_name(), "portal");
+        assert!(t0.elapsed() < Duration::from_millis(50));
+        std::thread::sleep(Duration::from_millis(300));
+        assert_eq!(crate::shortcuts::backend_state(), "pending");
+        let t0 = std::time::Instant::now();
+        while crate::shortcuts::backend_state() != "ready" && t0.elapsed() < Duration::from_secs(10) {
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        assert_eq!(crate::shortcuts::backend_state(), "ready");
+        assert!(binds.lock().unwrap().iter().any(|b| b.0 == "028d-8"));
         crate::shortcuts::clear_backend();
+
+        // A request that times out leaves nothing waiting and isn't counted as bound.
+        DELAY_MS.store(80, std::sync::atomic::Ordering::SeqCst);
+        let client2 = build().build().unwrap();
+        *CALLER.lock().unwrap() = client2.unique_name().unwrap().as_str().trim_start_matches(':').replace('.', "_");
+        let mut portal = Portal::connect(client2).unwrap();
+        portal.timeout = Duration::from_millis(200);
+        DELAY_MS.store(1000, std::sync::atomic::Ordering::SeqCst);
+        assert!(portal.bind(&more).is_err());
+        assert!(portal.waiters.lock().unwrap().is_empty(), "the timed-out request is forgotten");
+        assert!(portal.bound.lock().unwrap().is_empty(), "a failed bind isn't remembered as done");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

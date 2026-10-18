@@ -80,7 +80,7 @@ static LOCKED: AtomicBool = AtomicBool::new(false);
 /// sends it on two object paths; repeats are ignored.
 fn watch_lock(mgr: Arc<Manager>) -> Result<()> {
     let conn = zbus::blocking::Connection::session().context("no session bus")?;
-    let rule = zbus::MatchRule::builder().msg_type(zbus::message::Type::Signal).interface("org.freedesktop.ScreenSaver")?.member("ActiveChanged")?.build();
+    let rule = zbus::MatchRule::builder().msg_type(zbus::message::Type::Signal).sender("org.freedesktop.ScreenSaver")?.interface("org.freedesktop.ScreenSaver")?.member("ActiveChanged")?.build();
     let signals = zbus::blocking::MessageIterator::for_match_rule(rule, &conn, Some(16))?;
     info!("lock watcher running");
     for msg in signals {

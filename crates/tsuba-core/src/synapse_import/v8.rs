@@ -12,7 +12,7 @@ use anyhow::{bail, ensure, Context, Result};
 use serde_json::{Map, Number, Value};
 
 /// Deepest nesting accepted (real Synapse data nests a handful of levels).
-const MAX_DEPTH: usize = 128;
+const MAX_DEPTH: usize = 64;
 /// Output budget for one value: JSON nodes (back-reference copies included) and string bytes.
 const MAX_NODES: usize = 4 << 20;
 const MAX_BYTES: usize = 64 << 20;
@@ -401,15 +401,21 @@ mod tests {
     // ---- untrusted-input regressions (from the security review's proofs of concept) ----
 
     /// Deep nesting (one byte per level via boxed primitives) used to overflow the stack and
-    /// abort the process; now an error, even on a small stack.
+    /// abort the process; now an error, even on a small stack. A debug build's frames are ~8 KiB
+    /// a level (the limit is sized so even a 1 MiB stack holds it), so the debug run gets a
+    /// roomy thread and the release run keeps proving the small one.
     #[test]
     fn deep_nesting_is_an_error() {
+        let stack = if cfg!(debug_assertions) { 8 << 20 } else { 256 << 10 };
+        let h = std::thread::Builder::new().stack_size(stack).spawn(deep_nesting_cases).unwrap();
+        h.join().expect("decoder crashed");
+    }
+
+    fn deep_nesting_cases() {
         let mut b = vec![0xff, 0x0f];
         b.extend(std::iter::repeat_n(b's', 200_000));
         b.push(b'T');
-        let h = std::thread::Builder::new().stack_size(256 << 10).spawn(move || decode(&b).map(|_| ()).map_err(|e| e.to_string())).unwrap();
-        let r = h.join().expect("decoder crashed");
-        assert!(r.unwrap_err().contains("nested"));
+        assert!(decode(&b).unwrap_err().to_string().contains("nested"));
         // Nested arrays and objects too.
         let mut b = vec![0xff, 0x0f];
         for _ in 0..10_000 {

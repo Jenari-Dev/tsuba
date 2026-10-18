@@ -60,26 +60,54 @@ Rectangle {
     function fileNameFor(p) {
         return (p.name.replace(/[^\w .-]+/g, "_").trim() || "profile") + ".tsuba-profile.json";
     }
+    // Files left to import; one with commands, URLs or typed text waits for the user's approval.
+    property var importQueue: []
+    property int importOk: 0
+    property var importFailed: []
+    property var approval: ({ name: "", software: [], digest: "", path: "" })
     function importFiles(urls) {
-        let ok = 0;
-        const failed = [];
-        urls.forEach(u => {
-            const path = lp.pathOfUrl(u);
-            if (lp.call("Tsuba1.ImportLibraryProfile", [pid, path]) !== null) {
-                ok++;
-            } else {
-                failed.push(path.split("/").pop() + ": " + lp.error);
-            }
-        });
-        if (failed.length === 0) {
-            setStatus(ok > 0 ? i18np("Imported %1 profile", "Imported %1 profiles", ok) : "", false);
-        } else if (ok > 0) {
-            setStatus(i18np("Imported %1 profile; %2", "Imported %1 profiles; %2", ok, failed.join("; ")), false);
+        importQueue = urls.map(u => lp.pathOfUrl(u));
+        importOk = 0;
+        importFailed = [];
+        importNext();
+    }
+    function importDone(path, digest) {
+        if (lp.call("Tsuba1.ImportLibraryProfile", [pid, path, digest]) !== null) {
+            importOk++;
         } else {
-            setStatus(i18n("Failed: %1", failed.join("; ")), true);
+            importFailed = importFailed.concat([path.split("/").pop() + ": " + lp.error]);
+        }
+    }
+    function importNext() {
+        while (importQueue.length > 0) {
+            const path = importQueue[0];
+            const pre = lp.json("Tsuba1.GetLibraryImportPreview", [pid, path], null);
+            if (pre === null) {
+                importFailed = importFailed.concat([path.split("/").pop() + ": " + lp.error]);
+            } else if (pre.software.length > 0) {
+                approval = { name: pre.name, software: pre.software, digest: pre.digest, path: path };
+                approveDlg.open();
+                return;
+            } else {
+                importDone(path, "");
+            }
+            importQueue = importQueue.slice(1);
+        }
+        if (importFailed.length === 0) {
+            setStatus(importOk > 0 ? i18np("Imported %1 profile", "Imported %1 profiles", importOk) : "", false);
+        } else if (importOk > 0) {
+            setStatus(i18np("Imported %1 profile; %2", "Imported %1 profiles; %2", importOk, importFailed.join("; ")), false);
+        } else {
+            setStatus(i18n("Failed: %1", importFailed.join("; ")), true);
         }
         loadProfiles();
         Theme.profilesRev++;
+    }
+    // The user's answer for the file in `approval`: keep its commands, or import without them.
+    function answerApproval(keep) {
+        importDone(approval.path, keep ? approval.digest : "");
+        importQueue = importQueue.slice(1);
+        importNext();
     }
     function exportOne(url) {
         const p = current;
@@ -119,6 +147,61 @@ Rectangle {
         fileMode: FileDialog.OpenFiles
         nameFilters: [i18n("Tsuba profiles (*.tsuba-profile.json *.json)"), i18n("All files (*)")]
         onAccepted: page.importFiles(selectedFiles)
+    }
+    QQC2.Dialog {
+        id: approveDlg
+        objectName: "importApproveDialog"
+        parent: QQC2.Overlay.overlay
+        x: parent ? (parent.width - width) / 2 : 0
+        y: parent ? (parent.height - height) / 4 : 0
+        width: Math.min(parent ? parent.width - 48 : 520, 560)
+        modal: true
+        closePolicy: QQC2.Popup.NoAutoClose
+        title: i18n("Run commands from “%1”?", page.approval.name)
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            Text {
+                Layout.fillWidth: true
+                text: i18n("This profile file would run the following on your computer when its keys are pressed. Only keep them if you trust where the file came from.")
+                color: Theme.text
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSize
+                wrapMode: Text.Wrap
+            }
+            Repeater {
+                model: page.approval.software
+                delegate: Text {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    text: i18n("Key %1: %2", modelData.key, modelData.text)
+                    color: Theme.warn
+                    font.family: "monospace"
+                    font.pixelSize: Theme.fontSize
+                    wrapMode: Text.WrapAnywhere
+                }
+            }
+            RowLayout {
+                spacing: 12
+                SynButton {
+                    objectName: "importKeepCommands"
+                    text: i18n("Keep the commands")
+                    onClicked: {
+                        approveDlg.close();
+                        page.answerApproval(true);
+                    }
+                }
+                SynButton {
+                    objectName: "importDropCommands"
+                    text: i18n("Import without them")
+                    primary: true
+                    onClicked: {
+                        approveDlg.close();
+                        page.answerApproval(false);
+                    }
+                }
+            }
+        }
     }
     FileDialog {
         id: exportDlg
@@ -1007,6 +1090,12 @@ Rectangle {
 
                 Item {
                     Layout.fillWidth: true
+                }
+                LightingOwnerChip {
+                    objectName: "ownerChip"
+                    backend: page.backend
+                    pid: page.pid
+                    visible: !page.backend.readonly && typeof page.backend.studio_call === "function"
                 }
                 HelpButton {
                     size: 22

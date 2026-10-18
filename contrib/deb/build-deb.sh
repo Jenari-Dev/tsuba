@@ -24,9 +24,9 @@ Priority: optional
 Architecture: amd64
 Installed-Size: $size
 Maintainer: JenAriDev <noreply@users.noreply.github.com>
-Depends: libc6, libgcc-s1, libstdc++6, libqt6core6, libqt6gui6, libqt6qml6, libqt6quick6, qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtquick-dialogs, qml6-module-qtquick-templates, qml6-module-qtcore, qml6-module-qt-labs-platform, libkf6i18n6, qml6-module-org-kde-kirigami, qqc2-breeze-style, libpipewire-0.3-0, libpulse0, pulseaudio-utils, xdg-desktop-portal, xdg-utils, fonts-roboto, udev, systemd
+Depends: libc6, libgcc-s1, libstdc++6, libqt6core6, libqt6gui6, libqt6qml6, libqt6quick6, qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtquick-dialogs, qml6-module-qtquick-templates, qml6-module-qtcore, qml6-module-qt-labs-platform, libkf6i18n6, qml6-module-org-kde-kirigami, qqc2-breeze-style, libpipewire-0.3-0, libpulse0, libxkbcommon0, xkb-data, pulseaudio-utils, xdg-desktop-portal, xdg-utils, fonts-roboto, udev, systemd
 Recommends: kglobalaccel6
-Suggests: wine
+Suggests: wine, wtype, ydotool, xdotool
 Homepage: https://github.com/JenAriDev/tsuba
 Description: Open-source configuration for Razer keyboards and mice
  Remap keys and buttons, record macros, set DPI and lighting, and use Lighting

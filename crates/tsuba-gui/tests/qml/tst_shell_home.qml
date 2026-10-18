@@ -72,6 +72,19 @@ Item {
             compare(untested.length, 1, "the untested model is flagged");
         }
 
+        function test_connection_badge_follows_the_firmware_answer() {
+            page.devb = { features: pid => pid === "028d" ? JSON.stringify({ connection: "wireless" }) : JSON.stringify({ connection: "wired" }) };
+            page.devices = [
+                { pid: "028d", name: "BlackWidow V4 Pro", kind: "keyboard" },
+                { pid: "00aa", name: "Basilisk V3 Pro", kind: "mouse" }
+            ];
+            wait(60);
+            const texts = all(page, "connectionBadge").filter(b => b.visible).map(b => b.children[0].text);
+            compare(texts.length, 2);
+            verify(texts.indexOf("WIRELESS") >= 0 && texts.indexOf("WIRED") >= 0, texts.join());
+            page.devb = null;
+        }
+
         function test_single_group_has_no_heading() {
             page.devices = [{ pid: "028d", name: "BlackWidow V4 Pro", kind: "keyboard" }];
             wait(30);

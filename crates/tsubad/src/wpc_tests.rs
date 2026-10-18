@@ -34,8 +34,8 @@ fn lighting_is_stored_with_a_profile_applied_on_activation_and_follows_edits() {
     let ids = profile_ids(&mgr, "028d");
     let (a, b) = (ids[0].clone(), ids[1].clone());
     mgr.library_activate("028d", &a).unwrap();
-    // Store what the device shows now (the saved lighting, as the simulated device has no lighting).
-    mgr.store_lighting("028d", red()).unwrap();
+    // What the device shows now (the simulated device answers lighting commands, so it is read back).
+    mgr.set_effect_all(EffectConfig::Static { colour: "ff0000".into() }, Some(60)).unwrap();
     mgr.library_set_lighting("028d", &a, "current").unwrap();
     let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
     assert_eq!(l.get(&a).unwrap().lighting, Some(red()));
@@ -108,7 +108,7 @@ fn profiles_export_to_a_folder_without_overwriting() {
     let again = mgr.library_export_many("00aa", &ids[..1], dir_s).unwrap();
     assert!(again[0].ends_with("Fast_Slow_ mix_ 2.tsuba-profile.json"), "never overwrites: {again:?}");
     // What was written imports back.
-    let id = mgr.library_import("00aa", &paths[0]).unwrap();
+    let id = mgr.library_import("00aa", &paths[0], "").unwrap();
     assert!(DeviceLibrary::load(&lib::root(), "00aa").unwrap().get(&id).is_some());
     assert!(mgr.library_export_many("00aa", &ids, "/definitely/not/a/folder").is_err());
     assert!(mgr.library_export_many("00aa", &["0".repeat(32)], dir_s).is_err());

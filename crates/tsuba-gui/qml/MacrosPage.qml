@@ -206,13 +206,13 @@ Rectangle {
         case "delay":
             return e.ms >= 1000 ? (e.ms / 1000).toFixed(3) + " s" : e.ms + " ms";
         case "cursor":
-            return `Move cursor to ${e.x}, ${e.y}`;
+            return i18n("Move cursor to %1, %2", e.x, e.y);
         case "media":
             return (KeyNames.media[e.usage] || ("Media key 0x" + e.usage.toString(16)));
         case "power":
             return KeyNames.powerKeys[e.code] || ("System key " + e.code);
         case "run":
-            return e.command.trim() === "" ? "Run command (not set)" : "Run: " + e.command;
+            return e.command.trim() === "" ? i18n("Run command (not set)") : i18n("Run: %1", e.command);
         default:
             return "Event 0x" + e.op.toString(16);
         }
@@ -688,10 +688,10 @@ Rectangle {
                             { kind: "key", label: "Keyboard key" },
                             { kind: "button", label: "Mouse button" },
                             { kind: "scroll", label: "Scroll wheel" },
-                            { kind: "media", label: "Media key" },
-                            { kind: "power", label: "System key" },
-                            { kind: "cursor", label: "Cursor move" },
-                            { kind: "run", label: "Run command" }
+                            { kind: "media", label: i18n("Media key") },
+                            { kind: "power", label: i18n("System key") },
+                            { kind: "cursor", label: i18n("Cursor move") },
+                            { kind: "run", label: i18n("Run command") }
                         ]
                         delegate: Rectangle {
                             required property var modelData
@@ -927,7 +927,7 @@ Rectangle {
                                                     onActivated: i => page.delayMode = i
                                                 }
                                                 Text {
-                                                    text: "What to record"
+                                                    text: i18n("What to record")
                                                     color: Theme.text
                                                     font.family: Theme.font
                                                     font.pixelSize: Theme.small
@@ -935,13 +935,13 @@ Rectangle {
                                                 ModeTabs {
                                                     objectName: "recordFilter"
                                                     minTabWidth: 86
-                                                    model: ["Keys + mouse", "Keys only", "Mouse only"]
+                                                    model: [i18n("Keys + mouse"), i18n("Keys only"), i18n("Mouse only")]
                                                     currentIndex: page.recordFilter
                                                     onActivated: i => page.recordFilter = i
                                                 }
                                                 SynCheckBox {
                                                     objectName: "trackMoves"
-                                                    text: "Record pointer movement"
+                                                    text: i18n("Record pointer movement")
                                                     enabled: page.recordFilter !== 1
                                                     checked: page.trackMoves
                                                     onToggled: page.trackMoves = checked
@@ -1331,7 +1331,7 @@ Rectangle {
             }
             Text {
                 Layout.fillWidth: true
-                text: "Plays as a media key press through the device. Check that it does what you expect on your hardware."
+                text: i18n("Plays as a media key press through the device. Check that it does what you expect on your hardware.")
                 color: Theme.textMuted
                 font.family: Theme.font
                 font.pixelSize: 11
@@ -1348,7 +1348,7 @@ Rectangle {
                 objectName: "powerKeyPick"
                 Layout.fillWidth: true
                 readonly property var codes: [0x81, 0x82, 0x83]
-                model: ["Power", "Sleep", "Wake"]
+                model: [i18n("Power"), i18n("Sleep"), i18n("Wake")]
                 currentIndex: Math.max(0, codes.indexOf(editor.ev ? editor.ev.code : 0x83))
                 onActivated: i => page.update(page.sel, { type: "power", code: codes[i], down: editor.ev.down })
             }
@@ -1360,7 +1360,7 @@ Rectangle {
             }
             Text {
                 Layout.fillWidth: true
-                text: "Power and Sleep act on the whole computer when the macro plays."
+                text: i18n("Power and Sleep act on the whole computer when the macro plays.")
                 color: Theme.warn
                 font.family: Theme.font
                 font.pixelSize: 11
@@ -1406,7 +1406,7 @@ Rectangle {
             }
             Text {
                 Layout.fillWidth: true
-                text: "Screen position in pixels from the top left. Where the pointer ends up also depends on the device's pointer settings."
+                text: i18n("Screen position in pixels from the top left. Where the pointer ends up also depends on the device's pointer settings.")
                 color: Theme.textMuted
                 font.family: Theme.font
                 font.pixelSize: 11
@@ -1423,12 +1423,12 @@ Rectangle {
                 objectName: "runCommand"
                 Layout.fillWidth: true
                 text: editor.ev ? editor.ev.command : ""
-                placeholderText: "Command, e.g. konsole or xdg-open https://…"
+                placeholderText: i18n("Command, e.g. konsole or xdg-open https://…")
                 onTextEdited: page.update(page.sel, { type: "run", command: text, slot: editor.ev.slot })
             }
             Text {
                 Layout.fillWidth: true
-                text: "The macro presses a key combination reserved for this command (F14–F24 with modifiers) and Tsuba's service runs it, so it only works while the service is running. Each different command uses one of the 46 reserved combinations."
+                text: i18n("The macro presses a key combination reserved for this command (F14–F24 with modifiers) and Tsuba's service runs it, so it only works while the service is running. Each different command uses one of the 46 reserved combinations.")
                 color: Theme.textMuted
                 font.family: Theme.font
                 font.pixelSize: 11

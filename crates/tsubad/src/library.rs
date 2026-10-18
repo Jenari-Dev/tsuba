@@ -722,6 +722,11 @@ impl Manager {
                 p.id = old.id.clone();
                 p.created = old.created;
                 p.pinned_slot = old.pinned_slot;
+                // A re-import brings what Synapse knows; lighting that comes with the profile
+                // is Tsuba's own and stays.
+                if p.lighting.is_none() {
+                    p.lighting = old.lighting.clone();
+                }
             }
             None => {
                 p.id = lib::new_id();

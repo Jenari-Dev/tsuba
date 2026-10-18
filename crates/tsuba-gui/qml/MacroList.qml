@@ -63,7 +63,7 @@ ColumnLayout {
         const out = [];
         if (groups[""]) {
             if (names.length > 0) {
-                out.push({ header: "Unfiled", folder: "", count: groups[""].length });
+                out.push({ header: i18n("Unfiled"), folder: "", count: groups[""].length });
             }
             if (!collapsed[""]) {
                 groups[""].sort(byName).forEach(m => out.push({ m: m }));
@@ -130,7 +130,7 @@ ColumnLayout {
         changed();
     }
     function duplicate(m) {
-        const g = lp.call("DuplicateMacro", [m.guid, m.name + " copy"]);
+        const g = lp.call("DuplicateMacro", [m.guid, i18n("%1 copy", m.name)]);
         if (g === null) {
             message = "Failed: " + lp.error;
             return;
@@ -149,7 +149,7 @@ ColumnLayout {
         id: searchField
         objectName: "macroSearch"
         Layout.fillWidth: true
-        placeholderText: "Search macros"
+        placeholderText: i18n("Search macros")
         onTextEdited: ml.search = text
     }
     RowLayout {
@@ -158,7 +158,7 @@ ColumnLayout {
         SynCheckBox {
             objectName: "onlyUnused"
             visible: ml.usage !== null && ml.lib.length > 0
-            text: "Not in use (" + ml.unusedCount + ")"
+            text: i18n("Not in use (%1)", ml.unusedCount)
             checked: ml.onlyUnused
             onToggled: ml.onlyUnused = checked
         }
@@ -258,7 +258,7 @@ ColumnLayout {
                             }
                             Text {
                                 width: parent.width
-                                text: row.isHeader ? "" : row.m.events.length + " events" + (ml.placesOf(row.m.guid).length ? " · on " + ml.placesOf(row.m.guid).join(", ") : "")
+                                text: row.isHeader ? "" : row.m.events.length + i18n(" events") + (ml.placesOf(row.m.guid).length ? i18n(" · on %1", ml.placesOf(row.m.guid).join(", ")) : "")
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -283,7 +283,7 @@ ColumnLayout {
                                 Text {
                                     id: ut
                                     anchors.centerIn: parent
-                                    text: "NOT IN USE"
+                                    text: i18n("NOT IN USE")
                                     color: Theme.textMuted
                                     font.family: Theme.font
                                     font.pixelSize: 9
@@ -335,7 +335,7 @@ ColumnLayout {
             Text {
                 visible: ml.lib.length === 0
                 Layout.fillWidth: true
-                text: "No macros yet. Click + New to record one."
+                text: i18n("No macros yet. Click + New to record one.")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -344,7 +344,7 @@ ColumnLayout {
             Text {
                 visible: ml.lib.length > 0 && ml.rows.length === 0
                 Layout.fillWidth: true
-                text: "No macro matches."
+                text: i18n("No macro matches.")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -352,7 +352,7 @@ ColumnLayout {
 
             SectionLabel {
                 visible: ml.deviceOnlyList.length > 0
-                caption: "On device only"
+                caption: i18n("On device only")
                 Layout.topMargin: 14
             }
             Repeater {
@@ -388,7 +388,7 @@ ColumnLayout {
                             }
                             Text {
                                 width: parent.width
-                                text: (ml.deviceNames[modelData.pid] || modelData.pid) + " · " + modelData.m.events.length + " events"
+                                text: (ml.deviceNames[modelData.pid] || modelData.pid) + " · " + modelData.m.events.length + i18n(" events")
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -397,7 +397,7 @@ ColumnLayout {
                         }
                         SynButton {
                             objectName: "importRowButton"
-                            text: "Import"
+                            text: i18n("Import")
                             implicitWidth: 72
                             onClicked: ml.importDeviceMacro(modelData.pid, modelData.m.id)
                         }
@@ -424,25 +424,25 @@ ColumnLayout {
         property var macro: null
         QQC2.MenuItem {
             objectName: "menuRename"
-            text: "Rename"
+            text: i18n("Rename")
             enabled: !ml.backend.readonly
             onTriggered: ml.begin("rename", rowMenu.macro)
         }
         QQC2.MenuItem {
             objectName: "menuDuplicate"
-            text: "Duplicate"
+            text: i18n("Duplicate")
             enabled: !ml.backend.readonly
             onTriggered: ml.duplicate(rowMenu.macro)
         }
         QQC2.MenuItem {
             objectName: "menuFolder"
-            text: "Move to folder…"
+            text: i18n("Move to folder…")
             enabled: !ml.backend.readonly
             onTriggered: ml.begin("folder", rowMenu.macro)
         }
         QQC2.MenuItem {
             objectName: "menuDelete"
-            text: "Delete"
+            text: i18n("Delete")
             enabled: !ml.backend.readonly
             onTriggered: ml.begin("delete", rowMenu.macro)
         }
@@ -468,7 +468,7 @@ ColumnLayout {
             spacing: 10
             Text {
                 Layout.fillWidth: true
-                text: ml.action === "rename" ? "Rename macro" : (ml.action === "folder" ? "Folder" : (ml.target ? "Delete “" + ml.target.name + "”?" : ""))
+                text: ml.action === "rename" ? i18n("Rename macro") : (ml.action === "folder" ? i18n("Folder") : (ml.target ? i18n("Delete “%1”?", ml.target.name) : ""))
                 color: Theme.textBright
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -480,7 +480,7 @@ ColumnLayout {
                 objectName: "macroActionField"
                 visible: ml.action === "rename" || ml.action === "folder"
                 Layout.fillWidth: true
-                placeholderText: ml.action === "folder" ? "Folder name (empty = none)" : "Macro name"
+                placeholderText: ml.action === "folder" ? i18n("Folder name (empty = none)") : i18n("Macro name")
                 onAccepted: ml.apply()
             }
             Flow {
@@ -537,13 +537,13 @@ ColumnLayout {
                     Layout.fillWidth: true
                 }
                 SynButton {
-                    text: "Cancel"
+                    text: i18n("Cancel")
                     implicitWidth: 80
                     onClicked: ml.done()
                 }
                 SynButton {
                     objectName: "macroActionOk"
-                    text: ml.action === "delete" ? "Delete" : "Save"
+                    text: ml.action === "delete" ? i18n("Delete") : i18n("Save")
                     primary: true
                     implicitWidth: 80
                     onClicked: ml.apply()

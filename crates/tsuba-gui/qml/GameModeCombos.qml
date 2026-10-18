@@ -10,11 +10,11 @@ ColumnLayout {
     property bool readOnly: false
     // The combinations Tsuba can block one by one (names match the daemon's list).
     readonly property var catalogue: [
-        ["alt_tab", "Alt+Tab (switch window)"],
-        ["alt_f4", "Alt+F4 (close window)"],
-        ["alt_space", "Alt+Space / Alt+F2 (launcher)"],
-        ["meta", "Windows key (launcher, overview, Windows-key shortcuts)"],
-        ["ctrl_esc", "Ctrl+Esc (task manager)"]
+        ["alt_tab", i18n("Alt+Tab (switch window)")],
+        ["alt_f4", i18n("Alt+F4 (close window)")],
+        ["alt_space", i18n("Alt+Space / Alt+F2 (launcher)")],
+        ["meta", i18n("Windows key (launcher, overview, Windows-key shortcuts)")],
+        ["ctrl_esc", i18n("Ctrl+Esc (task manager)")]
     ]
     readonly property bool all: combos === null
     signal chosen(var list)
@@ -23,7 +23,7 @@ ColumnLayout {
 
     SynCheckBox {
         objectName: "gmAll"
-        text: "Block every desktop shortcut"
+        text: i18n("Block every desktop shortcut")
         enabled: !gmc.readOnly
         checked: gmc.all
         onToggled: gmc.chosen(checked ? null : gmc.catalogue.map(c => c[0]))
@@ -54,7 +54,7 @@ ColumnLayout {
         visible: !gmc.all
         Layout.fillWidth: true
         Layout.leftMargin: 28
-        text: "Only these shortcuts are taken away from the desktop while Game Mode is on, and given back when it ends (also after a crash, at the next start)."
+        text: i18n("Only these shortcuts are taken away from the desktop while Game Mode is on, and given back when it ends (also after a crash, at the next start).")
         color: Theme.textDim
         font.family: Theme.font
         font.pixelSize: 11

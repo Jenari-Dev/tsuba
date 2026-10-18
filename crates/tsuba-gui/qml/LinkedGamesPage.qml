@@ -102,6 +102,9 @@ Rectangle {
         if (backend.env_var && backend.env_var("TSUBA_GAMESCAN") === "1") {   // headless UI check
             scanGames();
         }
+        if (backend.env_var && backend.env_var("TSUBA_LINK_SEL") !== "") {
+            sel = parseInt(backend.env_var("TSUBA_LINK_SEL"));
+        }
     }
     // Keep the profile lists fresh: when the page is shown, when the device list changes and
     // after profiles are created / renamed / deleted elsewhere in the app.
@@ -136,7 +139,7 @@ Rectangle {
 
         // ---- Links
         Rectangle {
-            Layout.preferredWidth: 320
+            Layout.preferredWidth: 372
             Layout.fillHeight: true
             color: Theme.panel
             border.color: Theme.line
@@ -317,19 +320,19 @@ Rectangle {
                     SynButton {
                         objectName: "removeLink"
                         visible: !page.confirmRemove
-                        text: "Remove"
+                        text: i18n("Remove")
                         onClicked: page.confirmRemove = true
                     }
                     Text {
                         visible: page.confirmRemove
-                        text: "Remove “" + (parent.parent.cur ? page.label(parent.parent.cur) : "") + "”?"
+                        text: i18n("Remove “%1”?", parent.parent.cur ? page.label(parent.parent.cur) : "")
                         color: Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.small
                     }
                     SynButton {
                         visible: page.confirmRemove
-                        text: "Keep"
+                        text: i18n("Keep")
                         implicitWidth: 72
                         onClicked: page.confirmRemove = false
                     }
@@ -453,7 +456,7 @@ Rectangle {
                         readonly property var want: cur && cur.polling_hz ? cur.polling_hz[modelData.pid] : undefined
                         Text {
                             Layout.preferredWidth: 200
-                            text: modelData.name.replace(" (wired)", "") + " polling rate"
+                            text: i18n("%1 polling rate", modelData.name.replace(" (wired)", ""))
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
@@ -462,7 +465,7 @@ Rectangle {
                         QQC2.ComboBox {
                             objectName: "pollingPick_" + modelData.pid
                             Layout.preferredWidth: 260
-                            model: ["Don't change polling rate"].concat(opts.map(o => o + " Hz"))
+                            model: [i18n("Don't change polling rate")].concat(opts.map(o => i18n("%1 Hz", o)))
                             currentIndex: parent.want === undefined ? 0 : 1 + opts.indexOf(parent.want)
                             onActivated: i => page.edit(l => {
                                 l.polling_hz = l.polling_hz || {};
@@ -476,17 +479,17 @@ Rectangle {
                     }
                 }
                 SectionLabel {
-                    caption: "When"
+                    caption: i18n("When")
                 }
                 SynCheckBox {
                     objectName: "onlyFocused"
-                    text: "Only while the game's window has the focus"
+                    text: i18n("Only while the game's window has the focus")
                     checked: !!parent.cur && !!parent.cur.only_when_focused
                     onToggled: page.edit(l => l.only_when_focused = checked)
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: "Alt+Tab to your browser and the devices switch back; return to the game and they switch again. Needs KDE Plasma: Tsuba loads a small window-focus helper into the desktop while this is on. On other desktops the link applies while the game runs."
+                    text: i18n("Alt+Tab to your browser and the devices switch back; return to the game and they switch again. Needs KDE Plasma: Tsuba loads a small window-focus helper into the desktop while this is on. On other desktops the link applies while the game runs.")
                     color: Theme.textMuted
                     font.family: Theme.font
                     font.pixelSize: 11

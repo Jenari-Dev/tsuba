@@ -43,7 +43,7 @@ Rectangle {
     property var macroLib: []          // library macros, loaded when the Macro category opens
     property int macroIdx: 0
     property int playback: 0           // once, times, while_held, toggle, sequence
-    readonly property var playbackNames: ["Play once", "Repeat a number of times", "Repeat while held", "Toggle continuous playback", "Play as a sequence (experimental)"]
+    readonly property var playbackNames: [i18n("Play once"), i18n("Repeat a number of times"), i18n("Repeat while held"), i18n("Toggle continuous playback"), i18n("Play as a sequence (experimental)")]
     readonly property var playbackIds: ["once", "times", "while_held", "toggle", "sequence"]
     property int repeatCount: 2
 
@@ -125,7 +125,7 @@ Rectangle {
         if (open !== "macro" || !m) {
             return;
         }
-        stage("macro", "Macro: " + m.name, () => assignMacro());
+        stage("macro", i18n("Macro: %1", m.name), () => assignMacro());
     }
     onMacroIdxChanged: stageMacro()
     onPlaybackChanged: stageMacro()
@@ -144,9 +144,9 @@ Rectangle {
     readonly property var otherDevices: JSON.parse(backend ? (backend.devices || "[]") : "[]").filter(d => d.pid !== pid)
     property int interTarget: 0
     readonly property var interOps: [
-        ["Sensitivity stage up", { op: "dpi_stage_up" }], ["Sensitivity stage down", { op: "dpi_stage_down" }],
-        ["Sensitivity clutch (hold)", null], ["Next profile", { op: "profile_next" }], ["Previous profile", { op: "profile_previous" }],
-        ["Brightness up", { op: "brightness_up" }], ["Brightness down", { op: "brightness_down" }], ["Lighting on / off", { op: "lighting_toggle" }]
+        [i18n("Sensitivity stage up"), { op: "dpi_stage_up" }], [i18n("Sensitivity stage down"), { op: "dpi_stage_down" }],
+        [i18n("Sensitivity clutch (hold)"), null], [i18n("Next profile"), { op: "profile_next" }], [i18n("Previous profile"), { op: "profile_previous" }],
+        [i18n("Brightness up"), { op: "brightness_up" }], [i18n("Brightness down"), { op: "brightness_down" }], [i18n("Lighting on / off"), { op: "lighting_toggle" }]
     ]
 
     // A library macro for `events`, reusing an identical one; "" on failure.
@@ -194,23 +194,23 @@ Rectangle {
     // fn = the assignment function a category writes; alt = other functions it also covers.
     // The order is Synapse's, with Tsuba's extras after Multimedia.
     readonly property var categories: [
-        { id: "default", name: "Default", fn: -1 },
-        { id: "keyboard", name: "Keyboard function", fn: 2, alt: [13] },
-        { id: "mouse", name: "Mouse function", fn: 1, alt: [11, 14] },
-        { id: "sensitivity", name: "Sensitivity", fn: 6 },
-        { id: "macro", name: "Macro", fn: 3, alt: [4, 5, 15] },
-        { id: "interdevice", name: "Inter-device", fn: -5 },
-        { id: "profile", name: "Switch profile", fn: 7 },
-        { id: "lighting", name: "Lighting effect", fn: -6 },
-        { id: "hypershift", name: "Shift layer", fn: 12 },
-        { id: "launch", name: "Launch program / website", fn: -4 },
-        { id: "media", name: "Multimedia", fn: 10 },
-        { id: "audio", name: "Audio", fn: -7 },
-        { id: "shortcuts", name: "Shortcuts", fn: -3 },
-        { id: "text", name: "Text function", fn: -2 },
-        { id: "system", name: "System (power / sleep)", fn: 9 },
-        { id: "scroll", name: "Scroll wheel", fn: 18, mouseOnly: true },
-        { id: "disable", name: "Disable", fn: 0 }
+        { id: "default", name: i18n("Default"), fn: -1 },
+        { id: "keyboard", name: i18n("Keyboard function"), fn: 2, alt: [13] },
+        { id: "mouse", name: i18n("Mouse function"), fn: 1, alt: [11, 14] },
+        { id: "sensitivity", name: i18n("Sensitivity"), fn: 6 },
+        { id: "macro", name: i18n("Macro"), fn: 3, alt: [4, 5, 15] },
+        { id: "interdevice", name: i18n("Inter-device"), fn: -5 },
+        { id: "profile", name: i18n("Switch profile"), fn: 7 },
+        { id: "lighting", name: i18n("Lighting effect"), fn: -6 },
+        { id: "hypershift", name: i18n("Shift layer"), fn: 12 },
+        { id: "launch", name: i18n("Launch program / website"), fn: -4 },
+        { id: "media", name: i18n("Multimedia"), fn: 10 },
+        { id: "audio", name: i18n("Audio"), fn: -7 },
+        { id: "shortcuts", name: i18n("Shortcuts"), fn: -3 },
+        { id: "text", name: i18n("Text function"), fn: -2 },
+        { id: "system", name: i18n("System (power / sleep)"), fn: 9 },
+        { id: "scroll", name: i18n("Scroll wheel"), fn: 18, mouseOnly: true },
+        { id: "disable", name: i18n("Disable"), fn: 0 }
     ]
     // Repeat-while-held for keyboard functions.
     property bool turbo: false
@@ -302,7 +302,7 @@ Rectangle {
     // A key was picked or pressed for the keyboard function.
     function stageKey(d) {
         captured = d;
-        stage("key", KeyNames.legend({ function: 2, data: d }) + (turbo ? " (turbo " + turboRate + "/s)" : ""), () => turbo ? save(13, d.concat(turboData())) : save(2, d));
+        stage("key", KeyNames.legend({ function: 2, data: d }) + (turbo ? i18n(" (turbo %1/s)", turboRate) : ""), () => turbo ? save(13, d.concat(turboData())) : save(2, d));
     }
 
     onTargetChanged: {
@@ -653,7 +653,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 6
                     Repeater {
-                        model: [["Sensitivity stage up", 1], ["Sensitivity stage down", 2], ["Cycle up sensitivity stages", 6], ["Cycle down sensitivity stages", 7]]
+                        model: [[i18n("Sensitivity stage up"), 1], [i18n("Sensitivity stage down"), 2], [i18n("Cycle up sensitivity stages"), 6], [i18n("Cycle down sensitivity stages"), 7]]
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
@@ -681,7 +681,7 @@ Rectangle {
                         SynButton {
                             text: i18n("Select")
                             implicitWidth: 72
-                            onClicked: root.stage("dpi:clutch", "Sensitivity clutch " + clutchDpi.value + " DPI", () => root.save(6, [5, clutchDpi.value >> 8, clutchDpi.value & 255, clutchDpi.value >> 8, clutchDpi.value & 255]))
+                            onClicked: root.stage("dpi:clutch", i18n("Sensitivity clutch %1 DPI", clutchDpi.value), () => root.save(6, [5, clutchDpi.value >> 8, clutchDpi.value & 255, clutchDpi.value >> 8, clutchDpi.value & 255]))
                         }
                     }
                     RowLayout {
@@ -701,7 +701,7 @@ Rectangle {
                         SynButton {
                             text: i18n("Select")
                             implicitWidth: 72
-                            onClicked: root.stage("dpi:jump", "Jump to stage " + jumpStage.value, () => root.save(6, [3, jumpStage.value]))
+                            onClicked: root.stage("dpi:jump", i18n("Jump to stage %1", jumpStage.value), () => root.save(6, [3, jumpStage.value]))
                         }
                     }
                 }
@@ -792,7 +792,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 6
                     Repeater {
-                        model: [["Play / Pause", 0xcd], ["Next track", 0xb5], ["Previous track", 0xb6], ["Stop", 0xb7], ["Mute", 0xe2], ["Volume up", 0xe9], ["Volume down", 0xea]]
+                        model: [[i18n("Play / Pause"), 0xcd], [i18n("Next track"), 0xb5], [i18n("Previous track"), 0xb6], [i18n("Stop"), 0xb7], [i18n("Mute"), 0xe2], [i18n("Volume up"), 0xe9], [i18n("Volume down"), 0xea]]
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
@@ -819,7 +819,7 @@ Rectangle {
                         wrapMode: Text.Wrap
                     }
                     Repeater {
-                        model: [["Next profile", 1], ["Previous profile", 2], ["Cycle forward", 4], ["Cycle backward", 5]]
+                        model: [[i18n("Next profile"), 1], [i18n("Previous profile"), 2], [i18n("Cycle forward"), 4], [i18n("Cycle backward"), 5]]
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
@@ -845,7 +845,7 @@ Rectangle {
                         SynButton {
                             text: i18n("Select")
                             implicitWidth: 72
-                            onClicked: root.stage("profile:slot", "Switch to slot " + profileTarget.value, () => root.save(7, [3, profileTarget.value]))
+                            onClicked: root.stage("profile:slot", i18n("Switch to slot %1", profileTarget.value), () => root.save(7, [3, profileTarget.value]))
                         }
                     }
                 }
@@ -877,7 +877,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 6
                     Repeater {
-                        model: [["Power", 129], ["Sleep", 130], ["Wake", 131]]
+                        model: [[i18n("Power"), 129], [i18n("Sleep"), 130], [i18n("Wake"), 131]]
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
@@ -894,7 +894,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 6
                     Repeater {
-                        model: [["Tactile / free-spin toggle", 1], ["Scroll stage up", 2], ["Scroll stage down", 3], ["Cycle scroll stages up", 4], ["Cycle scroll stages down", 5]]
+                        model: [[i18n("Tactile / free-spin toggle"), 1], [i18n("Scroll stage up"), 2], [i18n("Scroll stage down"), 3], [i18n("Cycle scroll stages up"), 4], [i18n("Cycle scroll stages down"), 5]]
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
@@ -1027,7 +1027,7 @@ Rectangle {
                         text: i18n("LIGHTING PROFILES (LIGHTING STUDIO)")
                     }
                     Repeater {
-                        model: [[i18n("Next lighting profile"), { op: "studio_next" }], [i18n("Previous lighting profile"), { op: "studio_previous" }]].concat(lightingEd.studioNames.map(n => [i18n("Apply “") + n + "”", { op: "studio_profile", name: n }]))
+                        model: [[i18n("Next lighting profile"), { op: "studio_next" }], [i18n("Previous lighting profile"), { op: "studio_previous" }]].concat(lightingEd.studioNames.map(n => [i18n("Apply “%1”", n), { op: "studio_profile", name: n }]))
                         delegate: OptionRow {
                             required property var modelData
                             objectName: "studio_" + (modelData[1].name || modelData[1].op)
@@ -1070,7 +1070,7 @@ Rectangle {
                 objectName: "pendingNote"
                 Layout.fillWidth: true
                 visible: root.staged !== null && !root.listOpen
-                text: i18n("Selected: ") + (root.staged ? root.staged.label : "") + i18n(" — press SAVE to apply")
+                text: i18n("Selected: %1 — press SAVE to apply", root.staged ? root.staged.label : "")
                 color: Theme.accent
                 font.family: Theme.font
                 font.pixelSize: Theme.small

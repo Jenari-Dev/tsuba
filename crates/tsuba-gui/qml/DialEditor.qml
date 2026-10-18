@@ -38,9 +38,9 @@ SynCard {
         return a.function !== 17 || (a.data[0] >= 0x80 && a.data[0] <= 0x9f);
     }
 
-    title: "Command dial"
-    help: "The dial on top of the keyboard has several modes (for example volume, brightness, scroll). Pressing it cycles the mode; turning it acts on the current mode. Drag a mode (or use the arrows) to change the order the dial steps through. You can re-assign the dial press from Customize, which stops it switching modes."
-    description: "Press the dial to step to the next mode (Shift + press goes back). The dial's LED shows the active mode's colour. Click a mode to make it active; switch modes off to skip them."
+    title: i18n("Command dial")
+    help: i18n("The dial on top of the keyboard has several modes (for example volume, brightness, scroll). Pressing it cycles the mode; turning it acts on the current mode. Drag a mode (or use the arrows) to change the order the dial steps through. You can re-assign the dial press from Customize, which stops it switching modes.")
+    description: i18n("Press the dial to step to the next mode (Shift + press goes back). The dial's LED shows the active mode's colour. Click a mode to make it active; switch modes off to skip them.")
 
     LibProvider {
         id: provider
@@ -83,7 +83,7 @@ SynCard {
             return;
         }
         const r = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: dialKey, layer: 0, function: d.function, data: d.data }));
-        result = r === "" ? "Failed: " + backend.status : "Dial press reset to default";
+        result = r === "" ? "Failed: " + backend.status : i18n("Dial press reset to default");
         loadDial();
         changed();
     }
@@ -116,7 +116,7 @@ SynCard {
     function editDial(slot, change) {
         const list = plain();
         Object.assign(list[slot], change);
-        write(list, "Command dial saved");
+        write(list, i18n("Command dial saved"));
     }
     // Move the mode in slot `from` to slot `to`.
     function moveMode(from, to) {
@@ -125,7 +125,7 @@ SynCard {
         }
         const list = plain();
         list.splice(to, 0, list.splice(from, 1)[0]);
-        write(list, "Dial order saved");
+        write(list, i18n("Dial order saved"));
     }
     function resetModes() {
         confirmReset = false;
@@ -134,13 +134,13 @@ SynCard {
             result = "Failed: " + (provider.error !== "" ? provider.error : "the stock table isn't available");
             return;
         }
-        write(list, "Dial modes are back to the stock order");
+        write(list, i18n("Dial modes are back to the stock order"));
     }
 
     ColorDialog {
         id: dialPicker
         property int slot: 0
-        title: "Dial mode colour"
+        title: i18n("Dial mode colour")
         onAccepted: ed.editDial(slot, { colour: selectedColor.toString().replace("#", "").slice(-6) })
     }
 
@@ -151,7 +151,7 @@ SynCard {
         spacing: 12
         Text {
             Layout.fillWidth: true
-            text: "The dial press is remapped to " + KeyNames.describe(ed.dialAssign) + " — pressing the dial runs that instead of switching modes."
+            text: i18n("The dial press is remapped to %1 — pressing the dial runs that instead of switching modes.", KeyNames.describe(ed.dialAssign))
             color: Theme.accent
             font.family: Theme.font
             font.pixelSize: Theme.small
@@ -164,7 +164,7 @@ SynCard {
                 id: resetDialBtn
                 objectName: "resetDialPress"
                 anchors.fill: parent
-                text: "Reset dial press"
+                text: i18n("Reset dial press")
                 enabled: !ed.readOnly && ed.dialDefault !== null
                 onClicked: ed.resetDialPress()
             }
@@ -281,7 +281,7 @@ SynCard {
                     }
                     Text {
                         visible: slotRow.modelData.current
-                        text: "ACTIVE"
+                        text: i18n("ACTIVE")
                         color: Theme.accent
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -301,7 +301,7 @@ SynCard {
                     enabled: slotRow.modelData.enabled && !slotRow.modelData.current && !ed.readOnly
                     onTapped: {
                         if (ed.backend.set_dial_mode(ed.pid, slotRow.index)) {
-                            ed.result = slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2") + " is the active dial mode";
+                            ed.result = slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2") + i18n(" is the active dial mode");
                             ed.changed();
                         } else {
                             ed.result = "Failed: " + ed.backend.status;
@@ -317,13 +317,13 @@ SynCard {
         SynButton {
             objectName: "resetDialModes"
             visible: !ed.confirmReset
-            text: "Reset modes to stock"
+            text: i18n("Reset modes to stock")
             enabled: !ed.readOnly
             onClicked: ed.confirmReset = true
         }
         Text {
             visible: ed.confirmReset
-            text: "Put the modes back in the stock order and switch the stock ones on?"
+            text: i18n("Put the modes back in the stock order and switch the stock ones on?")
             color: Theme.text
             font.family: Theme.font
             font.pixelSize: Theme.small
@@ -332,14 +332,14 @@ SynCard {
         }
         SynButton {
             visible: ed.confirmReset
-            text: "Cancel"
+            text: i18n("Cancel")
             implicitWidth: 80
             onClicked: ed.confirmReset = false
         }
         SynButton {
             objectName: "confirmResetDial"
             visible: ed.confirmReset
-            text: "Reset"
+            text: i18n("Reset")
             primary: true
             implicitWidth: 80
             onClicked: ed.resetModes()

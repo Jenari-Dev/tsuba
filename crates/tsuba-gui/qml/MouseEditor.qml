@@ -15,7 +15,7 @@ ColumnLayout {
     property int comboMods: 0
     property int comboKey: 0
     property int comboButton: 0
-    readonly property var buttonNames: ["Left click", "Right click", "Middle click", "Mouse button 4", "Mouse button 5", "Scroll up", "Scroll down"]
+    readonly property var buttonNames: [i18n("Left click"), i18n("Right click"), i18n("Middle click"), i18n("Mouse button 4"), i18n("Mouse button 5"), i18n("Scroll up"), i18n("Scroll down")]
 
     spacing: 6
 
@@ -76,9 +76,9 @@ ColumnLayout {
         panel.stage(id, label, () => (turbo && code !== undefined) ? panel.save(14, turboData(code)) : fn());
     }
 
-    SectionHeading { text: "BUTTONS" }
+    SectionHeading { text: i18n("BUTTONS") }
     Repeater {
-        model: [["Left click", 1], ["Right click", 2], ["Scroll click", 3], ["Mouse button 4", 4], ["Mouse button 5", 5], ["Double click", -1]]
+        model: [[i18n("Left click"), 1], [i18n("Right click"), 2], [i18n("Scroll click"), 3], [i18n("Mouse button 4"), 4], [i18n("Mouse button 5"), 5], [i18n("Double click"), -1]]
         delegate: OptionRow {
             required property var modelData
             label: modelData[0]
@@ -88,23 +88,23 @@ ColumnLayout {
         }
     }
 
-    SectionHeading { text: "SCROLLING" }
+    SectionHeading { text: i18n("SCROLLING") }
     Repeater {
-        model: [["Scroll up", 9], ["Scroll down", 10], ["Scroll left", 104], ["Scroll right", 105]]
+        model: [[i18n("Scroll up"), 9], [i18n("Scroll down"), 10], [i18n("Scroll left"), 104], [i18n("Scroll right"), 105]]
         delegate: OptionRow {
             required property var modelData
             objectName: "scroll" + modelData[1]
             label: modelData[0]
             on: !!ed.panel.assignment && [1, 14].indexOf(ed.panel.assignment.function) >= 0 && ed.panel.assignment.data[0] === modelData[1]
             chosen: ed.panel.stagedId === "mouse:" + modelData[1]
-            onPicked: ed.pick("mouse:" + modelData[1], modelData[0] + (ed.turbo ? " (repeating)" : ""), () => ed.panel.save(1, [modelData[1]]), modelData[1])
+            onPicked: ed.pick("mouse:" + modelData[1], ed.turbo ? i18n("%1 (repeating)", modelData[0]) : modelData[0], () => ed.panel.save(1, [modelData[1]]), modelData[1])
         }
     }
     RowLayout {
         spacing: 8
         SynCheckBox {
             objectName: "repeatHeld"
-            text: "Repeat while held"
+            text: i18n("Repeat while held")
             checked: ed.turbo
             onToggled: {
                 ed.turbo = checked;
@@ -123,7 +123,7 @@ ColumnLayout {
             }
         }
         Text {
-            text: "per second"
+            text: i18n(i18n("per second"))
             color: Theme.textDim
             font.family: Theme.font
             font.pixelSize: Theme.small
@@ -131,7 +131,7 @@ ColumnLayout {
     }
     Text {
         Layout.fillWidth: true
-        text: "Pick a button or scroll direction after choosing the repeat rate."
+        text: i18n("Pick a button or scroll direction after choosing the repeat rate.")
         visible: ed.turbo
         color: Theme.textMuted
         font.family: Theme.font
@@ -139,10 +139,10 @@ ColumnLayout {
         wrapMode: Text.Wrap
     }
 
-    SectionHeading { text: "CLICK WITH KEYS HELD" }
+    SectionHeading { text: i18n("CLICK WITH KEYS HELD") }
     Text {
         Layout.fillWidth: true
-        text: "For Ctrl+click, Shift+click and the like. Saved as a small macro that presses the keys, clicks and lets go."
+        text: i18n("For Ctrl+click, Shift+click and the like. Saved as a small macro that presses the keys, clicks and lets go.")
         color: Theme.textDim
         font.family: Theme.font
         font.pixelSize: 11
@@ -177,14 +177,14 @@ ColumnLayout {
     RowLayout {
         spacing: 8
         Text {
-            text: ed.comboKey > 0 ? "and hold " + KeyNames.hidName(ed.comboKey) : "and hold a key (optional)"
+            text: ed.comboKey > 0 ? i18n("and hold %1", KeyNames.hidName(ed.comboKey)) : i18n("and hold a key (optional)")
             color: Theme.text
             font.family: Theme.font
             font.pixelSize: Theme.small
         }
         SynButton {
             visible: ed.comboKey > 0
-            text: "Clear"
+            text: i18n("Clear")
             implicitWidth: 60
             onClicked: {
                 ed.comboKey = 0;

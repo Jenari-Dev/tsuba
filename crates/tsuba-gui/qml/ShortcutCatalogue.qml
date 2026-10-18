@@ -30,6 +30,7 @@ ColumnLayout {
         return all;
     }
     property int areaIdx: 0
+    onLinkedAppsChanged: areaIdx = 0
     readonly property var items: areas[Math.min(areaIdx, areas.length - 1)][2]
     // The custom shortcut being built.
     property int customMods: 0
@@ -41,7 +42,7 @@ ColumnLayout {
         visible: cat.suggested !== ""
         objectName: "suggestedNote"
         Layout.fillWidth: true
-        text: "Suggested for " + cat.linkedApps.join(", ")
+        text: i18n("Suggested for %1", cat.linkedApps.join(", "))
         color: Theme.accent
         font.family: Theme.font
         font.pixelSize: 11
@@ -51,7 +52,7 @@ ColumnLayout {
         id: areaPick
         objectName: "shortcutArea"
         Layout.fillWidth: true
-        model: cat.areas.map(a => a[1] + (a[0] === cat.suggested ? "  (suggested)" : ""))
+        model: cat.areas.map(a => a[1] + (a[0] === cat.suggested ? i18n("  (suggested)") : ""))
         currentIndex: cat.areaIdx
         onActivated: i => cat.areaIdx = i
     }
@@ -73,7 +74,7 @@ ColumnLayout {
         color: Theme.borderSoft
     }
     Text {
-        text: "YOUR OWN SHORTCUT"
+        text: i18n("YOUR OWN SHORTCUT")
         color: Theme.textDim
         font.family: Theme.font
         font.pixelSize: 11

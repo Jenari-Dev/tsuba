@@ -45,7 +45,7 @@ ColumnLayout {
         }
         const r = events();
         plan = { layout: r.layout, skipped: r.skipped };
-        const label = "Type “" + (text.length > 24 ? text.slice(0, 24) + "…" : text.replace(/\n/g, " ")) + "”";
+        const label = i18n("Type “%1”", text.length > 24 ? text.slice(0, 24) + "…" : text.replace(/\n/g, " "));
         panel.stage("text", label, () => r.skipped.length > 0 || r.events.length === 0
             ? panel.assignAction({ type: "type", text: text })
             : panel.assignEventsMacro("Text: " + text.slice(0, 24).replace(/\n/g, " "), r.events));
@@ -55,7 +55,7 @@ ColumnLayout {
         id: textInput
         objectName: "textInput"
         Layout.fillWidth: true
-        placeholderText: "Text to type"
+        placeholderText: i18n("Text to type")
         onTextEdited: {
             ed.text = text;
             ed.restage();
@@ -64,7 +64,7 @@ ColumnLayout {
     RowLayout {
         spacing: 8
         Text {
-            text: "Delay between characters (ms)"
+            text: i18n("Delay between characters (ms)")
             color: Theme.text
             font.family: Theme.font
             font.pixelSize: Theme.small
@@ -85,7 +85,7 @@ ColumnLayout {
         visible: ed.layouts.length > 1
         spacing: 8
         Text {
-            text: "Keyboard layout"
+            text: i18n("Keyboard layout")
             color: Theme.text
             font.family: Theme.font
             font.pixelSize: Theme.small
@@ -106,8 +106,8 @@ ColumnLayout {
         visible: ed.text.length > 0
         Layout.fillWidth: true
         text: ed.plan.skipped.length > 0
-            ? "“" + ed.plan.skipped + "” can't be typed with keys on the " + ed.plan.layout + " layout, so Tsuba types this text itself while its service runs (needs wtype, ydotool or xdotool)."
-            : "Typed as an on-board macro using the " + ed.plan.layout + " layout; it works without Tsuba running."
+            ? i18n("“%1” can't be typed with keys on the %2 layout, so Tsuba types this text itself while its service runs (needs wtype, ydotool or xdotool).", ed.plan.skipped, ed.plan.layout)
+            : i18n("Typed as an on-board macro using the %1 layout; it works without Tsuba running.", ed.plan.layout)
         color: ed.plan.skipped.length > 0 ? Theme.warn : Theme.textMuted
         font.family: Theme.font
         font.pixelSize: 11

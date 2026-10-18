@@ -65,19 +65,19 @@ Rectangle {
                 failed.push(path.split("/").pop() + ": " + lp.error);
             }
         });
-        profileStatus = (ok > 0 ? "Imported " + ok + (ok === 1 ? " profile" : " profiles") : "") + (failed.length ? (ok > 0 ? "; " : "Failed: ") + failed.join("; ") : "");
+        profileStatus = (ok > 0 ? i18np("Imported %1 profile", "Imported %1 profiles", ok) : "") + (failed.length ? (ok > 0 ? "; " : "Failed: ") + failed.join("; ") : "");
         loadProfiles();
         Theme.profilesRev++;
     }
     function exportOne(url) {
         const p = current;
         const path = lp.pathOfUrl(url);
-        profileStatus = lp.call("Tsuba1.ExportLibraryProfile", [pid, p.id, path]) !== null ? "Exported “" + p.name + "”" : "Failed: " + lp.error;
+        profileStatus = lp.call("Tsuba1.ExportLibraryProfile", [pid, p.id, path]) !== null ? i18n("Exported “%1”", p.name) : "Failed: " + lp.error;
     }
     function exportMany(url) {
         const ids = Object.keys(exportSel).filter(k => exportSel[k]);
         const r = lp.json("ExportLibraryProfiles", [pid, JSON.stringify(ids), lp.pathOfUrl(url)], null);
-        profileStatus = r ? "Exported " + r.length + (r.length === 1 ? " profile" : " profiles") : "Failed: " + lp.error;
+        profileStatus = r ? i18np("Exported %1 profile", "Exported %1 profiles", r.length) : "Failed: " + lp.error;
     }
     // Profiles ticked in the "Export…" list.
     property var exportSel: ({})
@@ -94,7 +94,7 @@ Rectangle {
             return;
         }
         const ok = lp.call("SetProfileLighting", [pid, p.id, on ? "current" : "off"]) !== null;
-        profileAction(ok, on ? "“" + p.name + "” now keeps its own lighting" : "“" + p.name + "” no longer changes the lighting");
+        profileAction(ok, on ? i18n("“%1” now keeps its own lighting", p.name) : i18n("“%1” no longer changes the lighting", p.name));
         if (!ok) {
             profileStatus = "Failed: " + lp.error;
         }
@@ -102,22 +102,22 @@ Rectangle {
 
     FileDialog {
         id: importDlg
-        title: "Import profiles"
+        title: i18n("Import profiles")
         fileMode: FileDialog.OpenFiles
-        nameFilters: ["Tsuba profiles (*.tsuba-profile.json *.json)", "All files (*)"]
+        nameFilters: [i18n("Tsuba profiles (*.tsuba-profile.json *.json)"), i18n("All files (*)")]
         onAccepted: page.importFiles(selectedFiles)
     }
     FileDialog {
         id: exportDlg
-        title: "Export profile"
+        title: i18n("Export profile")
         fileMode: FileDialog.SaveFile
         defaultSuffix: "json"
-        nameFilters: ["Tsuba profiles (*.tsuba-profile.json)", "All files (*)"]
+        nameFilters: [i18n("Tsuba profiles (*.tsuba-profile.json)"), i18n("All files (*)")]
         onAccepted: page.exportOne(selectedFile)
     }
     FolderDialog {
         id: exportDirDlg
-        title: "Export the chosen profiles to a folder"
+        title: i18n("Export the chosen profiles to a folder")
         onAccepted: page.exportMany(selectedFolder)
     }
 
@@ -274,7 +274,7 @@ Rectangle {
             anchors.centerIn: parent
             width: Math.min(implicitWidth, 130)
             elide: Text.ElideRight
-            text: parent.apps.length === 1 ? parent.apps[0].toUpperCase() : parent.apps.length + " GAMES"
+            text: parent.apps.length === 1 ? parent.apps[0].toUpperCase() : i18n("%1 GAMES", parent.apps.length)
             color: Theme.accent
             font.family: Theme.font
             font.pixelSize: 9
@@ -684,7 +684,7 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuFactory"
-                                caption: "New from factory defaults"
+                                caption: i18n("New from factory defaults")
                                 enabled: !page.writesBlocked && page.switching === ""
                                 onPicked: {
                                     nameField.text = "Factory defaults";
@@ -738,7 +738,7 @@ Rectangle {
                             MenuRow {
                                 objectName: "menuLighting"
                                 readonly property bool has: !!page.current && !!page.current.lighting
-                                caption: has ? "✓ Lighting follows this profile (" + page.current.lighting.effect + ")" : "Lighting follows this profile"
+                                caption: has ? i18n("✓ Lighting follows this profile (%1)", page.current.lighting.effect) : i18n("Lighting follows this profile")
                                 enabled: !!page.current && !page.writesBlocked && page.switching === ""
                                 onPicked: page.setProfileLighting(!has)
                             }
@@ -750,7 +750,7 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuImport"
-                                caption: "Import…"
+                                caption: i18n("Import…")
                                 enabled: !page.writesBlocked
                                 onPicked: {
                                     moreMenu.close();
@@ -760,7 +760,7 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuExport"
-                                caption: "Export…"
+                                caption: i18n("Export…")
                                 enabled: !!page.current
                                 onPicked: {
                                     moreMenu.close();
@@ -771,7 +771,7 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuExportMany"
-                                caption: "Export several…"
+                                caption: i18n("Export several…")
                                 enabled: (page.lib.profiles || []).length > 0
                                 onPicked: {
                                     page.exportSel = ({});
@@ -808,14 +808,14 @@ Rectangle {
                                 Layout.margins: 12
                                 spacing: 6
                                 Text {
-                                    text: "Export profiles"
+                                    text: i18n("Export profiles")
                                     color: Theme.textDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
                                 }
                                 SynCheckBox {
                                     objectName: "exportAll"
-                                    text: "Select all"
+                                    text: i18n("Select all")
                                     checked: page.exportCount === (page.lib.profiles || []).length && page.exportCount > 0
                                     onToggled: page.selectAllForExport(checked)
                                 }
@@ -896,7 +896,7 @@ Rectangle {
                                 Layout.margins: 12
                                 spacing: 8
                                 Text {
-                                    text: page.nameMode === "rename" ? "Rename profile" : (page.nameMode === "duplicate" ? "Duplicate as" : (page.nameMode === "factory" ? "New profile with factory settings" : "New profile"))
+                                    text: page.nameMode === "rename" ? "Rename profile" : (page.nameMode === "duplicate" ? "Duplicate as" : (page.nameMode === "factory" ? i18n("New profile with factory settings") : "New profile"))
                                     color: Theme.textDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
@@ -927,7 +927,7 @@ Rectangle {
                                                 page.profileAction(page.backend.rename_library_profile(page.pid, page.current.id, n), "Renamed");
                                             } else if (page.nameMode === "factory") {
                                                 const id = page.lp.call("CreateFactoryProfile", [page.pid, n]);
-                                                page.profileAction(id !== null, "Created “" + n + "” with factory settings");
+                                                page.profileAction(id !== null, i18n("Created “%1” with factory settings", n));
                                                 if (id !== null) {
                                                     page.activate(id);
                                                 } else {

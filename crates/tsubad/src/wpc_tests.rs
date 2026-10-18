@@ -300,3 +300,24 @@ fn a_focus_only_link_follows_the_window_focus() {
     mgr.link_tick();
     *mgr.actions.focus.lock().unwrap() = None;
 }
+
+#[test]
+fn a_synapse_reimport_keeps_the_profiles_lighting() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let (mgr, _sim) = rig("00aa", 1);
+    let ids = profile_ids(&mgr, "00aa");
+    let mut l = DeviceLibrary::load(&lib::root(), "00aa").unwrap();
+    let mut p = l.get(&ids[0]).unwrap().clone();
+    p.synapse_guid = Some("syn-guid".into());
+    p.lighting = Some(red());
+    l.put(p.clone()).unwrap();
+    // What the importer sends: same Synapse guid, no lighting.
+    let mut incoming = p.clone();
+    incoming.lighting = None;
+    incoming.name = "Renamed in Synapse".into();
+    mgr.library_save("00aa", &serde_json::to_string(&incoming).unwrap()).unwrap();
+    let l = DeviceLibrary::load(&lib::root(), "00aa").unwrap();
+    assert_eq!(l.profiles.len(), 1);
+    assert_eq!(l.profiles[0].name, "Renamed in Synapse");
+    assert_eq!(l.profiles[0].lighting, Some(red()));
+}

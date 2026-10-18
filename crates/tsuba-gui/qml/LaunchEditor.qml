@@ -32,7 +32,7 @@ ColumnLayout {
         if (c === "") {
             return;
         }
-        panel.stage("launch:" + c, label || ("Launch " + c), () => panel.assignAction({ type: "launch", command: c }));
+        panel.stage("launch:" + c, label || i18n("Launch %1", c), () => panel.assignAction({ type: "launch", command: c }));
     }
     function stageUrl(text) {
         const t = text.trim();
@@ -40,13 +40,13 @@ ColumnLayout {
             return;
         }
         const url = (/^[a-z]+:/i.test(t) ? "" : "https://") + t;
-        panel.stage("url:" + url, "Open " + url, () => panel.assignAction({ type: "url", url: url }));
+        panel.stage("url:" + url, i18n("Open %1", url), () => panel.assignAction({ type: "url", url: url }));
     }
 
     ModeTabs {
         id: kind
         minTabWidth: 110
-        model: ["Program", "Website"]
+        model: [i18n("Program"), i18n("Website")]
         currentIndex: ed.mode
         onActivated: i => ed.mode = i
     }
@@ -56,7 +56,7 @@ ColumnLayout {
         visible: ed.mode === 0
         Layout.fillWidth: true
         spacing: 6
-        SectionHeading { text: "READY-MADE" }
+        SectionHeading { text: i18n("READY-MADE") }
         Repeater {
             model: ed.presets
             delegate: OptionRow {
@@ -64,20 +64,20 @@ ColumnLayout {
                 objectName: "preset_" + modelData.id
                 enabled: modelData.command !== ""
                 opacity: enabled ? 1 : 0.45
-                label: modelData.label + (modelData.command !== "" ? "  ·  " + modelData.command : "  (not installed)")
+                label: modelData.label + (modelData.command !== "" ? "  ·  " + modelData.command : i18n("  (not installed)"))
                 chosen: ed.panel.stagedId === "launch:" + modelData.command
                 onPicked: {
                     cmdField.text = modelData.command;
-                    ed.stageCommand(modelData.command, "Launch " + modelData.label);
+                    ed.stageCommand(modelData.command, i18n("Launch %1", modelData.label));
                 }
             }
         }
-        SectionHeading { text: "INSTALLED APPLICATIONS" }
+        SectionHeading { text: i18n("INSTALLED APPLICATIONS") }
         QQC2.TextField {
             id: search
             objectName: "appSearch"
             Layout.fillWidth: true
-            placeholderText: "Search applications"
+            placeholderText: i18n("Search applications")
             onTextEdited: ed.filter = text
         }
         Rectangle {
@@ -105,7 +105,7 @@ ColumnLayout {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
-                        text: modelData.name + (modelData.terminal ? "  (terminal)" : "")
+                        text: modelData.name + (modelData.terminal ? i18n("  (terminal)") : "")
                         color: ed.panel.stagedId === "launch:" + ed.commandFor(modelData) ? Theme.accent : Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -119,7 +119,7 @@ ColumnLayout {
                         onTapped: {
                             const c = ed.commandFor(modelData);
                             cmdField.text = c;
-                            ed.stageCommand(c, "Launch " + modelData.name);
+                            ed.stageCommand(c, i18n("Launch %1", modelData.name));
                         }
                     }
                 }
@@ -127,18 +127,18 @@ ColumnLayout {
             Text {
                 anchors.centerIn: parent
                 visible: ed.shown.length === 0
-                text: ed.apps.length === 0 ? "No applications found" : "Nothing matches"
+                text: ed.apps.length === 0 ? i18n("No applications found") : i18n("Nothing matches")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
             }
         }
-        SectionHeading { text: "OR TYPE A COMMAND" }
+        SectionHeading { text: i18n("OR TYPE A COMMAND") }
         QQC2.TextField {
             id: cmdField
             objectName: "launchCommand"
             Layout.fillWidth: true
-            placeholderText: "Command, e.g. firefox or steam"
+            placeholderText: i18n("Command, e.g. firefox or steam")
             onTextEdited: ed.stageCommand(text)
         }
     }
@@ -152,13 +152,13 @@ ColumnLayout {
             id: urlField
             objectName: "launchUrl"
             Layout.fillWidth: true
-            placeholderText: "https://…"
+            placeholderText: i18n("https://…")
             onTextEdited: ed.stageUrl(text)
         }
     }
     Text {
         Layout.fillWidth: true
-        text: "Runs on your PC while Tsuba's service is running."
+        text: i18n("Runs on your PC while Tsuba's service is running.")
         color: Theme.textMuted
         font.family: Theme.font
         font.pixelSize: 11

@@ -197,8 +197,11 @@ async fn main() -> Result<()> {
             loop {
                 let (m, n) = (mgr.clone(), notifier.clone());
                 let _ = tokio::task::spawn_blocking(move || {
-                    for (pid, _, _) in m.list() {
-                        notify::check_battery(&m, &n, &pid);
+                    // Mice only, like the app's battery badge: other kinds aren't asked for a battery level.
+                    for (pid, _, kind) in m.list() {
+                        if kind == "mouse" {
+                            notify::check_battery(&m, &n, &pid);
+                        }
                     }
                 })
                 .await;

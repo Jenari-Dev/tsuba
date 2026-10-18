@@ -163,17 +163,15 @@ Rectangle {
             SynCard {
                 title: i18n("This computer")
                 description: i18n("Include these lines when you report a problem.")
-                Repeater {
-                    model: page.detailLines()
-                    delegate: Text {
-                        required property string modelData
-                        Layout.fillWidth: true
-                        text: modelData
-                        color: Theme.text
-                        font.family: "monospace"
-                        font.pixelSize: 12
-                        elide: Text.ElideRight
-                    }
+                Text {
+                    objectName: "detailsText"
+                    Layout.fillWidth: true
+                    text: page.detailLines().join("\n")
+                    color: Theme.text
+                    font.family: "monospace"
+                    font.pixelSize: 12
+                    lineHeight: 1.3
+                    wrapMode: Text.Wrap
                 }
                 RowLayout {
                     spacing: 12

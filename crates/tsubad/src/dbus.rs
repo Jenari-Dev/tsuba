@@ -194,7 +194,12 @@ impl Tsuba {
     async fn save_chroma_profile(&self, profile: String, apply: bool) -> fdo::Result<Vec<String>> {
         use tsuba_core::chroma_profiles as cp;
         self.mgr.ensure_writable().map_err(err)?;
-        let p: cp::ChromaProfile = serde_json::from_str(&profile).map_err(|e| fdo::Error::InvalidArgs(e.to_string()))?;
+        let mut p: cp::ChromaProfile = serde_json::from_str(&profile).map_err(|e| fdo::Error::InvalidArgs(e.to_string()))?;
+        // The same limits as for an imported file: layer counts, numbers, colours, pictures.
+        p.sanitise();
+        if p.name.is_empty() {
+            return Err(fdo::Error::InvalidArgs("the lighting profile needs a name".into()));
+        }
         let name = p.name.clone();
         let mgr = self.mgr.clone();
         logged(

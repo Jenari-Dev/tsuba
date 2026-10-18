@@ -104,9 +104,14 @@ impl ChromaProfile {
                 let mut l = cl.layer.clone();
                 l.leds = leds.clone();
                 l.span = Some(self.canvas.span_for(pid));
-                out.entry(pid.clone()).or_default().layers.push(l);
+                let st = out.entry(pid.clone()).or_default();
+                // Device layers and canvas layers together stay within what a device runs.
+                if st.layers.len() < crate::studio::MAX_LAYERS {
+                    st.layers.push(l);
+                }
             }
         }
+        out.retain(|_, s| !s.layers.is_empty());
         out
     }
 
@@ -309,6 +314,20 @@ mod tests {
         let mouse = &e["00aa"].layers;
         assert_eq!(mouse.len(), 1);
         assert_eq!(mouse[0].leds, vec![[0, 1]]);
+    }
+
+    #[test]
+    fn expanded_never_exceeds_the_layer_limit() {
+        use crate::studio::MAX_LAYERS;
+        let mut p = ChromaProfile { name: "x".into(), ..Default::default() };
+        p.devices.insert("028d".into(), Studio { layers: (0..MAX_LAYERS).map(|i| Layer::new(&format!("l{i}"), StudioEffect::Battery)).collect() });
+        p.canvas = placed();
+        for _ in 0..MAX_LAYERS {
+            p.canvas.layers.push(CanvasLayer { layer: Layer::new("span", wave()), targets: BTreeMap::from([("028d".to_string(), vec![])]) });
+        }
+        p.sanitise();
+        assert_eq!(p.canvas.layers.len(), MAX_LAYERS);
+        assert_eq!(p.expanded()["028d"].layers.len(), MAX_LAYERS, "own layers + canvas layers are capped together");
     }
 
     #[test]

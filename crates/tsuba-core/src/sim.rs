@@ -394,6 +394,11 @@ pub struct FeatureSim {
     pub lift: Option<(u8, u8)>,
     /// Slots reset with Set Profile Reset, in order.
     pub resets: Vec<u8>,
+    /// Lighting per region id: (stored effect payload as sent, brightness 0–255). Mouse:
+    /// scroll wheel 1, logo 4, underglow 10; keyboard: backlight 5.
+    pub lighting: BTreeMap<u8, (Vec<u8>, u8)>,
+    /// Get Device Charging Status answer (None = not supported).
+    pub charging: Option<u8>,
 }
 
 impl Default for FeatureSim {
@@ -409,6 +414,8 @@ impl Default for FeatureSim {
             prox_state: 1,
             lift: None,
             resets: Vec::new(),
+            lighting: BTreeMap::new(),
+            charging: None,
         }
     }
 }
@@ -497,6 +504,29 @@ impl SimState {
                 Ok(a.to_vec())
             }
             (0x00, 0xb8) if self.mouse => Ok(vec![0]),
+            (0x07, 0x84) if f.charging.is_some() => Ok(vec![0, f.charging.unwrap_or(0)]),
+            // ---- lighting (class 0x0f): regions, effects, brightness
+            (0x0f, 0x80) => {
+                let ids: &[(u8, u8)] = if self.mouse { &[(1, 1), (4, 1), (10, 11)] } else { &[(5, 24)] };
+                Ok(ids.iter().flat_map(|&(id, cols)| [id, 25, 3, if cols == 24 { 9 } else { 1 }, cols]).collect())
+            }
+            (0x0f, 0x81) => {
+                let mut v = vec![arg(0)];
+                v.extend(if self.mouse { &[0u8, 1, 2, 3, 5, 8][..] } else { &[0u8, 1, 2, 3, 4, 5, 6, 7, 8, 10][..] });
+                Ok(v)
+            }
+            (0x0f, 0x82) => Ok(f.lighting.get(&arg(1)).map(|l| l.0.clone()).unwrap_or_else(|| vec![1, arg(1), 3, 0, 0, 0])),
+            (0x0f, 0x02) => {
+                let e = f.lighting.entry(arg(1)).or_insert((vec![], 255));
+                e.0 = a.to_vec();
+                Ok(a.to_vec())
+            }
+            (0x0f, 0x84) => Ok(vec![arg(0), arg(1), f.lighting.get(&arg(1)).map_or(255, |l| l.1)]),
+            (0x0f, 0x04) => {
+                let e = f.lighting.entry(arg(1)).or_insert((vec![1, arg(1), 3, 0, 0, 0], 255));
+                e.1 = arg(2);
+                Ok(a.to_vec())
+            }
             (0x05, 0x0b) => {
                 if !self.profiles.contains_key(&arg(0)) {
                     return Some(Err(fail()));

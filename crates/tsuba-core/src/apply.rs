@@ -1,7 +1,7 @@
 //! Apply a [`DeviceConfig`] to a device. Every function needs a `Device` with
 //! writes enabled and returns a short log of what it changed.
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, ensure, Context, Result};
 use tsuba_hid::{Device, Kind, Model};
 use tsuba_proto::{chroma, commands as c, decode};
 
@@ -17,6 +17,14 @@ pub fn apply(dev: &Device, model: &Model, cfg: &DeviceConfig) -> Result<Vec<Stri
     }
     if let Some(l) = &cfg.lighting {
         log.extend(apply_lighting(dev, l)?);
+    }
+    // Zones keep their own effect on top (not under software-rendered lighting, which owns every LED).
+    let software = cfg.lighting.as_ref().is_some_and(|l| matches!(l.effect, EffectConfig::Studio { .. } | EffectConfig::Custom { .. }));
+    if !software {
+        for (id, l) in &cfg.zones {
+            let Ok(id) = id.parse::<u8>() else { continue };
+            log.extend(apply_region(dev, id, l)?);
+        }
     }
     if let Some(d) = &cfg.dpi {
         if model.kind == Kind::Mouse && model.spec.features.dpi_stages {
@@ -100,29 +108,46 @@ pub fn apply_lighting(dev: &Device, l: &Lighting) -> Result<Vec<String>> {
         EffectConfig::Studio { .. } => return Ok(vec!["chroma studio (rendered by tsubad)".into()]),
         _ => {}
     }
-    let effect = to_effect(&l.effect)?;
-    let want = format!("{effect:?}");
     let mut log = Vec::new();
     for r in chroma::regions(&dev.query(chroma::GET_REGION_LIST, &[])?) {
-        let supported = dev
-            .query(chroma::GET_EFFECT_LIST, &[r.id])
-            .ok()
-            .and_then(|a| chroma::effect_list(&a))
-            .map(|(_, ids)| ids.iter().map(|x| format!("{x:?}")).collect::<Vec<_>>())
-            .unwrap_or_default();
-        let name = want.split([' ', '(', '{']).next().unwrap_or("");
-        if !supported.is_empty() && !supported.iter().any(|s| s == name) {
-            log.push(format!("region {}: {name} not supported, skipped", r.id));
-            continue;
-        }
-        dev.query(chroma::set_effect(colour_count(&effect)), &chroma::encode_effect(chroma::STORE, r.id, &effect))?;
-        log.push(format!("region {}: {want}", r.id));
-        if let Some(p) = l.brightness {
-            dev.query(chroma::SET_BRIGHTNESS, &chroma::encode_brightness(chroma::STORE, r.id, percent_to_level(p)))?;
-            log.push(format!("region {}: brightness {p}%", r.id));
-        }
+        log.extend(apply_region(dev, r.id, l)?);
     }
     Ok(log)
+}
+
+/// Apply a hardware effect and brightness to one lighting region (a mouse zone). A region
+/// that lacks the effect is skipped (logged), as in [`apply_lighting`].
+pub fn apply_region(dev: &Device, region: u8, l: &Lighting) -> Result<Vec<String>> {
+    if matches!(l.effect, EffectConfig::Custom { .. } | EffectConfig::Studio { .. }) {
+        bail!("zones take hardware effects only");
+    }
+    let effect = to_effect(&l.effect)?;
+    let want = format!("{effect:?}");
+    let supported = dev
+        .query(chroma::GET_EFFECT_LIST, &[region])
+        .ok()
+        .and_then(|a| chroma::effect_list(&a))
+        .map(|(_, ids)| ids.iter().map(|x| format!("{x:?}")).collect::<Vec<_>>())
+        .unwrap_or_default();
+    let name = want.split([' ', '(', '{']).next().unwrap_or("");
+    if !supported.is_empty() && !supported.iter().any(|s| s == name) {
+        return Ok(vec![format!("region {region}: {name} not supported, skipped")]);
+    }
+    dev.query(chroma::set_effect(colour_count(&effect)), &chroma::encode_effect(chroma::STORE, region, &effect))?;
+    let mut log = vec![format!("region {region}: {want}")];
+    if let Some(p) = l.brightness {
+        dev.query(chroma::SET_BRIGHTNESS, &chroma::encode_brightness(chroma::STORE, region, percent_to_level(p)))?;
+        log.push(format!("region {region}: brightness {p}%"));
+    }
+    Ok(log)
+}
+
+/// Set one region's brightness (percent) without touching its effect.
+pub fn set_region_brightness(dev: &Device, region: u8, percent: u8) -> Result<()> {
+    ensure!(percent <= 100, "brightness is a percentage");
+    ensure!(chroma::regions(&dev.query(chroma::GET_REGION_LIST, &[])?).iter().any(|r| r.id == region), "no lighting region {region}");
+    dev.query(chroma::SET_BRIGHTNESS, &chroma::encode_brightness(chroma::STORE, region, percent_to_level(percent)))?;
+    Ok(())
 }
 
 /// Switch to "normal" or "driver" mode (verified); returns false if it was already set.
@@ -239,6 +264,31 @@ mod tests {
     fn custom_grid_fills_missing_cells() {
         let g = custom_grid(&["ff0000 bogus".into()], 2, 3);
         assert_eq!(g, vec![vec![[255, 0, 0], [0, 0, 0], [0, 0, 0]], vec![[0, 0, 0]; 3]]);
+    }
+
+    #[test]
+    fn zones_override_the_device_lighting() {
+        use crate::config::DeviceConfig;
+        let s = std::sync::Arc::new(std::sync::Mutex::new(crate::sim::new_state("00aa", 1)));
+        let dev = crate::sim::device(&s);
+        let m = tsuba_hid::model(0x00aa).unwrap();
+        let mut cfg = DeviceConfig { pid: "00aa".into(), lighting: Some(Lighting { effect: EffectConfig::Spectrum, brightness: Some(100) }), ..Default::default() };
+        cfg.zones.insert("4".into(), Lighting { effect: EffectConfig::Static { colour: "ff0000".into() }, brightness: Some(40) });
+        apply(&dev, &m, &cfg).unwrap();
+        let st = s.lock().unwrap();
+        let fx = |id: u8| st.feat.lighting.get(&id).unwrap().clone();
+        assert_eq!(fx(4).0, vec![1, 4, 1, 0, 0, 1, 0xff, 0, 0], "logo static red");
+        assert_eq!(fx(4).1, percent_to_level(40));
+        assert_eq!((fx(1).0[2], fx(10).0[2], fx(10).1), (3, 3, 255), "wheel and underglow spectrum at 100%");
+        drop(st);
+        // Software lighting owns every LED: zones are not applied under it.
+        cfg.lighting = Some(Lighting { effect: EffectConfig::Studio { studio: Default::default() }, brightness: None });
+        assert!(apply(&dev, &m, &cfg).unwrap().iter().all(|l| !l.contains("region 4")));
+        // Zones take hardware effects only; unknown regions are refused for brightness.
+        assert!(apply_region(&dev, 4, &Lighting { effect: EffectConfig::Custom { rows: vec![] }, brightness: None }).is_err());
+        assert!(set_region_brightness(&dev, 7, 50).is_err());
+        set_region_brightness(&dev, 10, 50).unwrap();
+        assert_eq!(s.lock().unwrap().feat.lighting[&10].1, percent_to_level(50));
     }
 }
 

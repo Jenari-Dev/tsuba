@@ -8,6 +8,7 @@ mod applinks;
 mod audio;
 mod cache;
 mod dbus;
+mod dbus_device;
 mod game_http;
 mod game_lighting;
 mod gamemode;
@@ -74,6 +75,7 @@ async fn main() -> Result<()> {
     let conn = zbus::connection::Builder::session()?
         .name(dbus::BUS_NAME)?
         .serve_at(dbus::PATH, dbus::Tsuba { mgr: mgr.clone(), game: game.clone() })?
+        .serve_at(dbus::PATH, dbus_device::DeviceIface { mgr: mgr.clone() })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;

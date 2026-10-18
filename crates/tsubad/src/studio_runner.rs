@@ -53,7 +53,7 @@ pub fn spawn(pid: String, model: Model, dev: Arc<Mutex<Device>>, studio: Studio)
     let kept = studio.clone();
     let wants_battery = studio.uses_battery();
     // Audio Meter layers need the PC's audio levels; the capture lives as long as the thread.
-    let capture = if studio.uses_audio() { Some(crate::audio::shared()?) } else { None };
+    let captures: Vec<(String, std::sync::Arc<crate::audio::AudioCapture>)> = studio.audio_sources().into_iter().map(|src| crate::audio::shared(&src).map(|c| (src, c))).collect::<Result<_>>()?;
     // Ambient layers need the screen (the portal may show KDE's share-screen dialog once).
     let screen = if studio.uses_screen() { Some(crate::ambient::shared()?) } else { None };
     let stop = Arc::new(AtomicBool::new(false));
@@ -61,9 +61,9 @@ pub fn spawn(pid: String, model: Model, dev: Arc<Mutex<Device>>, studio: Studio)
     let thread = std::thread::Builder::new().name(format!("studio-{pid}")).spawn(move || {
         info!("{pid}: lighting studio running ({layers} layers, {} LEDs, {:?}/frame)", geo.pos.len(), period);
         let mut renderer = Renderer::new(studio, geo);
-        renderer.audio = capture.as_ref().map(|c| c.levels.clone());
+        renderer.audio = captures.iter().map(|(src, c)| (src.clone(), c.levels.clone())).collect();
         renderer.screen = screen.as_ref().map(|c| c.frame.clone());
-        let _capture = capture;
+        let _captures = captures;
         let _screen = screen;
         let start = Instant::now();
         let mut armed = false;

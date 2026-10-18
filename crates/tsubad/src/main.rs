@@ -15,6 +15,7 @@ mod idle;
 mod library;
 mod manager;
 mod shortcuts;
+mod dbus_lighting;
 mod studio_runner;
 
 use std::path::PathBuf;
@@ -70,10 +71,12 @@ async fn main() -> Result<()> {
     game.listen_allowed.store(!mgr.read_only || port_override.is_some(), std::sync::atomic::Ordering::Relaxed);
     game.underglow.store(mgr.config.lock().unwrap().game_lighting_underglow_enabled(), std::sync::atomic::Ordering::Relaxed);
     game.web.store(mgr.config.lock().unwrap().game_lighting_web_enabled(), std::sync::atomic::Ordering::Relaxed);
+    game.use_rules_file(tsuba_core::game_lighting::rules_path());
 
     let conn = zbus::connection::Builder::session()?
         .name(dbus::BUS_NAME)?
         .serve_at(dbus::PATH, dbus::Tsuba { mgr: mgr.clone(), game: game.clone() })?
+        .serve_at(dbus::PATH, dbus_lighting::Lighting { mgr: mgr.clone(), game: game.clone() })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;

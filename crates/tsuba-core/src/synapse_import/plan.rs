@@ -812,14 +812,14 @@ fn studio_effect(name: &str, p: &Value, warnings: &mut BTreeSet<String>) -> Opti
             StudioEffect::Wave { direction: wave_direction(n(p, "angle").unwrap_or(90.0)), duration: dur, colours: if custom { stop_colours(p) } else { vec![] } }
         }
         "spectrum" | "spectrumCycling" | "spectrumcycling" => StudioEffect::Spectrum { duration: duration(n(p, "duration"), 4000.0) },
-        "wheel" => StudioEffect::Wheel { direction: Direction::Clockwise, duration: Duration::Medium },
+        "wheel" => StudioEffect::Wheel { direction: Direction::Clockwise, duration: Duration::Medium, centre: [0.5, 0.5], spread: 1.0, colours: vec![] },
         "fire" => StudioEffect::Fire { duration: Duration::Medium },
         "ambient" | "ambientAwareness" => StudioEffect::Ambient { boost: 1.3, area: [0.0, 0.0, 1.0, 1.0] },
         "audio" | "audioMeter" => {
             if custom {
                 warnings.insert("Audio meter: custom colours aren't supported; the green–red gradient is used".into());
             }
-            StudioEffect::AudioMeter { colour: None, gain: 1.0, flow: false, boost: n(p, "boost").unwrap_or(1.0).clamp(0.1, 4.0) as f32 }
+            StudioEffect::AudioMeter { colour: None, gain: 1.0, flow: false, boost: n(p, "boost").unwrap_or(1.0).clamp(0.1, 4.0) as f32, source: None, mode: Default::default(), peak_hold: false }
         }
         other => {
             warnings.insert(format!("{} layers aren't supported yet", if other.is_empty() { "Unnamed" } else { other }));
@@ -920,6 +920,9 @@ fn lighting_profile(prof: &Value, data: &SynapseData, all_leds: &BTreeMap<u32, B
                     effect: effect.clone(),
                     brightness: 1.0,
                     blend: Default::default(),
+                    opacity: 1.0,
+                    speed: 1.0,
+                    span: None,
                 });
             }
         }
@@ -954,7 +957,7 @@ fn lighting_profile(prof: &Value, data: &SynapseData, all_leds: &BTreeMap<u32, B
         warnings.insert("Nothing in this effect maps to a Tsuba device".into());
     }
     plan.warnings = warnings.into_iter().collect();
-    plan.profile = ChromaProfile { name: plan.name.clone(), devices };
+    plan.profile = ChromaProfile { name: plan.name.clone(), devices, canvas: Default::default() };
     plan
 }
 

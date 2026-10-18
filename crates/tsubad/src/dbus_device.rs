@@ -79,6 +79,7 @@ impl Manager {
         o.insert("zones".into(), serde_json::to_value(&dc.zones)?);
         o.insert("battery_lighting".into(), serde_json::to_value(&dc.battery_lighting)?);
         o.insert("battery".into(), (report.supported("battery") && model.spec.features.battery).into());
+        o.insert("wireless".into(), model.spec.features.wireless.into());
         o.insert("factory_reset_phrase".into(), factory_reset_phrase(&model).into());
         o.insert("profile_reset_phrase".into(), profile_reset_phrase(profile).into());
         o.insert("tested".into(), model.tested().into());

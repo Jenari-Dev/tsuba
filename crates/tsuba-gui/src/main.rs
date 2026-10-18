@@ -1,6 +1,7 @@
 //! Tsuba desktop app (Kirigami). Device control goes through tsubad over D-Bus.
 
 mod backend;
+mod device_backend;
 mod i18n;
 mod synapse;
 

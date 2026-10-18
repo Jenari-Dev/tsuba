@@ -37,6 +37,51 @@ QQC2.ScrollView {
     property var gm: null   // keyboard Game Mode
     property var pw: null   // power / battery / device info
 
+    // Firmware features found by tsubad's read-only probe (debounce, lift-off, dimming…);
+    // controls for features the device didn't answer stay hidden. `devb` talks to the daemon's
+    // Device interface (null in the headless QML tests unless a test sets a fake).
+    property var devb: null
+    property var feat: ({})
+    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
+    function tr(translated, plain) {
+        return typeof i18n === "function" ? translated() : plain;
+    }
+    function loadFeatures() {
+        if (!devb) {
+            return;
+        }
+        const s = devb.features(pid, profile);
+        feat = s === "" ? ({}) : JSON.parse(s);
+    }
+    function setFeat(change) {
+        const r = devb.set_features(pid, JSON.stringify(Object.assign({ profile: profile }, change)));
+        result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : r.split("\n").join(" · ");
+        loadFeatures();
+    }
+    function makeDevb() {
+        try {
+            return Qt.createQmlObject("import io.github.jenaridev.tsuba\nDeviceBackend {}", tab, "DeviceBackend");
+        } catch (e) {
+            return null;
+        }
+    }
+    // Move DPI stage i one place up (-1) or down (+1); the active stage moves with it.
+    function moveStage(i, d) {
+        const j = i + d;
+        if (j < 0 || j >= stages.length) {
+            return;
+        }
+        const s = stages.slice();
+        [s[i], s[j]] = [s[j], s[i]];
+        stages = s;
+        if (activeStage === i + 1) {
+            activeStage = j + 1;
+        } else if (activeStage === j + 1) {
+            activeStage = i + 1;
+        }
+        commitStages();
+    }
+
     function loadPower() {
         const s = backend.power(pid);
         pw = s === "" ? null : JSON.parse(s);
@@ -65,6 +110,7 @@ QQC2.ScrollView {
         loadGameMode();
         loadPower();
         loadDial();
+        loadFeatures();
     }
 
     // Fn+F10 (Razer key 3) toggles Game Mode in the daemon; follow it here.
@@ -92,6 +138,7 @@ QQC2.ScrollView {
 
     function load() {
         loadDial();
+        loadFeatures();
         const s = backend.performance(pid, profile);
         if (s === "") {
             return;
@@ -122,7 +169,12 @@ QQC2.ScrollView {
         stageCommit.restart();
     }
 
-    Component.onCompleted: load()
+    Component.onCompleted: {
+        if (!devb) {
+            devb = makeDevb();
+        }
+        load();
+    }
     Connections {
         target: Theme
         function onDataRevChanged() {
@@ -362,6 +414,37 @@ QQC2.ScrollView {
                                     }
                                 }
                             }
+                            Column {
+                                objectName: "stageMove" + stageRow.index
+                                Layout.alignment: Qt.AlignTop
+                                spacing: 0
+                                visible: tab.stages.length > 1
+                                Repeater {
+                                    model: [-1, 1]
+                                    delegate: Text {
+                                        id: mv
+                                        required property int modelData
+                                        readonly property bool can: !tab.readOnly && stageRow.index + modelData >= 0 && stageRow.index + modelData < tab.stages.length
+                                        width: 18
+                                        height: 16
+                                        horizontalAlignment: Text.AlignHCenter
+                                        text: modelData < 0 ? "▲" : "▼"
+                                        color: mvHover.hovered && mv.can ? Theme.accent : Theme.textMuted
+                                        opacity: mv.can ? 1 : 0.3
+                                        font.pixelSize: 11
+                                        HoverHandler {
+                                            id: mvHover
+                                            cursorShape: mv.can ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                        }
+                                        TapHandler {
+                                            enabled: mv.can
+                                            onTapped: tab.moveStage(stageRow.index, mv.modelData)
+                                        }
+                                        QQC2.ToolTip.visible: mvHover.hovered && mv.can
+                                        QQC2.ToolTip.text: mv.modelData < 0 ? i18n("Move this stage up") : i18n("Move this stage down")
+                                    }
+                                }
+                            }
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 0
@@ -588,6 +671,11 @@ QQC2.ScrollView {
                     Label14 {
                         text: `Firmware ${tab.st.firmware || "?"}   ·   Mode: ${tab.st.mode === "Driver" ? "driver (software control)" : (tab.st.mode || "?")}`
                     }
+                    Label14 {
+                        objectName: "deviceModel"
+                        visible: !!tab.feat.model
+                        text: i18n("Model: %1", tab.feat.model || "") + (tab.feat.connection ? "   ·   " + (tab.feat.connection === "wireless" ? i18n("Connection: wireless (HyperSpeed receiver)") : i18n("Connection: wired")) : "") + (tab.feat.dongle_quality !== undefined ? "   ·   " + i18n("Link quality %1", tab.feat.dongle_quality) : "")
+                    }
                     RowLayout {
                         visible: !!tab.pw && !!tab.pw.serial
                         spacing: 10
@@ -600,6 +688,28 @@ QQC2.ScrollView {
                             onClicked: tab.backend.copy_text(tab.pw.serial)
                         }
                     }
+                    RowLayout {
+                        visible: !!tab.feat.support_url
+                        spacing: 10
+                        Text {
+                            Layout.fillWidth: true
+                            text: i18n("Firmware updates are published by Razer for Windows only; Tsuba never updates firmware.")
+                            color: Theme.textDim
+                            font.family: Theme.font
+                            font.pixelSize: Theme.small
+                            wrapMode: Text.Wrap
+                        }
+                        SynButton {
+                            objectName: "firmwareLink"
+                            text: i18n("Check for updates")
+                            onClicked: Qt.openUrlExternally(tab.feat.support_url)
+                        }
+                    }
+                }
+                DeviceResetCard {
+                    visible: tab.perfMode && tab.devb !== null && (!!tab.feat.can_reset_profile || !!tab.feat.factory_reset_phrase)
+                    host: tab
+                    onResetDone: tab.changed()
                 }
             }
 
@@ -659,6 +769,50 @@ QQC2.ScrollView {
                         checked: !!tab.perf.scroll_acceleration
                         onToggled: on => tab.apply({ scroll_acceleration: on })
                     }
+                    // Levels, for mice whose firmware answered them in the feature probe.
+                    Repeater {
+                        model: [
+                            { key: "scroll_accel_level", label: i18n("Scroll acceleration level"), on: tab.perf.scroll_acceleration !== false },
+                            { key: "smart_reel_threshold", label: i18n("Auto free-spin speed threshold"), on: tab.perf.smart_reel !== false }
+                        ].filter(x => tab.feat[x.key] !== undefined)
+                        delegate: ColumnLayout {
+                            id: lvl
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: 2
+                            Label14 {
+                                text: lvl.modelData.label
+                            }
+                            SynSlider {
+                                objectName: lvl.modelData.key
+                                Layout.fillWidth: true
+                                from: 0
+                                to: Math.max(10, tab.feat[lvl.modelData.key])
+                                stepSize: 1
+                                badge: true
+                                rangeLabels: true
+                                enabled: !tab.readOnly && lvl.modelData.on
+                                value: tab.feat[lvl.modelData.key]
+                                onPressedChanged: if (!pressed) {
+                                    const c = {};
+                                    c[lvl.modelData.key] = Math.round(value);
+                                    tab.setFeat(c);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ---- Mice: lift-off distance (lift-off sensor answered the probe)
+                SmartTrackingCard {
+                    visible: tab.perfMode && tab.st.kind === "mouse" && !!tab.feat.lift_sensor
+                    host: tab
+                }
+
+                // ---- Keyboards: switch debounce
+                DebounceCard {
+                    visible: tab.perfMode && tab.st.kind === "keyboard" && !!tab.feat.debounce
+                    host: tab
                 }
 
                 // ---- Keyboard: Game Mode
@@ -689,6 +843,12 @@ QQC2.ScrollView {
                         checked: !!tab.gm && tab.gm.block_shortcuts
                         onToggled: on => tab.setGameMode({ block_shortcuts: on })
                     }
+                }
+
+                // ---- Firmware dimming (battery devices that answered the probe)
+                WirelessDimCard {
+                    visible: !tab.perfMode && (tab.feat.smart_illumination !== undefined || tab.feat.time_to_dim !== undefined)
+                    host: tab
                 }
 
                 // ---- Power & battery (devices that report it)

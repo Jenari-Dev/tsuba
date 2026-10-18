@@ -51,9 +51,15 @@ fn main() {
                 "qml/UntestedBanner.qml",
                 "qml/DeviceInfoPage.qml",
                 "qml/SupportedDevicesPage.qml",
+                "qml/DebounceCard.qml",
+                "qml/SmartTrackingCard.qml",
+                "qml/DeviceResetCard.qml",
+                "qml/WirelessDimCard.qml",
+                "qml/DeviceLedsCard.qml",
+                "qml/BatteryLightingCard.qml",
             ]),
     )
-    .files(["src/backend.rs", "src/i18n.rs"])
+    .files(["src/backend.rs", "src/i18n.rs", "src/device_backend.rs"])
     .include_dir("src")
     .cpp_file("src/i18n.cpp");
     // SAFETY: only adds an include path for the KF6 I18n headers.

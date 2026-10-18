@@ -941,6 +941,10 @@ Rectangle {
             const fx = newEffect(backend.env_var("TSUBA_DEMO_EFFECT"));
             updateCurrent(l => l.effect = fx);
         }
+        if (backend.env_var("TSUBA_DEMO_IMAGE") !== "") {   // headless UI check
+            addLayer("image");
+            pic.source = "file://" + backend.env_var("TSUBA_DEMO_IMAGE");
+        }
         if (backend.env_var("TSUBA_DEMO_CANVAS") !== "" && hasMouse) {   // headless UI check
             showCombined(true);
             addLayer("wave");
@@ -2483,6 +2487,7 @@ Rectangle {
     }
 
     // Loads a picture, shrinks it to at most 64 pixels a side and stores it in the layer.
+    // `pic` only reads the picture's size; the Canvas does the (smoothed) shrinking.
     Image {
         id: pic
         visible: false
@@ -2493,23 +2498,28 @@ Rectangle {
             const s = Math.min(1, 64 / Math.max(implicitWidth, implicitHeight));
             sampler.w = Math.max(1, Math.round(implicitWidth * s));
             sampler.h = Math.max(1, Math.round(implicitHeight * s));
+            sampler.loadImage(source);
             sampler.requestPaint();
         }
     }
     Canvas {
         id: sampler
-        visible: false
+        // Invisible but "shown": a Canvas only paints while it is visible.
+        opacity: 0
+        enabled: false
+        z: -1
         property int w: 1
         property int h: 1
         width: w
         height: h
+        onImageLoaded: requestPaint()
         onPaint: {
-            if (pic.status !== Image.Ready) {
+            if (pic.status !== Image.Ready || !isImageLoaded(pic.source)) {
                 return;
             }
             const ctx = getContext("2d");
             ctx.reset();
-            ctx.drawImage(pic, 0, 0, w, h);
+            ctx.drawImage(pic.source, 0, 0, w, h);
             const d = ctx.getImageData(0, 0, w, h);
             const hex = studio.pixelsHex(d, w, h);
             const ww = w, hh = h;

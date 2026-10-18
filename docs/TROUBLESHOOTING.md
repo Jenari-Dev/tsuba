@@ -122,7 +122,7 @@ home directory path (those are replaced before the file is written). Open the zi
 
 ## Still stuck?
 
-Open an issue at https://github.com/JenAriDev/tsuba/issues with the diagnostics zip and what you expected to happen.
+Open an issue at https://github.com/Jenari-Dev/tsuba/issues with the diagnostics zip and what you expected to happen.
 
 ## Sending a useful report for a new device
 

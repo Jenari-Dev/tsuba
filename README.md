@@ -5,6 +5,12 @@ macros, DPI and polling rate, a profile library (unlimited profiles on the PC, p
 and power settings. It talks to the devices directly over hidraw (no kernel driver needed) and runs as a
 user daemon (`tsubad`) plus a Qt/QML app (`tsuba-app`) and a CLI (`tsuba`).
 
+> **Early release (v0.1.0) - feedback welcome.** Tsuba has been developed and tested on two devices only. What is
+> verified on hardware, what is only unit-tested and what is left out is listed honestly in
+> [docs/STATUS.md](docs/STATUS.md). If you have a Razer keyboard or mouse, please send a
+> [device report](https://github.com/Jenari-Dev/tsuba/issues/new?template=device-report.md): it is the most
+> useful thing you can do for the project. Untested devices start read-only.
+
 Supported and tested: BlackWidow V4 Pro (1532:028d), Basilisk V3 Pro (1532:00aa, wired).
 
 **Install:** see [docs/INSTALL.md](docs/INSTALL.md). **Something wrong?** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).

@@ -5,7 +5,13 @@ command-line tool `tsuba`. They need no kernel driver — Tsuba uses the standar
 
 ## Arch Linux (and Arch-based: CachyOS, EndeavourOS, Manjaro…)
 
-Build and install the package from a source checkout:
+Each [release](https://github.com/Jenari-Dev/tsuba/releases) has a ready-built package (and a `SHA256SUMS` file):
+
+```bash
+sudo pacman -U tsuba-*-x86_64.pkg.tar.zst
+```
+
+Or build and install the package from a source checkout:
 
 ```bash
 cd contrib/arch && ./build-local.sh
@@ -34,6 +40,12 @@ tsuba-handover
 It stops the OpenRazer daemon, blacklists its kernel modules, rebinds the devices to the generic HID driver
 and switches them to normal mode. Undo with `tsuba-handover-restore`. Nothing is uninstalled.
 
+The `PKGBUILD` in `contrib/arch/` downloads the GitHub tarball of the release tag
+(`$url/archive/refs/tags/v$pkgver.tar.gz`) and does not pin its checksum (`sha256sums=('SKIP')`), because
+GitHub does not guarantee byte-identical archives; the release workflow builds the published package straight
+from that tag. `build-local.sh` packs your working tree under the same file name, so local builds never
+touch the network for the source.
+
 ## Debian, Ubuntu, Fedora (recipes, not yet tried)
 
 `contrib/deb/build-deb.sh` and `contrib/rpm/tsuba.spec` build a `.deb` / `.rpm` from a source checkout. They have
@@ -57,6 +69,14 @@ Install `target/release/{tsubad,tsuba,tsuba-app}` somewhere on your `PATH`, copy
 `~/.config/systemd/user/` (adjust `ExecStart`), and `data/devices`, `data/devicedb` and
 `shim/build/{x64,x86}` to `/usr/share/tsuba/{devices,devicedb,game-lighting/…}` (a source checkout also
 finds them next to the build tree).
+
+## Why there is no Flatpak
+
+Tsuba needs raw access to `/dev/hidraw*` (granted by a udev rule on the host), runs a user service
+(`tsubad`) that must outlive the window, talks to the session D-Bus under its own name, reads the desktop's
+global-shortcut and idle interfaces, and installs a bridge DLL into Wine/Proton prefixes. A Flatpak sandbox
+would have to punch holes for all of that, which defeats the point of a sandbox and would be fragile, so
+the project does not offer one.
 
 ## After installing
 

@@ -4,7 +4,7 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc='Open-source Razer Synapse replacement: remaps, macros, DPI, lighting and Chroma Studio for Razer keyboards and mice'
 arch=('x86_64')
-url='https://github.com/JenAriDev/tsuba'
+url='https://github.com/Jenari-Dev/tsuba'
 license=('GPL-2.0-or-later')
 depends=(
     'gcc-libs' 'glibc' 'hicolor-icon-theme'
@@ -22,7 +22,10 @@ optdepends=(
 )
 options=('!lto')   # cxx-qt's C++ objects must stay native for rust-lld
 install=tsuba.install
-source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
+# The tarball GitHub generates for the release tag. Its checksum is not pinned: GitHub does not
+# promise byte-stable archives, and the release workflow builds this file straight from the tag.
+# (contrib/arch/build-local.sh packs the working tree under the same file name instead.)
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
 prepare() {
@@ -70,9 +73,9 @@ package() {
     install -Dm644 "$srcdir/shim-build/x64/RzChromaSDK64.dll" "$pkgdir/usr/share/tsuba/game-lighting/x64/RzChromaSDK64.dll"
     install -Dm644 "$srcdir/shim-build/x86/RzChromaSDK.dll" "$pkgdir/usr/share/tsuba/game-lighting/x86/RzChromaSDK.dll"
 
-    install -Dm644 contrib/io.github.jenaridev.tsuba.desktop -t "$pkgdir/usr/share/applications"
-    sed -i 's|^Exec=.*|Exec=tsuba-app|' "$pkgdir/usr/share/applications/io.github.jenaridev.tsuba.desktop"
-    install -Dm644 contrib/io.github.jenaridev.tsuba.svg -t "$pkgdir/usr/share/icons/hicolor/scalable/apps"
+    install -Dm644 contrib/io.github.Jenari_Dev.Tsuba.desktop -t "$pkgdir/usr/share/applications"
+    sed -i 's|^Exec=.*|Exec=tsuba-app|' "$pkgdir/usr/share/applications/io.github.Jenari_Dev.Tsuba.desktop"
+    install -Dm644 contrib/io.github.Jenari_Dev.Tsuba.svg -t "$pkgdir/usr/share/icons/hicolor/scalable/apps"
 
     # openrazer hand-over (opt-in, reversible): the package never blacklists drivers by itself.
     install -Dm755 contrib/openrazer-handover.sh "$pkgdir/usr/bin/tsuba-handover"

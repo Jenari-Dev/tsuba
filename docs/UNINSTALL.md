@@ -10,7 +10,7 @@ systemctl --user disable --now tsubad
 ```
 
 In Tsuba's Settings, switch off **Launch Tsuba at login** (or delete
-`~/.config/autostart/io.github.jenaridev.tsuba.desktop`).
+`~/.config/autostart/io.github.Jenari_Dev.Tsuba.desktop`).
 
 ## 2. Give devices back to OpenRazer (only if you used the hand-over)
 

@@ -1,0 +1,106 @@
+name: Release
+
+# Runs when a tag such as v0.1.1 is pushed: builds the Arch package from the tag's source
+# tarball and publishes a GitHub release with the package, its checksum and the changelog entry.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  arch-package:
+    name: Arch package
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm --needed \
+            base-devel git curl rust clang pkgconf mingw-w64-gcc gettext python \
+            qt6-base qt6-declarative qt6-svg ki18n qqc2-breeze-style \
+            libpipewire libpulse libxkbcommon xkeyboard-config hicolor-icon-theme ttf-roboto
+
+      - uses: actions/checkout@v7.0.1
+
+      - name: The tag matches the PKGBUILD
+        run: |
+          pkgver=$(sed -n 's/^pkgver=//p' contrib/arch/PKGBUILD)
+          if [ "v$pkgver" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match pkgver $pkgver in contrib/arch/PKGBUILD" >&2
+            exit 1
+          fi
+          cargo_ver=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          if [ "$cargo_ver" != "$pkgver" ]; then
+            echo "Cargo.toml version $cargo_ver does not match pkgver $pkgver" >&2
+            exit 1
+          fi
+
+      - name: Build as a normal user from the tagged tarball
+        # makepkg refuses to run as root. The PKGBUILD downloads the tag's tarball from GitHub
+        # (its checksum is SKIP), so only the packaging files are needed in the build directory.
+        run: |
+          useradd -m builder
+          chown -R builder:builder .
+          su builder -c 'cd contrib/arch && makepkg --noconfirm --clean'
+          ls -l contrib/arch/*.pkg.tar.zst
+
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: arch-package
+          path: contrib/arch/*.pkg.tar.zst
+          if-no-files-found: error
+
+  release:
+    name: GitHub release
+    needs: [arch-package]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/download-artifact@v8.0.2
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Release notes from the changelog
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          # The section of CHANGELOG.md for this version.
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "no section for $version in CHANGELOG.md" >&2
+            exit 1
+          fi
+          {
+            echo
+            echo "### Install"
+            echo
+            echo "- Arch Linux and derivatives: \`sudo pacman -U tsuba-$version-1-x86_64.pkg.tar.zst\`"
+            echo "- Other distributions: build from source, see docs/INSTALL.md"
+            echo
+            echo "This is an early release. See docs/STATUS.md for what has and has not been verified on real hardware."
+            echo "Tsuba is an independent project and is not affiliated with or endorsed by Razer Inc."
+          } >> notes.md
+          (cd dist && sha256sum * > SHA256SUMS)
+          cat notes.md
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Tsuba $version" \
+            --notes-file notes.md \
+            dist/*

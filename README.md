@@ -20,6 +20,18 @@ Steam / Lutris / Heroic / Bottles game scanner); power and idle settings; **Impo
 the profiles, macros and lighting effects of a Windows Synapse 4 install on a mounted drive);
 your own device pictures; and game lighting.
 
+Also: macros can **run a command** (a shortcut slot the daemon watches), **type text** in the PC's keyboard layout
+(`wtype`, `ydotool` or `xdotool` for the Type action), linked games can follow **window focus** (KDE), the
+**global shortcut backend** is KDE's kglobalaccel or the desktop portal's GlobalShortcuts (GNOME and others), and **Game
+Mode** blocks the keyboard's Windows / Menu keys and, per combination, the desktop shortcuts you pick. Lighting follows the
+profile when you tell a profile to carry it. Profile files you import never bring commands along unless you approve the
+list shown to you.
+
+Two read-only helpers for owners of new devices: `tsuba probe-features` asks the device which optional settings it answers
+(one Get per candidate, never a write; `--json` and `--out FILE` save the result to attach to a report), and
+`tsuba led-guide` walks a per-key keyboard's LED columns so you can check the layout drawing (it lights keys, so it asks
+for confirmation first).
+
 Around the devices: a tray icon with quick profile switching, desktop notifications (DPI stage, profile,
 dial, scroll-wheel mode, low battery, connect / disconnect), launch at login, light, dark or automatic
 theme with a custom accent colour, a welcome tour, an English and 日本語 interface, and a diagnostics export that

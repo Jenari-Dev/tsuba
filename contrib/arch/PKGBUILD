@@ -9,12 +9,15 @@ license=('GPL-2.0-or-later')
 depends=(
     'gcc-libs' 'glibc' 'hicolor-icon-theme'
     'qt6-base' 'qt6-declarative' 'qt6-svg' 'qqc2-breeze-style' 'ki18n'
-    'libpipewire' 'libpulse' 'xdg-desktop-portal' 'xdg-utils' 'ttf-roboto'
+    'libpipewire' 'libpulse' 'libxkbcommon' 'xkeyboard-config' 'xdg-desktop-portal' 'xdg-utils' 'ttf-roboto'
 )
 makedepends=('cargo' 'clang' 'pkgconf' 'mingw-w64-gcc' 'gettext')
 optdepends=(
     'kglobalaccel: run Launch / Inter-device / Audio actions from device buttons'
     'systemsettings: "Open system settings" shortcut on the Customize tab'
+    'wtype: type-text actions and macro text on Wayland'
+    'ydotool: type-text actions on Wayland without wtype (needs ydotoold)'
+    'xdotool: type-text actions on X11'
     'wine: game lighting for Windows games (the bridge DLLs are installed into Wine/Proton prefixes)'
 )
 options=('!lto')   # cxx-qt's C++ objects must stay native for rust-lld

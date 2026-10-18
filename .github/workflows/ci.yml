@@ -14,7 +14,7 @@ jobs:
         run: |
           pacman -Syu --noconfirm --needed base-devel git rust clang pkgconf \
             qt6-base qt6-declarative qt6-svg ki18n qqc2-breeze-style \
-            libpipewire libpulse mingw-w64-gcc ttf-roboto gettext python
+            libpipewire libpulse libxkbcommon xkeyboard-config mingw-w64-gcc ttf-roboto gettext python
 
       - uses: actions/checkout@v4
 

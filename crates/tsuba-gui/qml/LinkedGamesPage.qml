@@ -16,6 +16,9 @@ Rectangle {
     property var chromaNames: []
     readonly property var devs: JSON.parse(backend.devices || "[]")
     property var deviceProfiles: ({})   // pid -> [{id, name}]
+    property var pollingOptions: ({})   // pid -> [125, 500, 1000, …] (mice)
+    // The link a "Remove" is waiting to confirm.
+    property bool confirmRemove: false
 
     color: Theme.bg
 
@@ -38,7 +41,26 @@ Rectangle {
             dp[d.pid] = p.profiles.map(x => ({ id: x.id, name: x.name + (x.pinned_slot ? "  (slot " + x.pinned_slot + ")" : "") }));
         });
         deviceProfiles = dp;
+        const po = {};
+        devs.forEach(d => {
+            if (typeof backend.performance === "function") {
+                const r = backend.performance(d.pid, 1);
+                const opts = r === "" ? [] : (JSON.parse(r).polling_options || []);
+                if (opts.length > 0) {
+                    po[d.pid] = opts.slice().sort((a, b) => a - b);
+                }
+            }
+        });
+        pollingOptions = po;
     }
+    function removeSelected() {
+        const l = links.slice();
+        l.splice(sel, 1);
+        store(l);
+        sel = Math.min(sel, l.length - 1);
+        confirmRemove = false;
+    }
+    onSelChanged: confirmRemove = false
     function store(list) {
         links = list;
         backend.set_app_links(JSON.stringify({ links: list }));
@@ -80,6 +102,9 @@ Rectangle {
         if (backend.env_var && backend.env_var("TSUBA_GAMESCAN") === "1") {   // headless UI check
             scanGames();
         }
+        if (backend.env_var && backend.env_var("TSUBA_LINK_SEL") !== "") {
+            sel = parseInt(backend.env_var("TSUBA_LINK_SEL"));
+        }
     }
     // Keep the profile lists fresh: when the page is shown, when the device list changes and
     // after profiles are created / renamed / deleted elsewhere in the app.
@@ -114,7 +139,7 @@ Rectangle {
 
         // ---- Links
         Rectangle {
-            Layout.preferredWidth: 320
+            Layout.preferredWidth: 372
             Layout.fillHeight: true
             color: Theme.panel
             border.color: Theme.line
@@ -264,10 +289,15 @@ Rectangle {
                 }
             }
 
-            ColumnLayout {
+            QQC2.ScrollView {
                 visible: page.sel >= 0 && page.sel < page.links.length
                 anchors.fill: parent
-                anchors.margins: 28
+                contentWidth: availableWidth
+                clip: true
+            ColumnLayout {
+                x: 28
+                y: 28
+                width: parent.width - 56
                 spacing: 16
                 readonly property var cur: page.sel >= 0 ? page.links[page.sel] : null
 
@@ -288,13 +318,31 @@ Rectangle {
                         Layout.fillWidth: true
                     }
                     SynButton {
-                        text: "Delete"
-                        onClicked: {
-                            const l = page.links.slice();
-                            l.splice(page.sel, 1);
-                            page.store(l);
-                            page.sel = Math.min(page.sel, l.length - 1);
-                        }
+                        objectName: "removeLink"
+                        visible: !page.confirmRemove
+                        text: i18n("Remove")
+                        onClicked: page.confirmRemove = true
+                    }
+                    Text {
+                        visible: page.confirmRemove
+                        text: i18n("Remove “%1”?", parent.parent.cur ? page.label(parent.parent.cur) : "")
+                        color: Theme.text
+                        font.family: Theme.font
+                        font.pixelSize: Theme.small
+                    }
+                    SynButton {
+                        visible: page.confirmRemove
+                        text: i18n("Keep")
+                        implicitWidth: 72
+                        onClicked: page.confirmRemove = false
+                    }
+                    SynButton {
+                        objectName: "confirmRemoveLink"
+                        visible: page.confirmRemove
+                        text: "Remove"
+                        primary: true
+                        implicitWidth: 84
+                        onClicked: page.removeSelected()
                     }
                 }
 
@@ -397,9 +445,60 @@ Rectangle {
                         onActivated: i => page.edit(l => l.chroma = i === 0 ? null : page.chromaNames[i - 1])
                     }
                 }
-                Item {
-                    Layout.fillHeight: true
+                Repeater {
+                    model: page.devs.filter(d => !!page.pollingOptions[d.pid])
+                    delegate: RowLayout {
+                        required property var modelData
+                        objectName: "pollingRow_" + modelData.pid
+                        spacing: 12
+                        readonly property var cur: page.sel >= 0 && page.links[page.sel] ? page.links[page.sel] : null
+                        readonly property var opts: page.pollingOptions[modelData.pid] || []
+                        readonly property var want: cur && cur.polling_hz ? cur.polling_hz[modelData.pid] : undefined
+                        Text {
+                            Layout.preferredWidth: 200
+                            text: i18n("%1 polling rate", modelData.name.replace(" (wired)", ""))
+                            color: Theme.text
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize
+                            elide: Text.ElideRight
+                        }
+                        QQC2.ComboBox {
+                            objectName: "pollingPick_" + modelData.pid
+                            Layout.preferredWidth: 260
+                            model: [i18n("Don't change polling rate")].concat(opts.map(o => i18n("%1 Hz", o)))
+                            currentIndex: parent.want === undefined ? 0 : 1 + opts.indexOf(parent.want)
+                            onActivated: i => page.edit(l => {
+                                l.polling_hz = l.polling_hz || {};
+                                if (i === 0) {
+                                    delete l.polling_hz[modelData.pid];
+                                } else {
+                                    l.polling_hz[modelData.pid] = opts[i - 1];
+                                }
+                            })
+                        }
+                    }
                 }
+                SectionLabel {
+                    caption: i18n("When")
+                }
+                SynCheckBox {
+                    objectName: "onlyFocused"
+                    text: i18n("Only while the game's window has the focus")
+                    checked: !!parent.cur && !!parent.cur.only_when_focused
+                    onToggled: page.edit(l => l.only_when_focused = checked)
+                }
+                Text {
+                    Layout.fillWidth: true
+                    text: i18n("Alt+Tab to your browser and the devices switch back; return to the game and they switch again. Needs KDE Plasma: Tsuba loads a small window-focus helper into the desktop while this is on. On other desktops the link applies while the game runs.")
+                    color: Theme.textMuted
+                    font.family: Theme.font
+                    font.pixelSize: 11
+                    wrapMode: Text.Wrap
+                }
+                Item {
+                    Layout.preferredHeight: 20
+                }
+            }
             }
         }
     }

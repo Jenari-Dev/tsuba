@@ -17,6 +17,7 @@ serde_json = "1.0.154"
 dirs = "7.0.0"
 snap = "1.1.1"
 libc.workspace = true
+xkbcommon = "0.9.0"
 
 [features]
 # A simulated device for tests (tsuba_core::sim).

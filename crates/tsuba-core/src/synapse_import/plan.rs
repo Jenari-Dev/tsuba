@@ -235,6 +235,7 @@ fn playback_label(p: Playback, count: u8) -> String {
         Playback::Times => format!("play {count} times"),
         Playback::WhileHeld => "repeat while held".into(),
         Playback::Toggle => "toggle on/off".into(),
+        Playback::Sequence => "play as a sequence".into(),
     }
 }
 
@@ -661,7 +662,7 @@ fn convert_macro(m: &Value) -> MacroPlan {
     if name.is_empty() {
         name = "Synapse macro".into();
     }
-    let mut plan = MacroPlan { guid: tsuba_guid(&sg), synapse_guid: sg, name: name.clone(), events: 0, warnings: Vec::new(), mac: Macro { guid: String::new(), name, events: Vec::new() } };
+    let mut plan = MacroPlan { guid: tsuba_guid(&sg), synapse_guid: sg, name: name.clone(), events: 0, warnings: Vec::new(), mac: Macro { name, ..Default::default() } };
     let events = m.get("macroEvents").and_then(Value::as_array).cloned().unwrap_or_default();
     let mut out: Vec<MacroEvent> = Vec::new();
     let mut loop_start: Option<(usize, u32)> = None;
@@ -708,7 +709,7 @@ fn convert_macro(m: &Value) -> MacroPlan {
                     let body: Vec<MacroEvent> = out[start..].to_vec();
                     let times = times.min(100);
                     for _ in 1..times {
-                        out.extend(body.iter().copied());
+                        out.extend(body.iter().cloned());
                     }
                     if times > 1 {
                         plan.warnings.push(format!("A loop ({times}×) was written out as repeated events"));
@@ -748,7 +749,7 @@ fn convert_macro(m: &Value) -> MacroPlan {
         plan.warnings.push(format!("Pressed but never released: {} (Synapse may have released it for you)", held.join(", ")));
     }
     plan.events = out.len();
-    plan.mac = Macro { guid: plan.guid.clone(), name: plan.name.clone(), events: out };
+    plan.mac = Macro { guid: plan.guid.clone(), name: plan.name.clone(), events: out, ..Default::default() };
     plan
 }
 

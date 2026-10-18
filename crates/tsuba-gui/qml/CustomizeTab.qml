@@ -13,6 +13,9 @@ Item {
 
     property int keyLayer: 0
     property int profile: 1
+    // The library profile being edited and how many there are (shortcut suggestions, hints).
+    property string profileId: ""
+    property int profileCount: 2
     onProfileChanged: {
         load();
         loadScroll();
@@ -163,6 +166,8 @@ Item {
             readOnly: tab.readOnly
             pid: tab.pid
             profile: tab.profile
+            profileId: tab.profileId
+            profileCount: tab.profileCount
             isMouse: tab.isMouse
             keyLayer: tab.keyLayer
             target: tab.selected

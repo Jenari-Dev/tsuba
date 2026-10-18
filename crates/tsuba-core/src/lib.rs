@@ -5,6 +5,7 @@ pub mod app_links;
 pub mod apply;
 pub mod chroma_profiles;
 pub mod config;
+pub mod desktop_apps;
 pub mod devices;
 pub mod features;
 pub mod fsutil;
@@ -21,6 +22,7 @@ pub mod state;
 pub mod sim;
 pub mod studio;
 pub mod synapse_import;
+pub mod text_layout;
 
 pub use config::{Config, DeviceConfig};
 pub use state::DeviceState;

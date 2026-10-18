@@ -256,6 +256,106 @@ QtObject {
         ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Refresh (F5)", 0x00, 0x3e], ["Fullscreen (F11)", 0x00, 0x44]
     ]
 
+    // ---- Key groups for the key picker: [title, [HID usages]].
+    function range(a, b) {
+        const r = [];
+        for (let i = a; i <= b; i++) {
+            r.push(i);
+        }
+        return r;
+    }
+    readonly property var keyGroups: [
+        ["Letters", range(0x04, 0x1d)],
+        ["Numbers", range(0x1e, 0x27)],
+        ["Function keys", range(0x3a, 0x45).concat(range(0x68, 0x73))],
+        ["Navigation", [0x52, 0x51, 0x50, 0x4f, 0x4a, 0x4d, 0x4b, 0x4e, 0x49, 0x4c]],
+        ["Editing and spacing", [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x39, 0x65, 0x46, 0x47, 0x48]],
+        ["Punctuation", [0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x32, 0x64]],
+        ["Numpad", range(0x53, 0x63)],
+        ["Modifiers", range(0xe0, 0xe7)]
+    ]
+    // Keyboard-function data [modifier bits, usage] for a picked key (modifier keys are a bit, no usage).
+    function pickedData(h, mods) {
+        return h >= 0xe0 && h <= 0xe7 ? [1 << (h - 0xe0), 0] : [mods, h];
+    }
+    // Which group a HID usage belongs to (index into keyGroups), or -1.
+    function groupOf(h) {
+        return keyGroups.findIndex(g => g[1].indexOf(h) >= 0);
+    }
+
+    // ---- Shortcut catalogue: [category id, title, [[label, modifier bits, HID usage], ...]].
+    // Modifier bits: 1 Ctrl, 2 Shift, 4 Alt, 8 Meta (Windows key). Linux / KDE defaults.
+    readonly property var shortcutCatalogue: [
+        ["system", "System", [
+            ["Switch window (Alt+Tab)", 0x04, 0x2b], ["Close window (Alt+F4)", 0x04, 0x3d], ["Show desktop (Meta+D)", 0x08, 0x07],
+            ["Application launcher (Meta)", 0x08, 0], ["Overview (Meta+W)", 0x08, 0x1a], ["Lock screen (Meta+L)", 0x08, 0x0f],
+            ["Run command (Alt+Space)", 0x04, 0x2c], ["Screenshot (Print)", 0x00, 0x46], ["Task manager (Ctrl+Esc)", 0x01, 0x29],
+            ["Maximise window (Meta+Up)", 0x08, 0x52], ["Minimise window (Meta+Down)", 0x08, 0x51], ["Emoji picker (Meta+.)", 0x08, 0x37],
+            ["Clipboard history (Meta+V)", 0x08, 0x19], ["Next desktop (Ctrl+Meta+Right)", 0x09, 0x4f], ["Previous desktop (Ctrl+Meta+Left)", 0x09, 0x50]
+        ]],
+        ["editing", "Editing", [
+            ["Copy", 0x01, 0x06], ["Cut", 0x01, 0x1b], ["Paste", 0x01, 0x19], ["Paste without formatting", 0x03, 0x19],
+            ["Undo", 0x01, 0x1d], ["Redo", 0x03, 0x1d], ["Select all", 0x01, 0x04], ["Find", 0x01, 0x09], ["Replace", 0x01, 0x0b],
+            ["Save", 0x01, 0x16], ["Save as", 0x03, 0x16], ["Open", 0x01, 0x12], ["New", 0x01, 0x11], ["Print", 0x01, 0x13]
+        ]],
+        ["browser", "Browser", [
+            ["New tab", 0x01, 0x17], ["Close tab", 0x01, 0x1a], ["Reopen closed tab", 0x03, 0x17], ["Next tab", 0x01, 0x2b],
+            ["Previous tab", 0x03, 0x2b], ["Address bar", 0x01, 0x0f], ["Refresh", 0x00, 0x3e], ["Refresh without cache", 0x03, 0x15],
+            ["Back", 0x04, 0x50], ["Forward", 0x04, 0x4f], ["Home page", 0x04, 0x4a], ["Bookmark page", 0x01, 0x07],
+            ["Developer tools", 0x00, 0x45], ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Reset zoom", 0x01, 0x27], ["Full screen", 0x00, 0x44]
+        ]],
+        ["office", "Office", [
+            ["Bold", 0x01, 0x05], ["Italic", 0x01, 0x0c], ["Underline", 0x01, 0x18], ["Align left", 0x01, 0x0f], ["Align centre", 0x01, 0x08],
+            ["Align right", 0x01, 0x15], ["Insert link", 0x01, 0x0e], ["Find and replace", 0x01, 0x0b], ["Go to line / page", 0x01, 0x0a],
+            ["Spell check", 0x00, 0x40], ["Select all", 0x01, 0x04], ["Save", 0x01, 0x16], ["Print", 0x01, 0x13]
+        ]],
+        ["creative", "Creative apps", [
+            ["Undo", 0x01, 0x1d], ["Redo", 0x03, 0x1d], ["Brush smaller ([)", 0x00, 0x2f], ["Brush bigger (])", 0x00, 0x30],
+            ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Fit on screen", 0x01, 0x27], ["Brush (B)", 0x00, 0x05], ["Eraser (E)", 0x00, 0x08],
+            ["Move (V)", 0x00, 0x19], ["Eyedropper (I)", 0x00, 0x0c], ["Deselect", 0x01, 0x07], ["Invert selection", 0x03, 0x0c],
+            ["Free transform", 0x01, 0x17], ["New layer", 0x03, 0x11], ["Merge layer down", 0x01, 0x08]
+        ]],
+        ["video", "Video", [
+            ["Play / pause (Space)", 0x00, 0x2c], ["Back 5 seconds", 0x00, 0x50], ["Forward 5 seconds", 0x00, 0x4f], ["Back 10 seconds (J)", 0x00, 0x0d],
+            ["Pause (K)", 0x00, 0x0e], ["Forward 10 seconds (L)", 0x00, 0x0f], ["Previous frame (,)", 0x00, 0x36], ["Next frame (.)", 0x00, 0x37],
+            ["Mark in (I)", 0x00, 0x0c], ["Mark out (O)", 0x00, 0x12], ["Split clip (S)", 0x00, 0x16], ["Full screen (F)", 0x00, 0x09], ["Mute (M)", 0x00, 0x10]
+        ]],
+        ["meeting", "Meetings", [
+            ["Mute / unmute (Zoom)", 0x04, 0x04], ["Camera on / off (Zoom)", 0x04, 0x19], ["Raise hand (Zoom)", 0x04, 0x1c], ["Share screen (Zoom)", 0x04, 0x16],
+            ["Mute / unmute (Meet)", 0x01, 0x07], ["Camera on / off (Meet)", 0x01, 0x08], ["Mute / unmute (Teams)", 0x03, 0x10],
+            ["Camera on / off (Teams)", 0x03, 0x12], ["Raise hand (Teams)", 0x03, 0x0e], ["Leave meeting (Teams)", 0x03, 0x0b],
+            ["Mute microphone (Discord)", 0x03, 0x10], ["Deafen (Discord)", 0x03, 0x07]
+        ]]
+    ]
+    // The flat list the first version had (kept for callers that still read it).
+    readonly property var allShortcuts: shortcutCatalogue.reduce((a, c) => a.concat(c[2]), [])
+
+    // Which catalogue category suits a linked app (by its name or the text it is matched by), or "".
+    readonly property var appCategories: [
+        ["browser", ["firefox", "chrome", "chromium", "brave", "vivaldi", "opera", "edge", "zen", "librewolf", "browser"]],
+        ["office", ["libreoffice", "writer", "calc", "impress", "word", "excel", "powerpoint", "onlyoffice", "soffice", "obsidian", "notion", "thunderbird"]],
+        ["creative", ["photoshop", "gimp", "krita", "blender", "inkscape", "aseprite", "darktable", "figma", "illustrator", "affinity", "clip studio", "paint"]],
+        ["video", ["vlc", "mpv", "kdenlive", "davinci", "resolve", "premiere", "shotcut", "olive", "handbrake", "obs", "youtube", "netflix", "plex", "jellyfin"]],
+        ["meeting", ["zoom", "teams", "discord", "slack", "skype", "meet", "jitsi", "webex", "telegram"]]
+    ]
+    function categoryForApp(text) {
+        const t = String(text || "").toLowerCase();
+        for (const c of appCategories) {
+            if (c[1].some(k => t.indexOf(k) >= 0)) {
+                return c[0];
+            }
+        }
+        return "";
+    }
+    // Text of a shortcut chip: "Ctrl+Shift+K".
+    function chord(mods, usage) {
+        const parts = [mods & 1 ? "Ctrl" : "", mods & 2 ? "Shift" : "", mods & 4 ? "Alt" : "", mods & 8 ? "Meta" : ""].filter(x => x !== "");
+        if (usage) {
+            parts.push(hid[usage] || ("0x" + usage.toString(16)));
+        }
+        return parts.join("+");
+    }
+
     // Linux evdev keycode -> HID keyboard usage; modifier keys -> modifier bit.
     readonly property var evdevHid: ({ 1: 0x29, 2: 0x1e, 3: 0x1f, 4: 0x20, 5: 0x21, 6: 0x22, 7: 0x23, 8: 0x24, 9: 0x25, 10: 0x26, 11: 0x27, 12: 0x2d, 13: 0x2e, 14: 0x2a, 15: 0x2b, 16: 0x14, 17: 0x1a, 18: 0x08, 19: 0x15, 20: 0x17, 21: 0x1c, 22: 0x18, 23: 0x0c, 24: 0x12, 25: 0x13, 26: 0x2f, 27: 0x30, 28: 0x28, 30: 0x04, 31: 0x16, 32: 0x07, 33: 0x09, 34: 0x0a, 35: 0x0b, 36: 0x0d, 37: 0x0e, 38: 0x0f, 39: 0x33, 40: 0x34, 41: 0x35, 43: 0x31, 44: 0x1d, 45: 0x1b, 46: 0x06, 47: 0x19, 48: 0x05, 49: 0x11, 50: 0x10, 51: 0x36, 52: 0x37, 53: 0x38, 55: 0x55, 57: 0x2c, 58: 0x39, 59: 0x3a, 60: 0x3b, 61: 0x3c, 62: 0x3d, 63: 0x3e, 64: 0x3f, 65: 0x40, 66: 0x41, 67: 0x42, 68: 0x43, 69: 0x53, 70: 0x47, 71: 0x5f, 72: 0x60, 73: 0x61, 74: 0x56, 75: 0x5c, 76: 0x5d, 77: 0x5e, 78: 0x57, 79: 0x59, 80: 0x5a, 81: 0x5b, 82: 0x62, 83: 0x63, 87: 0x44, 88: 0x45, 96: 0x58, 98: 0x54, 99: 0x46, 102: 0x4a, 103: 0x52, 104: 0x4b, 105: 0x50, 106: 0x4f, 107: 0x4d, 108: 0x51, 109: 0x4e, 110: 0x49, 111: 0x4c, 119: 0x48, 127: 0x65, 183: 0x68, 184: 0x69, 185: 0x6a, 186: 0x6b, 187: 0x6c, 188: 0x6d, 189: 0x6e, 190: 0x6f, 191: 0x70, 192: 0x71, 193: 0x72, 194: 0x73 })
     readonly property var evdevMod: ({ 29: 0x01, 42: 0x02, 54: 0x20, 56: 0x04, 97: 0x10, 100: 0x40, 125: 0x08, 126: 0x80 })

@@ -33,7 +33,6 @@ pub struct Manager {
     studios: Mutex<HashMap<String, StudioHandle>>,
     events: EventTx,
     pub(crate) actions: crate::actions::ActionState,
-    pub(crate) shortcut_conn: Mutex<Option<zbus::blocking::Connection>>,
     /// When the user went idle (None = active), and devices whose lighting was turned off for it.
     pub(crate) idle_since: Mutex<Option<std::time::Instant>>,
     pub(crate) dimmed: Mutex<HashMap<String, Vec<(u8, u8)>>>,
@@ -58,6 +57,10 @@ pub struct Manager {
     pub(crate) library_tx: Mutex<Option<mpsc::UnboundedSender<String>>>,
 }
 
+/// Serialises changes of the macro library file (`macros.json`): load → change → save.
+/// Taken before any device lock.
+pub(crate) static MACROS_LOCK: Mutex<()> = Mutex::new(());
+
 /// The user's lighting to restore when game lighting hands a device back.
 #[derive(Debug, Clone)]
 pub enum GameRestore {
@@ -74,7 +77,7 @@ pub enum GameRestore {
 impl Manager {
     pub fn new(read_only: bool, config_path: PathBuf, events: EventTx) -> Result<Self> {
         let config = Config::load(&config_path)?;
-        Ok(Self { read_only, config_path, config: Mutex::new(config), devices: Mutex::new(BTreeMap::new()), studios: Mutex::new(HashMap::new()), events, actions: Default::default(), shortcut_conn: Mutex::new(None), idle_since: Mutex::new(None), dimmed: Mutex::new(HashMap::new()), link_state: Mutex::new(Default::default()), link_active: Mutex::new(None), links_lock: Mutex::new(()), gm_lock: Mutex::new(()), cache: Default::default(), warming: Default::default(), game_held: Mutex::new(HashMap::new()), lib_lock: Mutex::new(()), library_tx: Mutex::new(None) })
+        Ok(Self { read_only, config_path, config: Mutex::new(config), devices: Mutex::new(BTreeMap::new()), studios: Mutex::new(HashMap::new()), events, actions: Default::default(), idle_since: Mutex::new(None), dimmed: Mutex::new(HashMap::new()), link_state: Mutex::new(Default::default()), link_active: Mutex::new(None), links_lock: Mutex::new(()), gm_lock: Mutex::new(()), cache: Default::default(), warming: Default::default(), game_held: Mutex::new(HashMap::new()), lib_lock: Mutex::new(()), library_tx: Mutex::new(None) })
     }
 
     /// Attach new devices, drop vanished ones. Returns (added, removed) pids.
@@ -417,8 +420,16 @@ impl Manager {
         Ok(())
     }
 
-    /// Store one device's lighting in the config file (the GUI already applied it live).
+    /// Store one device's lighting in the config file (the GUI already applied it live). The
+    /// active library profile keeps it too when that profile carries lighting.
     pub fn save_lighting(&self, pid: &str, lighting: tsuba_core::config::Lighting) -> Result<()> {
+        self.store_lighting(pid, lighting.clone())?;
+        self.mirror_lighting(pid, &lighting);
+        Ok(())
+    }
+
+    /// Only the config-file part of [`Self::save_lighting`].
+    pub(crate) fn store_lighting(&self, pid: &str, lighting: tsuba_core::config::Lighting) -> Result<()> {
         let mut cfg = self.config.lock().unwrap().clone();
         let mut dc = cfg.device(pid).cloned().unwrap_or_else(|| tsuba_core::DeviceConfig { pid: pid.into(), ..Default::default() });
         dc.lighting = Some(lighting);
@@ -510,14 +521,34 @@ impl Manager {
         Ok(serde_json::json!({ "library": lib.macros, "devices": devices }))
     }
 
-    pub fn save_macro(&self, mac: tsuba_core::macros::Macro) -> Result<String> {
+    pub fn save_macro(&self, mut mac: tsuba_core::macros::Macro) -> Result<String> {
+        use tsuba_core::macros::MacroEvent;
         anyhow::ensure!(!mac.name.trim().is_empty(), "the macro needs a name");
-        mac.encode()?;
-        let path = tsuba_core::macros::library_path();
-        let mut lib = tsuba_core::macros::Library::load(&path)?;
-        let guid = lib.upsert(mac)?;
-        lib.save(&path)?;
-        let mac = lib.get(&guid).cloned().context("saved macro")?;
+        // The library file is changed under the lock; the desktop's shortcut service and the
+        // devices are told afterwards (the desktop may take a while to answer).
+        let (guid, mac, sync) = {
+            let _g = MACROS_LOCK.lock().unwrap();
+            // Run-command events play a shortcut slot: give them one before the macro is encoded.
+            let has_run = mac.events.iter().any(|e| matches!(e, MacroEvent::Run { .. }));
+            self.alloc_run_slots(&mut mac)?;
+            mac.encode()?;
+            let path = tsuba_core::macros::library_path();
+            let mut lib = tsuba_core::macros::Library::load(&path)?;
+            let had_run = lib.get(&mac.guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, MacroEvent::Run { .. })));
+            // A save that doesn't name a folder keeps the one the macro is in (SetMacroGroup changes it).
+            if mac.group.is_empty() {
+                if let Some(old) = lib.get(&mac.guid) {
+                    mac.group = old.group.clone();
+                }
+            }
+            let guid = lib.upsert(mac)?;
+            lib.save(&path)?;
+            let mac = lib.get(&guid).cloned().context("saved macro")?;
+            (guid, mac, has_run || had_run)
+        };
+        if sync {
+            crate::shortcuts::sync(self);
+        }
         // Refresh copies already on devices (same id, so bindings stay valid).
         for pid in self.attached() {
             self.with_device(&pid, |dev, _| {
@@ -548,6 +579,19 @@ impl Manager {
     }
 
     pub fn delete_macro(&self, guid: &str) -> Result<()> {
+        let had_run = {
+            let _g = MACROS_LOCK.lock().unwrap();
+            self.delete_macro_locked(guid)?
+        };
+        if had_run {
+            crate::shortcuts::sync(self);
+        }
+        Ok(())
+    }
+
+    /// The part of [`Self::delete_macro`] that runs under the macro lock; returns whether the
+    /// macro had run-command events.
+    fn delete_macro_locked(&self, guid: &str) -> Result<bool> {
         let path = tsuba_core::macros::library_path();
         let mut lib = tsuba_core::macros::Library::load(&path)?;
         for pid in self.attached() {
@@ -562,15 +606,19 @@ impl Manager {
                 Ok(())
             })?;
         }
+        let had_run = lib.get(guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, tsuba_core::macros::MacroEvent::Run { .. })));
         lib.macros.retain(|m| m.guid != guid);
-        lib.save(&path)
+        lib.save(&path)?;
+        Ok(had_run)
     }
 
     pub fn import_macro(&self, pid: &str, id: u16) -> Result<String> {
+        let _g = MACROS_LOCK.lock().unwrap();
         let on = self.with_device(pid, |dev, _| tsuba_core::macros::read_macro(dev, id))?;
         let path = tsuba_core::macros::library_path();
         let mut lib = tsuba_core::macros::Library::load(&path)?;
-        let guid = lib.upsert(tsuba_core::macros::Macro { guid: on.guid, name: on.name, events: on.events })?;
+        let group = lib.get(&on.guid).map(|m| m.group.clone()).unwrap_or_default();
+        let guid = lib.upsert(tsuba_core::macros::Macro { guid: on.guid, name: on.name, events: on.events, group })?;
         lib.save(&path)?;
         Ok(guid)
     }

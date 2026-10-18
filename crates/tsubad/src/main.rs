@@ -11,16 +11,22 @@ mod dbus;
 mod dbus_app;
 mod diag;
 mod dbus_device;
+mod dbus_library;
+mod focus;
 mod game_http;
 mod game_lighting;
 mod gamemode;
 mod idle;
 mod library;
+mod macro_lib;
 mod manager;
 mod notify;
+mod portal_shortcuts;
 mod shortcuts;
 mod dbus_lighting;
 mod studio_runner;
+#[cfg(test)]
+mod wpc_tests;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -103,6 +109,7 @@ async fn main() -> Result<()> {
         .serve_at(dbus::PATH, dbus_app::App { notifier: notifier.clone(), read_only: mgr.read_only })?
         .serve_at(dbus::PATH, dbus_lighting::Lighting { mgr: mgr.clone(), game: game.clone() })?
         .serve_at(dbus::PATH, dbus_device::DeviceIface { mgr: mgr.clone() })?
+        .serve_at(dbus::PATH, dbus_library::LibraryApi { mgr: mgr.clone() })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;
@@ -188,6 +195,7 @@ async fn main() -> Result<()> {
         shortcuts::spawn(mgr.clone());
         idle::spawn(mgr.clone());
         applinks::spawn(mgr.clone());
+        focus::spawn(mgr.clone());
         game_autoinstall::spawn();
         // Blocking D-Bus calls must run off the async runtime.
         let m = mgr.clone();
@@ -263,6 +271,7 @@ async fn main() -> Result<()> {
     game_sig.abort();
     lib_sig.abort();
     let _ = tokio::task::spawn_blocking(gamemode::unblock_on_exit).await;
+    let _ = tokio::task::spawn_blocking(focus::unload_on_exit).await;
     hot.abort();
     battery.abort();
     fwd.abort();

@@ -47,6 +47,10 @@ Item {
             verify(b !== null);
             verify(b.enabled);
             b.clicked();
+            // Choosing only prepares the change; SAVE writes it.
+            compare(fake.written.length, 0);
+            verify(panel.staged !== null);
+            panel.commit();
             compare(fake.written.length, 1);
             compare(fake.written[0].key, 1);
             compare(fake.written[0].layer, 0);

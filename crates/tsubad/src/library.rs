@@ -11,7 +11,7 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use tracing::{info, warn};
 use tsuba_core::app_links::ProfileRef;
-use tsuba_core::config::{ActionConfig, DialSlotConfig};
+use tsuba_core::config::{ActionConfig, DialSlotConfig, EffectConfig, Lighting};
 use tsuba_core::library::{self as lib, ActionBinding, DeviceLibrary, LibraryProfile, MacroBinding, Op};
 use tsuba_core::macros::Playback;
 use tsuba_core::performance::Performance;
@@ -125,6 +125,7 @@ impl Manager {
                     "synapse": p.synapse_guid.is_some(),
                     "synapse_guid": p.synapse_guid,
                     "modified": p.modified,
+                    "lighting": p.lighting.as_ref().map(|l| json!({ "effect": tsuba_core::config::effect_name(&l.effect), "brightness": l.brightness })),
                 })
             })
             .collect();
@@ -290,6 +291,14 @@ impl Manager {
         let mut a = r?;
         l.set_holds(slot, id);
         l.save_state()?;
+        // Lighting that comes with the profile (a failure is a warning, the keys are done).
+        if let Some(light) = &p.lighting {
+            match self.apply_profile_lighting(pid, light) {
+                Ok(true) => a.writes += 1,
+                Ok(false) => {}
+                Err(e) => a.warnings.push(format!("lighting: {e:#}")),
+            }
+        }
         // Macros Tsuba uploaded for profiles no slot runs any more go when memory runs low.
         a.macros_removed = self.gc_macros(pid, &mut l, &[], false);
         a.ms = t0.elapsed().as_millis() as u64;
@@ -713,6 +722,11 @@ impl Manager {
                 p.id = old.id.clone();
                 p.created = old.created;
                 p.pinned_slot = old.pinned_slot;
+                // A re-import brings what Synapse knows; lighting that comes with the profile
+                // is Tsuba's own and stays.
+                if p.lighting.is_none() {
+                    p.lighting = old.lighting.clone();
+                }
             }
             None => {
                 p.id = lib::new_id();
@@ -780,6 +794,154 @@ impl Manager {
         l.save_state()
     }
 
+    // ---- lighting that follows a profile ---------------------------------------------------
+
+    /// Make `light` the device's lighting (live and as its saved startup lighting). Returns
+    /// whether anything was applied: lighting that is already the saved one is left running
+    /// (re-activating a profile must not restart a Lighting Studio effect).
+    fn apply_profile_lighting(&self, pid: &str, light: &Lighting) -> Result<bool> {
+        let saved = self.config.lock().unwrap().device(pid).and_then(|d| d.lighting.clone());
+        if saved.as_ref() == Some(light) {
+            return Ok(false);
+        }
+        self.store_lighting(pid, light.clone())?;
+        // A game is lighting the device: this is what to put back afterwards.
+        if self.game_defer(pid, crate::manager::GameRestore::Lighting(light.clone())) {
+            return Ok(true);
+        }
+        match &light.effect {
+            EffectConfig::Studio { studio } => self.start_studio(pid, studio.clone())?,
+            _ => {
+                self.stop_studio(pid);
+                self.with_device(pid, |dev, _| tsuba_core::apply::apply_lighting(dev, light).map(|_| ()))?;
+            }
+        }
+        Ok(true)
+    }
+
+    /// The lighting the device has now, as a config value: the saved one for Lighting Studio
+    /// and custom frames (they can't be read back), else what the hardware reports.
+    fn current_lighting(&self, pid: &str) -> Result<Lighting> {
+        let saved = self.config.lock().unwrap().device(pid).and_then(|d| d.lighting.clone());
+        if let Some(l) = saved.clone().filter(|l| matches!(l.effect, EffectConfig::Studio { .. } | EffectConfig::Custom { .. })) {
+            return Ok(l);
+        }
+        let from_device = self.state(pid).ok().and_then(|st| tsuba_core::config::from_state(&st).lighting);
+        from_device.or(saved).context("this device has no lighting to store in the profile")
+    }
+
+    /// Store lighting in a profile (`what` = "current": what the device shows now; "off": the
+    /// profile no longer carries lighting; or a Lighting JSON). Active profiles with lighting
+    /// are applied right away only through activation, so this just saves.
+    pub fn library_set_lighting(&self, pid: &str, id: &str, what: &str) -> Result<()> {
+        let _g = self.lib_lock.lock().unwrap();
+        let mut l = self.lib_load(pid)?;
+        let mut p = l.require(id)?.clone();
+        p.lighting = match what.trim() {
+            "off" | "none" | "null" => None,
+            "current" => Some(self.current_lighting(pid)?),
+            json => Some(serde_json::from_str(json).context("lighting JSON")?),
+        };
+        p.modified = lib::now_ms();
+        l.put(p)?;
+        drop(_g);
+        self.library_changed(pid);
+        Ok(())
+    }
+
+    /// The user changed the lighting (and saved it): the profile that is active keeps that as
+    /// its lighting when it carries lighting at all.
+    pub(crate) fn mirror_lighting(&self, pid: &str, light: &Lighting) {
+        let r = (|| -> Result<()> {
+            if !self.devices.lock().unwrap().contains_key(pid) {
+                return Ok(());
+            }
+            let _g = self.lib_lock.lock().unwrap();
+            let active = self.with_device(pid, |dev, _| profiles::active(dev))?;
+            let mut l = self.lib_load(pid)?;
+            let Some(mut p) = l.holder(active).cloned() else { return Ok(()) };
+            if p.lighting.is_none() || p.lighting.as_ref() == Some(light) {
+                return Ok(());
+            }
+            p.lighting = Some(light.clone());
+            p.modified = lib::now_ms();
+            l.put(p)?;
+            drop(_g);
+            self.library_changed(pid);
+            Ok(())
+        })();
+        if let Err(e) = r {
+            warn!("{pid}: saving the lighting in the active profile: {e:#}");
+        }
+    }
+
+    // ---- more library edits ------------------------------------------------------------------
+
+    /// A profile that resets the device to its factory settings (keys, performance, dial).
+    pub fn library_create_factory(&self, pid: &str, name: &str) -> Result<String> {
+        ensure!(!name.trim().is_empty(), "the profile needs a name");
+        let _g = self.lib_lock.lock().unwrap();
+        let mut l = self.lib_load(pid)?;
+        let p = LibraryProfile::factory(pid, &l.unique_name(name, None));
+        let id = p.id.clone();
+        l.put(p)?;
+        drop(_g);
+        self.library_changed(pid);
+        Ok(id)
+    }
+
+    /// Write several profiles into folder `dir`, one `<name>.tsuba-profile.json` each (existing
+    /// files are never overwritten: a number is added). Returns the paths written.
+    pub fn library_export_many(&self, pid: &str, ids: &[String], dir: &str) -> Result<Vec<String>> {
+        let l = self.lib_load(pid)?;
+        let dir = std::path::Path::new(dir);
+        ensure!(dir.is_dir(), "{} is not a folder", dir.display());
+        let mut out = Vec::new();
+        for id in ids {
+            let p = l.require(id)?;
+            let text = lib::export(pid, p)?;
+            let stem: String = p.name.chars().map(|c| if c.is_alphanumeric() || matches!(c, ' ' | '-' | '_') { c } else { '_' }).take(60).collect();
+            let stem = if stem.trim().is_empty() { "profile".to_string() } else { stem.trim().to_string() };
+            let mut path = dir.join(format!("{stem}.tsuba-profile.json"));
+            let mut n = 2;
+            while path.exists() {
+                path = dir.join(format!("{stem} {n}.tsuba-profile.json"));
+                n += 1;
+            }
+            std::fs::write(&path, text).with_context(|| format!("writing {}", path.display()))?;
+            out.push(path.display().to_string());
+        }
+        Ok(out)
+    }
+
+    /// Which library profiles (of every device) bind each library macro, and the bindings whose
+    /// macro isn't in the macro library any more:
+    /// `{"used": {guid: [{pid, profile, profile_id, key, layer}]}, "missing": [{…, guid}]}`.
+    pub fn macro_usage_json(&self) -> Result<Value> {
+        let macros = self.library()?;
+        let mut used: serde_json::Map<String, Value> = serde_json::Map::new();
+        let mut missing = Vec::new();
+        let root = lib::root();
+        let mut pids: Vec<String> = std::fs::read_dir(&root).into_iter().flatten().flatten().filter_map(|e| e.file_name().into_string().ok()).filter(|n| n.len() == 4 && n.bytes().all(|b| b.is_ascii_hexdigit())).collect();
+        pids.sort();
+        for pid in pids {
+            let Ok(l) = DeviceLibrary::load(&root, &pid) else { continue };
+            for p in &l.profiles {
+                for b in &p.macros {
+                    let entry = json!({ "pid": pid, "profile": p.name, "profile_id": p.id, "key": b.key, "layer": b.layer });
+                    if macros.get(&b.guid).is_some() {
+                        used.entry(b.guid.clone()).or_insert_with(|| json!([])).as_array_mut().unwrap().push(entry);
+                    } else {
+                        let mut e = entry;
+                        e["guid"] = json!(b.guid);
+                        missing.push(e);
+                    }
+                }
+            }
+        }
+        Ok(json!({ "used": used, "missing": missing }))
+    }
+
     // ---- keeping the library in step with edits -----------------------------------------
 
     /// An edit on `slot` (0 = the active slot) went to the device: store it in the library
@@ -835,14 +997,14 @@ impl Manager {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use std::sync::{Arc, Mutex};
     use tsuba_core::app_links::{self, AppLinks};
     use tsuba_core::sim::{self, Sim};
 
     /// Every test here keeps its config (library, macros, app links) in a temp folder.
-    fn temp_config() -> std::path::PathBuf {
+    pub(crate) fn temp_config() -> std::path::PathBuf {
         static DIR: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
         DIR.get_or_init(|| {
             let d = std::env::temp_dir().join(format!("tsubad-library-test-{}", std::process::id()));
@@ -855,21 +1017,21 @@ mod tests {
         .clone()
     }
 
-    static SERIAL: Mutex<()> = Mutex::new(());
+    use crate::gamemode::fake_kde::SERIAL;
 
-    fn rig(pid: &str, slots: u8) -> (Arc<Manager>, Sim) {
+    pub(crate) fn rig(pid: &str, slots: u8) -> (Arc<Manager>, Sim) {
         rig_hooked(pid, slots, Arc::new(|_, _| None))
     }
 
     /// Runs before the simulated device answers a command; `Some(error)` fails it instead
     /// (e.g. an I/O error for an unplugged device).
-    type Hook = Arc<dyn Fn(tsuba_proto::Command, &[u8]) -> Option<tsuba_hid::HidError> + Send + Sync>;
+    pub(crate) type Hook = Arc<dyn Fn(tsuba_proto::Command, &[u8]) -> Option<tsuba_hid::HidError> + Send + Sync>;
 
     fn unplugged() -> tsuba_hid::HidError {
         tsuba_hid::HidError::Io { path: "/dev/null".into(), source: std::io::Error::from_raw_os_error(19) }
     }
 
-    fn rig_hooked(pid: &str, slots: u8, hook: Hook) -> (Arc<Manager>, Sim) {
+    pub(crate) fn rig_hooked(pid: &str, slots: u8, hook: Hook) -> (Arc<Manager>, Sim) {
         let dir = temp_config();
         let _ = std::fs::remove_dir_all(dir.join("tsuba"));
         let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
@@ -889,7 +1051,7 @@ mod tests {
         (mgr, sim)
     }
 
-    fn list(mgr: &Manager, pid: &str) -> Value {
+    pub(crate) fn list(mgr: &Manager, pid: &str) -> Value {
         serde_json::from_str(&mgr.library_json(pid).unwrap()).unwrap()
     }
 
@@ -1571,7 +1733,7 @@ mod tests {
         let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
         let (mgr, sim) = rig("00aa", 1);
         mgr.library_migrate("00aa").unwrap();
-        let guid = mgr.save_macro(Macro { guid: String::new(), name: "M1".into(), events: vec![MacroEvent::Key { hid: 4, down: true }, MacroEvent::Key { hid: 4, down: false }] }).unwrap();
+        let guid = mgr.save_macro(Macro { name: "M1".into(), events: vec![MacroEvent::Key { hid: 4, down: true }, MacroEvent::Key { hid: 4, down: false }], ..Default::default() }).unwrap();
         let key = *lib::factory_table("00aa", 0).keys().nth(2).unwrap();
         let a = mgr.library_create("00aa", "A", "").unwrap();
         {

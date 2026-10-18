@@ -109,7 +109,6 @@ QQC2.ScrollView {
     onStChanged: {
         loadGameMode();
         loadPower();
-        loadDial();
         loadFeatures();
     }
 
@@ -137,7 +136,6 @@ QQC2.ScrollView {
     contentWidth: availableWidth
 
     function load() {
-        loadDial();
         loadFeatures();
         const s = backend.performance(pid, profile);
         if (s === "") {
@@ -182,71 +180,6 @@ QQC2.ScrollView {
             tab.loadGameMode();
             tab.loadPower();
         }
-    }
-
-    // Dial press (key position 169, standard layer): warn when it no longer switches modes.
-    readonly property int dialKey: 169
-    property var dialAssign: null
-    readonly property var dialDefault: KeyNames.defaultFor(false, dialKey, 0)
-    readonly property bool dialRemapped: {
-        const a = dialAssign;
-        if (!a) {
-            return false;
-        }
-        const d = dialDefault;
-        if (d) {
-            return a.function !== d.function || JSON.stringify(a.data) !== JSON.stringify(d.data);
-        }
-        // Default unknown: a RazerKey (17) outside the dynamic-action range counts as untouched.
-        return a.function !== 17 || (a.data[0] >= 0x80 && a.data[0] <= 0x9f);
-    }
-    function loadDial() {
-        if (!st.dial) {
-            dialAssign = null;
-            return;
-        }
-        const s = backend.assignments(pid, profile, 0);
-        const a = s === "" ? null : JSON.parse(s).find(x => x.key === dialKey);
-        if (a) {
-            const byKey = {};
-            JSON.parse(backend.actions(pid) || "[]").forEach(x => {
-                if (x.profile === profile && x.layer === 0) {
-                    byKey[x.key] = x.label;
-                }
-            });
-            KeyNames.currentPid = pid;
-            KeyNames.actionByKey = byKey;
-        }
-        dialAssign = a || null;
-    }
-    function resetDial() {
-        const d = dialDefault;
-        if (!d) {
-            return;
-        }
-        const r = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: dialKey, layer: 0, function: d.function, data: d.data }));
-        result = r === "" ? "Failed: " + backend.status : "Dial press reset to default";
-        loadDial();
-        changed();
-    }
-
-    // Rewrite all dial slots with one slot changed ({colour} and/or {enabled}).
-    function editDial(slot, change) {
-        const slots = st.dial.map(d => ({ function: d.function, colour: d.colour, enabled: d.enabled }));
-        Object.assign(slots[slot], change);
-        if (!slots.some(d => d.enabled)) {
-            result = "Failed: at least one dial mode must stay on";
-            return;
-        }
-        result = backend.set_dial(pid, JSON.stringify(slots)) ? "Command dial saved" : "Failed: " + backend.status;
-        changed();
-    }
-
-    ColorDialog {
-        id: dialPicker
-        property int slot: 0
-        title: "Dial mode colour"
-        onAccepted: tab.editDial(slot, { colour: selectedColor.toString().replace("#", "").slice(-6) })
     }
 
     // Coalesce slider drags / typing into one write.
@@ -506,118 +439,15 @@ QQC2.ScrollView {
                     }
                 }
 
-                // ---- Keyboard: command dial
-                Panel {
+                // ---- Keyboard: command dial (reorder, colours, reset)
+                DialEditor {
                     visible: tab.perfMode && !!tab.st.dial
-                    title: "Command dial"
-                    help: "The dial on top of the keyboard has several modes (for example volume, brightness, scroll). Pressing it cycles the mode; turning it acts on the current mode. You can re-assign the dial press from Customize, which stops it switching modes."
-                    description: "Press the dial to step to the next mode (Shift + press goes back). The dial's LED shows the active mode's colour. Click a mode to make it active; switch modes off to skip them."
-
-                    RowLayout {
-                        objectName: "dialRemapWarning"
-                        visible: tab.dialRemapped
-                        Layout.fillWidth: true
-                        spacing: 12
-                        Text {
-                            Layout.fillWidth: true
-                            text: "The dial press is remapped to " + KeyNames.describe(tab.dialAssign) + " — pressing the dial runs that instead of switching modes."
-                            color: Theme.accent
-                            font.family: Theme.font
-                            font.pixelSize: Theme.small
-                            wrapMode: Text.Wrap
-                        }
-                        Item {
-                            implicitWidth: resetDialBtn.implicitWidth
-                            implicitHeight: resetDialBtn.implicitHeight
-                            SynButton {
-                                id: resetDialBtn
-                                objectName: "resetDialPress"
-                                anchors.fill: parent
-                                text: "Reset dial press"
-                                enabled: !tab.readOnly && tab.dialDefault !== null
-                                onClicked: tab.resetDial()
-                            }
-                            HoverHandler { id: resetDialHover }
-                            QQC2.ToolTip {
-                                visible: resetDialHover.hovered && tab.dialDefault === null
-                                text: KeyNames.defaultUnknownTip
-                            }
-                        }
-                    }
-                    Repeater {
-                        model: tab.st.dial || []
-                        delegate: Rectangle {
-                            id: slotRow
-                            required property var modelData
-                            required property int index
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 46
-                            radius: 3
-                            color: modelData.current ? Theme.accentTint : (dh.hovered ? "#14ffffff" : Theme.bg)
-                            border.color: modelData.current ? Theme.accent : Theme.borderSoft
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 12
-                                anchors.rightMargin: 14
-                                spacing: 12
-                                Rectangle {
-                                    Layout.preferredWidth: 22
-                                    Layout.preferredHeight: 22
-                                    radius: 11
-                                    color: "#" + slotRow.modelData.colour
-                                    border.color: sw.hovered ? Theme.textBright : Theme.border
-                                    opacity: slotRow.modelData.enabled ? 1 : 0.35
-                                    HoverHandler {
-                                        id: sw
-                                        cursorShape: Qt.PointingHandCursor
-                                    }
-                                    TapHandler {
-                                        enabled: !tab.readOnly
-                                        onTapped: {
-                                            dialPicker.slot = slotRow.index;
-                                            dialPicker.selectedColor = "#" + slotRow.modelData.colour;
-                                            dialPicker.open();
-                                        }
-                                    }
-                                }
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2")
-                                    color: slotRow.modelData.enabled ? Theme.text : Theme.textMuted
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.fontSize
-                                }
-                                Text {
-                                    visible: slotRow.modelData.current
-                                    text: "ACTIVE"
-                                    color: Theme.accent
-                                    font.family: Theme.font
-                                    font.pixelSize: 11
-                                    font.letterSpacing: 1
-                                }
-                                SynToggle {
-                                    checked: slotRow.modelData.enabled
-                                    enabled: !tab.readOnly
-                                    onToggled: on => tab.editDial(slotRow.index, { enabled: on })
-                                }
-                            }
-                            HoverHandler {
-                                id: dh
-                                cursorShape: slotRow.modelData.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            }
-                            TapHandler {
-                                enabled: slotRow.modelData.enabled && !slotRow.modelData.current && !tab.readOnly
-                                onTapped: {
-                                    if (tab.backend.set_dial_mode(tab.pid, slotRow.index)) {
-                                        tab.result = slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2") + " is the active dial mode";
-                                        tab.changed();
-                                    } else {
-                                        tab.result = "Failed: " + tab.backend.status;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    backend: tab.backend
+                    pid: tab.pid
+                    profile: tab.profile
+                    st: tab.st
+                    readOnly: tab.readOnly
+                    onChanged: tab.changed()
                 }
 
                 Panel {
@@ -842,6 +672,12 @@ QQC2.ScrollView {
                         hint: "Alt+Tab, Alt+F4, Meta shortcuts and other KDE global shortcuts (including Tsuba's own) are paused while Game Mode is on."
                         checked: !!tab.gm && tab.gm.block_shortcuts
                         onToggled: on => tab.setGameMode({ block_shortcuts: on })
+                    }
+                    GameModeCombos {
+                        visible: !!tab.gm && tab.gm.block_shortcuts
+                        combos: tab.gm && tab.gm.blocked_combos !== undefined ? tab.gm.blocked_combos : null
+                        readOnly: tab.readOnly
+                        onChosen: list => tab.setGameMode({ blocked_combos: list })
                     }
                 }
 

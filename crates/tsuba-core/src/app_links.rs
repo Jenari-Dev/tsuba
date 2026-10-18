@@ -31,6 +31,13 @@ pub struct AppLink {
     /// Cover art (`file://` URL) shown on the list row; filled in when added via "Scan for games".
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub art: String,
+    /// Device pid → polling rate (Hz) to use while the game is active (restored when it stops).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub polling_hz: BTreeMap<String, u32>,
+    /// Switch only while the game's window has the keyboard focus (needs the KWin focus
+    /// script; without window information the link behaves as "while running").
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub only_when_focused: bool,
 }
 
 fn yes() -> bool {
@@ -77,8 +84,40 @@ impl AppLinks {
 
     /// The first enabled link whose text appears in any running process (list order = priority).
     pub fn active<'a>(&'a self, procs: &[Proc]) -> Option<&'a AppLink> {
-        self.links.iter().filter(|l| l.enabled && !l.matches.trim().is_empty()).find(|l| procs.iter().any(|p| matches_proc(&l.matches, p)))
+        self.active_focused(procs, None)
     }
+
+    /// Like [`Self::active`], but links with `only_when_focused` also need the focused window to
+    /// belong to the game. `focus` None = no window information (every running link counts).
+    pub fn active_focused<'a>(&'a self, procs: &[Proc], focus: Option<&FocusInfo>) -> Option<&'a AppLink> {
+        self.links.iter().filter(|l| l.enabled && !l.matches.trim().is_empty()).find(|l| {
+            procs.iter().any(|p| matches_proc(&l.matches, p)) && (!l.only_when_focused || focus.is_none_or(|f| focus_matches(&l.matches, procs, f)))
+        })
+    }
+}
+
+/// The window that has the keyboard focus (reported by the KWin script).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FocusInfo {
+    pub pid: u32,
+    /// Window class and name (e.g. `steam_app_1245620`), and its title.
+    pub class: String,
+    pub name: String,
+    pub caption: String,
+}
+
+/// Whether the focused window belongs to the program the match text `m` selects: its process
+/// matches, or (plain text only) the window class / name / title contains the text.
+pub fn focus_matches(m: &str, procs: &[Proc], f: &FocusInfo) -> bool {
+    if procs.iter().any(|p| p.pid == f.pid && matches_proc(m, p)) {
+        return true;
+    }
+    let m = m.trim().to_lowercase();
+    if m.starts_with("dir:") || m.is_empty() {
+        return false;
+    }
+    let m = m.trim_end_matches(".exe");
+    [&f.class, &f.name, &f.caption].iter().any(|t| t.to_lowercase().contains(m))
 }
 
 /// Lower-case with forward slashes, so Wine's `Z:\\home\\…` and native paths compare alike.
@@ -213,6 +252,32 @@ mod tests {
         assert!(mk("dir:").active(&[proc("a", "a")]).is_none());
         // Plain text matching is unchanged.
         assert!(mk("eldenring").active(&[proc("x", "foo eldenring.exe")]).is_some());
+    }
+
+    #[test]
+    fn focus_decides_for_focus_only_links() {
+        let mk = |only: bool| AppLinks { links: vec![AppLink { name: "E".into(), matches: "eldenring.exe".into(), enabled: true, only_when_focused: only, ..Default::default() }] };
+        let mut game = proc("wine64-preloader", "Z:\\g\\eldenring.exe");
+        game.pid = 77;
+        let other = proc("firefox", "firefox");
+        let procs = vec![game, other];
+        let on_game = FocusInfo { pid: 77, ..Default::default() };
+        let on_browser = FocusInfo { pid: 1, class: "firefox".into(), ..Default::default() };
+        assert!(mk(false).active_focused(&procs, Some(&on_browser)).is_some(), "plain links ignore focus");
+        assert!(mk(true).active_focused(&procs, Some(&on_game)).is_some());
+        assert!(mk(true).active_focused(&procs, Some(&on_browser)).is_none());
+        assert!(mk(true).active_focused(&procs, None).is_some(), "no window info: while running");
+        // The window class can name the game when the pid isn't a process of ours.
+        let by_class = FocusInfo { pid: 9999, class: "ELDENRING".into(), ..Default::default() };
+        assert!(mk(true).active_focused(&procs, Some(&by_class)).is_some());
+        // Not running at all: never active.
+        assert!(mk(true).active_focused(&[proc("bash", "bash")], Some(&on_game)).is_none());
+        // New fields survive a round trip and stay out of old files.
+        let l: AppLinks = serde_json::from_str(r#"{"links": [{"matches": "x", "polling_hz": {"00aa": 4000}, "only_when_focused": true}]}"#).unwrap();
+        assert_eq!(l.links[0].polling_hz["00aa"], 4000);
+        assert!(l.links[0].only_when_focused);
+        let plain = serde_json::to_string(&AppLinks { links: vec![AppLink { matches: "x".into(), ..Default::default() }] }).unwrap();
+        assert!(!plain.contains("polling_hz") && !plain.contains("only_when"), "{plain}");
     }
 
     #[test]

@@ -80,7 +80,7 @@ Item {
             compare(pick.textAt(1), "Sign off");
             const pb = find(panel, "playbackPick");
             verify(pb.visible);
-            compare(pb.count, 4);
+            compare(pb.count, 5);
             verify(find(panel, "manageMacros").visible, "Manage macros link");
         }
         function test_manage_link_opens_macros_page_only_as_secondary() {

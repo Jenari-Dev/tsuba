@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Id": "tsuba-focus",
+        "Name": "Tsuba focus reporter",
+        "Description": "Tells the Tsuba daemon which window has the focus, for linked games that apply only while focused.",
+        "Authors": [{ "Name": "JenAriDev" }],
+        "License": "GPL-2.0-or-later",
+        "Version": "0.1.0"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}

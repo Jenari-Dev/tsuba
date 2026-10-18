@@ -10,6 +10,7 @@ fn main() {
                 "qml/Main.qml",
                 "qml/HomePage.qml",
                 "qml/MacrosPage.qml",
+                "qml/MacroList.qml",
                 "qml/LinkedGamesPage.qml",
                 "qml/GameLightingPage.qml",
                 "qml/GameScanDialog.qml",
@@ -40,6 +41,17 @@ fn main() {
                 "qml/KeyboardImageView.qml",
                 "qml/MouseImageView.qml",
                 "qml/AssignmentPanel.qml",
+                "qml/AudioEditor.qml",
+                "qml/DialEditor.qml",
+                "qml/GameModeCombos.qml",
+                "qml/KeyPicker.qml",
+                "qml/LaunchEditor.qml",
+                "qml/LibProvider.qml",
+                "qml/MouseEditor.qml",
+                "qml/OptionRow.qml",
+                "qml/SectionHeading.qml",
+                "qml/ShortcutCatalogue.qml",
+                "qml/TextEditor.qml",
                 "qml/ModeTabs.qml",
                 "qml/SynButton.qml",
                 "qml/SectionLabel.qml",
@@ -65,7 +77,7 @@ fn main() {
                 "qml/BatteryLightingCard.qml",
             ]),
     )
-    .files(["src/backend.rs", "src/app_backend.rs", "src/i18n.rs", "src/device_backend.rs"])
+    .files(["src/backend.rs", "src/app_backend.rs", "src/i18n.rs", "src/device_backend.rs", "src/library_backend.rs"])
     .include_dir("src")
     .cpp_file("src/i18n.cpp");
     // SAFETY: only adds an include path for the KF6 I18n headers.

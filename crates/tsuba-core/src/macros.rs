@@ -11,7 +11,7 @@ use tsuba_hid::Device;
 use tsuba_proto::macros as m;
 
 /// One recorded action, in the form the app and the library file use.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum MacroEvent {
     /// Keyboard key by HID usage (modifiers are 0xe0–0xe7).
@@ -21,7 +21,60 @@ pub enum MacroEvent {
     Scroll { up: bool },
     Delay { ms: u32 },
     Cursor { x: u16, y: u16 },
+    /// A multimedia key (HID consumer usage, e.g. 0xcd play/pause) pressed or released.
+    Media { usage: u16, down: bool },
+    /// A system key (power 0x81, sleep 0x82, wake 0x83) pressed or released.
+    Power { code: u8, down: bool },
+    /// Run a command line on the PC. The macro plays a shortcut-slot key combination that
+    /// tsubad turns into the command (see [`slot_events`]); `slot` is allocated by tsubad when
+    /// the macro is saved and is `None` until then.
+    Run {
+        command: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        slot: Option<u8>,
+    },
     Raw { op: u8, data: [u8; 2] },
+}
+
+/// Event opcodes of the media / system keys (FINDINGS "Macros": 03/04 power, 05/06 media; the
+/// two data bytes are the usage, high byte first — to be confirmed on hardware).
+const OP_POWER_DOWN: u8 = 0x03;
+const OP_POWER_UP: u8 = 0x04;
+const OP_MEDIA_DOWN: u8 = 0x05;
+const OP_MEDIA_UP: u8 = 0x06;
+
+/// The key presses a shortcut slot's combination consists of (modifiers down, key down, key up,
+/// modifiers up, with short delays so the desktop sees them as one chord).
+pub fn slot_events(slot: u8) -> Vec<m::Event> {
+    let [mods, key] = crate::config::slot_keys(slot);
+    let held: Vec<u8> = [(0x01u8, 0xe0u8), (0x02, 0xe1), (0x04, 0xe2), (0x08, 0xe3)].iter().filter(|(bit, _)| mods & bit != 0).map(|(_, hid)| *hid).collect();
+    let mut out: Vec<m::Event> = held.iter().map(|&hid| m::Event::Key { hid, down: true }).collect();
+    out.push(m::Event::Delay { ms: 20 });
+    out.push(m::Event::Key { hid: key, down: true });
+    out.push(m::Event::Delay { ms: 20 });
+    out.push(m::Event::Key { hid: key, down: false });
+    out.push(m::Event::Delay { ms: 20 });
+    out.extend(held.iter().rev().map(|&hid| m::Event::Key { hid, down: false }));
+    out
+}
+
+impl MacroEvent {
+    /// The device events this event plays as. A [`MacroEvent::Run`] without a slot can't be
+    /// written yet.
+    pub fn to_events(&self) -> Result<Vec<m::Event>> {
+        Ok(match self {
+            Self::Key { hid, down } => vec![m::Event::Key { hid: *hid, down: *down }],
+            Self::Button { button, down } => vec![m::Event::Button { button: *button, down: *down }],
+            Self::Scroll { up } => vec![m::Event::Scroll { up: *up }],
+            Self::Delay { ms } => vec![m::Event::Delay { ms: *ms }],
+            Self::Cursor { x, y } => vec![m::Event::Cursor { x: *x, y: *y }],
+            Self::Media { usage, down } => vec![m::Event::Raw { op: if *down { OP_MEDIA_DOWN } else { OP_MEDIA_UP }, data: usage.to_be_bytes() }],
+            Self::Power { code, down } => vec![m::Event::Raw { op: if *down { OP_POWER_DOWN } else { OP_POWER_UP }, data: [0, *code] }],
+            Self::Run { slot: Some(s), .. } => slot_events(*s),
+            Self::Run { command, slot: None } => bail!("the command “{command}” has no shortcut slot yet (save the macro through tsubad)"),
+            Self::Raw { op, data } => vec![m::Event::Raw { op: *op, data: *data }],
+        })
+    }
 }
 
 impl From<m::Event> for MacroEvent {
@@ -32,37 +85,37 @@ impl From<m::Event> for MacroEvent {
             m::Event::Scroll { up } => Self::Scroll { up },
             m::Event::Delay { ms } => Self::Delay { ms },
             m::Event::Cursor { x, y } => Self::Cursor { x, y },
+            m::Event::Raw { op: OP_MEDIA_DOWN | OP_MEDIA_UP, data } => Self::Media { usage: u16::from_be_bytes(data), down: matches!(e, m::Event::Raw { op: OP_MEDIA_DOWN, .. }) },
+            m::Event::Raw { op: op @ (OP_POWER_DOWN | OP_POWER_UP), data: [0, code] } => Self::Power { code, down: op == OP_POWER_DOWN },
             m::Event::Raw { op, data } => Self::Raw { op, data },
         }
     }
 }
 
-impl From<MacroEvent> for m::Event {
-    fn from(e: MacroEvent) -> Self {
-        match e {
-            MacroEvent::Key { hid, down } => Self::Key { hid, down },
-            MacroEvent::Button { button, down } => Self::Button { button, down },
-            MacroEvent::Scroll { up } => Self::Scroll { up },
-            MacroEvent::Delay { ms } => Self::Delay { ms },
-            MacroEvent::Cursor { x, y } => Self::Cursor { x, y },
-            MacroEvent::Raw { op, data } => Self::Raw { op, data },
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Macro {
     /// 32 hex digits; empty when creating a new macro.
     #[serde(default)]
     pub guid: String,
     pub name: String,
+    /// Folder the macro is listed under in the app ("" = none).
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub group: String,
     pub events: Vec<MacroEvent>,
 }
 
 impl Macro {
     pub fn encode(&self) -> Result<Vec<u8>> {
-        let events: Vec<m::Event> = self.events.iter().map(|e| (*e).into()).collect();
+        let mut events: Vec<m::Event> = Vec::new();
+        for e in &self.events {
+            events.extend(e.to_events()?);
+        }
         m::encode_events(&events).map_err(anyhow::Error::msg)
+    }
+
+    /// Number of device events (what the name block's item count holds).
+    pub fn event_count(&self) -> usize {
+        self.events.iter().map(|e| e.to_events().map_or(1, |v| v.len())).sum()
     }
 }
 
@@ -97,6 +150,35 @@ impl Library {
 
     pub fn get(&self, guid: &str) -> Option<&Macro> {
         self.macros.iter().find(|x| x.guid == guid)
+    }
+
+    /// A copy of `guid` under a new GUID and `name` (not on any device yet). Run-command events
+    /// lose their slot: the copy gets its own when saved through tsubad.
+    pub fn duplicate(&mut self, guid: &str, name: &str) -> Result<String> {
+        let mut m = self.get(guid).cloned().context("no such macro in the library")?;
+        m.guid = String::new();
+        m.name = name.trim().to_string();
+        for e in &mut m.events {
+            if let MacroEvent::Run { slot, .. } = e {
+                *slot = None;
+            }
+        }
+        self.upsert(m)
+    }
+
+    /// `name`, or `name 2`, `name 3`… when another macro has it.
+    pub fn unique_name(&self, name: &str, except: &str) -> String {
+        let name = name.trim();
+        let taken = |n: &str| self.macros.iter().any(|m| m.name == n && m.guid != except);
+        if !taken(name) {
+            return name.to_string();
+        }
+        (2..).map(|i| format!("{name} {i}")).find(|n| !taken(n)).unwrap_or_default()
+    }
+
+    /// Shortcut slots the macros' run-command events use.
+    pub fn run_slots(&self) -> Vec<u8> {
+        self.macros.iter().flat_map(|m| m.events.iter()).filter_map(|e| if let MacroEvent::Run { slot: Some(s), .. } = e { Some(*s) } else { None }).collect()
     }
 
     /// Insert or replace by GUID (assigning a new GUID when empty); returns the GUID.
@@ -285,7 +367,7 @@ pub fn upload(dev: &Device, mac: &Macro, reuse: Option<u16>) -> Result<u16> {
         bail!("not enough macro memory on the device ({} bytes needed, {} free)", need, s.available);
     }
     dev.query(m::ALLOCATE, &m::encode_allocate(id, data.len() as u32))?;
-    let block = m::encode_name_block(&m::NameBlock { guid, items: mac.events.len() as u32, name: mac.name.clone() });
+    let block = m::encode_name_block(&m::NameBlock { guid, items: mac.event_count() as u32, name: mac.name.clone() });
     for (i, chunk) in block.chunks(m::NAME_CHUNK).enumerate() {
         dev.query(m::set_name(chunk.len()), &m::encode_set_name(id, (i * m::NAME_CHUNK) as u16, chunk))?;
     }
@@ -297,6 +379,18 @@ pub fn upload(dev: &Device, mac: &Macro, reuse: Option<u16>) -> Result<u16> {
     Ok(id)
 }
 
+/// Rewrite the name block of on-board macro `id` (GUID, item count, name) without touching its
+/// events, so a renamed library macro shows its new name on the device too.
+pub fn write_name(dev: &Device, id: u16, mac: &Macro) -> Result<()> {
+    let guid = guid_bytes(&mac.guid)?;
+    let block = m::encode_name_block(&m::NameBlock { guid, items: mac.event_count() as u32, name: mac.name.clone() });
+    for (i, chunk) in block.chunks(m::NAME_CHUNK).enumerate() {
+        dev.query(m::set_name(chunk.len()), &m::encode_set_name(id, (i * m::NAME_CHUNK) as u16, chunk))?;
+    }
+    ensure!(read_name(dev, id)?.name == mac.name.chars().take(99).collect::<String>() || read_name(dev, id)?.guid == guid, "macro name read-back differs");
+    Ok(())
+}
+
 /// How a bound macro plays (Synapse's playback options).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -305,6 +399,9 @@ pub enum Playback {
     Times,
     WhileHeld,
     Toggle,
+    /// Razer's sequence playback (function 15): `[id16]`. What it does exactly still has to be
+    /// confirmed on hardware.
+    Sequence,
 }
 
 /// Assignment function + data binding a key/button to on-board macro `id`.
@@ -315,6 +412,7 @@ pub fn binding(id: u16, playback: Playback, count: u8) -> (u8, Vec<u8>) {
         Playback::Times => (3, vec![hi, lo, count.max(1)]),
         Playback::WhileHeld => (4, vec![hi, lo]),
         Playback::Toggle => (5, vec![hi, lo]),
+        Playback::Sequence => (15, vec![hi, lo]),
     }
 }
 
@@ -337,4 +435,75 @@ pub fn ensure_on_device(dev: &Device, mac: &Macro) -> Result<u16> {
         }
     }
     upload(dev, mac, None)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn mac(events: Vec<MacroEvent>) -> Macro {
+        Macro { guid: "00".repeat(16), name: "M".into(), events, ..Default::default() }
+    }
+
+    #[test]
+    fn media_and_power_events_round_trip_through_the_device_format() {
+        let m = mac(vec![MacroEvent::Media { usage: 0xcd, down: true }, MacroEvent::Media { usage: 0xcd, down: false }, MacroEvent::Power { code: 0x82, down: true }, MacroEvent::Power { code: 0x82, down: false }]);
+        let bytes = m.encode().unwrap();
+        assert_eq!(bytes, [0x05, 0x00, 0xcd, 0x06, 0x00, 0xcd, 0x03, 0x00, 0x82, 0x04, 0x00, 0x82]);
+        let back: Vec<MacroEvent> = m::decode_events(&bytes).unwrap().into_iter().map(Into::into).collect();
+        assert_eq!(back, m.events);
+        // Anything else in those opcodes stays raw.
+        let odd: MacroEvent = m::Event::Raw { op: 3, data: [7, 7] }.into();
+        assert_eq!(odd, MacroEvent::Raw { op: 3, data: [7, 7] });
+    }
+
+    #[test]
+    fn cursor_events_encode_big_endian() {
+        let m = mac(vec![MacroEvent::Cursor { x: 1920, y: 1080 }]);
+        assert_eq!(m.encode().unwrap(), [0x15, 0x07, 0x80, 0x04, 0x38]);
+        assert_eq!(MacroEvent::from(m::decode_events(&m.encode().unwrap()).unwrap()[0]), m.events[0]);
+    }
+
+    #[test]
+    fn run_command_plays_its_shortcut_slot() {
+        // Slot 7 is Shift+F14 (first key of the second modifier group).
+        let ev = MacroEvent::Run { command: "konsole".into(), slot: Some(7) }.to_events().unwrap();
+        let keys: Vec<(u8, bool)> = ev.iter().filter_map(|e| if let m::Event::Key { hid, down } = e { Some((*hid, *down)) } else { None }).collect();
+        assert_eq!(keys, [(0xe1, true), (0x69, true), (0x69, false), (0xe1, false)]);
+        let m = mac(vec![MacroEvent::Run { command: "x".into(), slot: Some(0) }]);
+        assert_eq!(m.event_count(), ev.len() - 2, "plain F14: no modifier events");
+        assert!(MacroEvent::Run { command: "x".into(), slot: None }.to_events().is_err());
+        assert!(mac(vec![MacroEvent::Run { command: "x".into(), slot: None }]).encode().is_err(), "can't be uploaded before it has a slot");
+        // The slot is saved in the library file, the command stays readable.
+        let j = serde_json::to_string(&MacroEvent::Run { command: "x y".into(), slot: Some(3) }).unwrap();
+        assert_eq!(j, r#"{"type":"run","command":"x y","slot":3}"#);
+        assert_eq!(serde_json::from_str::<MacroEvent>(r#"{"type":"run","command":"c"}"#).unwrap(), MacroEvent::Run { command: "c".into(), slot: None });
+    }
+
+    #[test]
+    fn sequence_binds_function_15_and_is_found_again() {
+        assert_eq!(binding(0x1234, Playback::Sequence, 1), (15, vec![0x12, 0x34]));
+        assert_eq!(bound_id(15, &[0x12, 0x34]), Some(0x1234));
+        assert_eq!(serde_json::to_string(&Playback::Sequence).unwrap(), "\"sequence\"");
+    }
+
+    #[test]
+    fn library_duplicates_renames_and_tracks_slots() {
+        let mut lib = Library::default();
+        let a = lib.upsert(Macro { name: "Open".into(), group: "Work".into(), events: vec![MacroEvent::Run { command: "kate".into(), slot: Some(4) }, MacroEvent::Delay { ms: 5 }], ..Default::default() }).unwrap();
+        assert_eq!(lib.run_slots(), vec![4]);
+        let b = lib.duplicate(&a, "Open copy").unwrap();
+        assert_ne!(a, b);
+        let copy = lib.get(&b).unwrap();
+        assert_eq!((copy.name.as_str(), copy.group.as_str()), ("Open copy", "Work"));
+        assert_eq!(copy.events[0], MacroEvent::Run { command: "kate".into(), slot: None }, "the copy gets its own slot");
+        assert_eq!(lib.run_slots(), vec![4]);
+        assert_eq!(lib.unique_name("Open", ""), "Open 2");
+        assert_eq!(lib.unique_name("Open", &a), "Open");
+        assert!(lib.duplicate("nope", "x").is_err());
+        // Old files without a group still load, and an empty group isn't written.
+        let old: Macro = serde_json::from_str(r#"{"guid": "", "name": "O", "events": []}"#).unwrap();
+        assert_eq!(old.group, "");
+        assert!(!serde_json::to_string(&old).unwrap().contains("group"));
+    }
 }

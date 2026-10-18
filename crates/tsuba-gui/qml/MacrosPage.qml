@@ -13,10 +13,19 @@ Rectangle {
     property var lib: []
     property var devs: ({})
     property var deviceNames: ({})
+    // Which profiles use which macro (null until the daemon answered).
+    property var usage: null
+    property alias lp: provider
+    LibProvider {
+        id: provider
+    }
+    readonly property var deviceOnlyList: deviceOnly()
 
     // The macro being edited.
     property string guid: ""
     property string macroName: ""
+    // The folder the macro is filed in (kept when saving; the list's menu changes it).
+    property string macroGroup: ""
     property var events: []
     property int sel: -1
     property bool dirty: false
@@ -40,8 +49,16 @@ Rectangle {
         return Object.values(down).some(v => v !== 0) || events[events.length - 1].type === "delay";
     }
 
+    // A "Run command" event without a command can't be saved.
+    readonly property bool hasEmptyCommand: events.some(e => e.type === "run" && e.command.trim() === "")
+
     property bool recording: false
     property int delayMode: 0          // 0 recorded, 1 fixed, 2 none
+    // What to record: 0 keys and mouse, 1 keys only, 2 mouse only. Pointer moves are recorded
+    // as "Move cursor" events only when asked for.
+    property int recordFilter: 0
+    property bool trackMoves: false
+    property double lastMove: 0
     property int fixedDelay: 50
     property double lastTime: 0
     property string result: ""
@@ -70,6 +87,7 @@ Rectangle {
         const dn = {};
         list.forEach(d => dn[d.pid] = d.name.replace(" (wired)", ""));
         deviceNames = dn;
+        usage = provider.json("MacroUsage", [], null);
     }
 
     function openMacro(m) {
@@ -77,6 +95,7 @@ Rectangle {
         devView = null;
         guid = m.guid;
         macroName = m.name;
+        macroGroup = m.group || "";
         events = m.events.slice();
         sel = -1;
         dirty = false;
@@ -91,6 +110,7 @@ Rectangle {
         devView = { pid: pid, id: m.id, name: m.name };
         guid = m.guid || "";
         macroName = m.name;
+        macroGroup = "";
         events = (m.events || []).slice();
         sel = -1;
         dirty = false;
@@ -104,6 +124,7 @@ Rectangle {
         devView = null;
         guid = "";
         macroName = "Macro " + (lib.length + 1);
+        macroGroup = "";
         events = [];
         sel = -1;
         dirty = true;
@@ -114,7 +135,7 @@ Rectangle {
 
     function save() {
         stopRecording();
-        const g = backend.save_macro(JSON.stringify({ guid: guid, name: macroName, events: events }));
+        const g = backend.save_macro(JSON.stringify({ guid: guid, name: macroName, group: macroGroup, events: events }));
         if (g === "") {
             result = "Failed: " + backend.status;
             return;
@@ -190,7 +211,13 @@ Rectangle {
         case "delay":
             return e.ms >= 1000 ? (e.ms / 1000).toFixed(3) + " s" : e.ms + " ms";
         case "cursor":
-            return `Move cursor to ${e.x}, ${e.y}`;
+            return i18n("Move cursor to %1, %2", e.x, e.y);
+        case "media":
+            return (KeyNames.media[e.usage] || ("Media key 0x" + e.usage.toString(16)));
+        case "power":
+            return KeyNames.powerKeys[e.code] || ("System key " + e.code);
+        case "run":
+            return e.command.trim() === "" ? i18n("Run command (not set)") : i18n("Run: %1", e.command);
         default:
             return "Event 0x" + e.op.toString(16);
         }
@@ -200,7 +227,7 @@ Rectangle {
         if (e.type === "delay") {
             return "⏱";
         }
-        if (e.type === "key" || e.type === "button") {
+        if (e.type === "key" || e.type === "button" || e.type === "media" || e.type === "power") {
             return e.down ? "↓" : "↑";
         }
         return e.type === "scroll" ? "⇕" : "•";
@@ -281,6 +308,18 @@ Rectangle {
         case "scroll":
             insert([{ type: "scroll", up: true }]);
             break;
+        case "media":
+            insert([{ type: "media", usage: 0xcd, down: true }, { type: "media", usage: 0xcd, down: false }]);
+            break;
+        case "power":
+            insert([{ type: "power", code: 0x83, down: true }, { type: "power", code: 0x83, down: false }]);
+            break;
+        case "cursor":
+            insert([{ type: "cursor", x: 960, y: 540 }]);
+            break;
+        case "run":
+            insert([{ type: "run", command: "" }]);
+            break;
         }
     }
 
@@ -338,6 +377,40 @@ Rectangle {
                 ln(9, 13.5, 9, 16.5);
                 ln(7.5, 15, 9, 16.5);
                 ln(10.5, 15, 9, 16.5);
+                break;
+            case "media":    // play triangle in a circle
+                c.beginPath();
+                c.arc(9, 9, 6.5, 0, Math.PI * 2);
+                c.stroke();
+                c.beginPath();
+                c.moveTo(7.5, 6);
+                c.lineTo(12, 9);
+                c.lineTo(7.5, 12);
+                c.closePath();
+                c.stroke();
+                break;
+            case "power":    // power symbol
+                c.beginPath();
+                c.arc(9, 10, 5.5, -Math.PI * 0.32, Math.PI * 1.32);
+                c.stroke();
+                ln(9, 2.5, 9, 9);
+                break;
+            case "cursor":   // arrow pointer
+                c.beginPath();
+                c.moveTo(5, 3);
+                c.lineTo(5, 14);
+                c.lineTo(8, 11);
+                c.lineTo(11, 15);
+                c.lineTo(12.5, 14);
+                c.lineTo(9.5, 10);
+                c.lineTo(13, 10);
+                c.closePath();
+                c.stroke();
+                break;
+            case "run":      // prompt
+                ln(3.5, 5, 8, 9);
+                ln(8, 9, 3.5, 13);
+                ln(10, 13.5, 15, 13.5);
                 break;
             default:
                 c.beginPath();
@@ -418,6 +491,10 @@ Rectangle {
     }
 
     function record(e) {
+        const keyLike = e.type === "key" || e.type === "media" || e.type === "power";
+        if ((recordFilter === 1 && !keyLike) || (recordFilter === 2 && keyLike)) {
+            return;
+        }
         const now = Date.now();
         const add = [];
         if (events.length > 0 && lastTime > 0) {
@@ -493,122 +570,39 @@ Rectangle {
                     }
                 }
 
-                QQC2.ScrollView {
+                MacroList {
+                    id: macroList
+                    objectName: "macroList"
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    contentWidth: availableWidth
-
-                    ColumnLayout {
-                        width: parent.width
-                        spacing: 6
-
-                        Repeater {
-                            model: page.lib
-                            delegate: Rectangle {
-                                required property var modelData
-                                readonly property bool active: page.editing && page.guid === modelData.guid
-                                readonly property var places: page.placesOf(modelData.guid)
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 54
-                                color: active ? Theme.accentTint : (lh.hovered ? "#14ffffff" : Theme.bg)
-                                border.color: active ? Theme.accent : Theme.borderSoft
-                                Column {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: 12
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 3
-                                    Text {
-                                        width: parent.width
-                                        text: modelData.name
-                                        color: active ? Theme.accent : Theme.textBright
-                                        font.family: Theme.font
-                                        font.pixelSize: Theme.fontSize
-                                        elide: Text.ElideRight
-                                    }
-                                    Text {
-                                        width: parent.width
-                                        text: modelData.events.length + " events" + (places.length ? " · on " + places.join(", ") : "")
-                                        color: Theme.textDim
-                                        font.family: Theme.font
-                                        font.pixelSize: 11
-                                        elide: Text.ElideRight
-                                    }
-                                }
-                                HoverHandler {
-                                    id: lh
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: page.openMacro(modelData)
-                                }
-                            }
+                    backend: page.backend
+                    lp: page.lp
+                    lib: page.lib
+                    devs: page.devs
+                    deviceNames: page.deviceNames
+                    deviceOnlyList: page.deviceOnlyList
+                    usage: page.usage
+                    activeGuid: page.guid
+                    editing: page.editing
+                    devView: page.devView
+                    onOpenMacro: m => page.openMacro(m)
+                    onOpenDeviceMacro: (pid, m) => page.openDeviceMacro(pid, m)
+                    onImportDeviceMacro: (pid, id) => page.importMacro(pid, id)
+                    onChanged: page.load()
+                    onDuplicated: g => {
+                        const m = page.lib.find(x => x.guid === g);
+                        if (m) {
+                            page.openMacro(m);
                         }
-                        Text {
-                            visible: page.lib.length === 0
-                            Layout.fillWidth: true
-                            text: "No macros yet. Click + New to record one."
-                            color: Theme.textDim
-                            font.family: Theme.font
-                            font.pixelSize: Theme.small
-                            wrapMode: Text.Wrap
+                    }
+                    onRemoved: g => {
+                        if (page.guid === g) {
+                            page.editing = false;
                         }
-
-                        SectionLabel {
-                            visible: onlyOnDevice.count > 0
-                            caption: "On device only"
-                            Layout.topMargin: 14
-                        }
-                        Repeater {
-                            id: onlyOnDevice
-                            model: page.deviceOnly()
-                            delegate: Rectangle {
-                                required property var modelData
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 54
-                                readonly property bool active: page.editing && page.devView !== null && page.devView.pid === modelData.pid && page.devView.id === modelData.m.id
-                                color: active ? Theme.accentTint : (dh.hovered ? "#14ffffff" : Theme.bg)
-                                border.color: active ? Theme.accent : Theme.borderSoft
-                                HoverHandler {
-                                    id: dh
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: page.openDeviceMacro(modelData.pid, modelData.m)
-                                }
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 12
-                                    anchors.rightMargin: 8
-                                    Column {
-                                        Layout.fillWidth: true
-                                        spacing: 3
-                                        Text {
-                                            width: parent.width
-                                            text: modelData.m.name
-                                            color: Theme.text
-                                            font.family: Theme.font
-                                            font.pixelSize: Theme.fontSize
-                                            elide: Text.ElideRight
-                                        }
-                                        Text {
-                                            width: parent.width
-                                            text: (page.deviceNames[modelData.pid] || modelData.pid) + " · " + modelData.m.events.length + " events"
-                                            color: Theme.textDim
-                                            font.family: Theme.font
-                                            font.pixelSize: 11
-                                            elide: Text.ElideRight
-                                        }
-                                    }
-                                    SynButton {
-                                        objectName: "importRowButton"
-                                        text: "Import"
-                                        implicitWidth: 72
-                                        onClicked: page.importMacro(modelData.pid, modelData.m.id)
-                                    }
-                                }
-                            }
+                    }
+                    onRenamed: (g, n) => {
+                        if (page.guid === g && !page.dirty) {
+                            page.macroName = n;
                         }
                     }
                 }
@@ -698,7 +692,11 @@ Rectangle {
                             { kind: "delay", label: "Delay" },
                             { kind: "key", label: "Keyboard key" },
                             { kind: "button", label: "Mouse button" },
-                            { kind: "scroll", label: "Scroll wheel" }
+                            { kind: "scroll", label: "Scroll wheel" },
+                            { kind: "media", label: i18n("Media key") },
+                            { kind: "power", label: i18n("System key") },
+                            { kind: "cursor", label: i18n("Cursor move") },
+                            { kind: "run", label: i18n("Run command") }
                         ]
                         delegate: Rectangle {
                             required property var modelData
@@ -933,6 +931,26 @@ Rectangle {
                                                     currentIndex: page.delayMode
                                                     onActivated: i => page.delayMode = i
                                                 }
+                                                Text {
+                                                    text: i18n("What to record")
+                                                    color: Theme.text
+                                                    font.family: Theme.font
+                                                    font.pixelSize: Theme.small
+                                                }
+                                                ModeTabs {
+                                                    objectName: "recordFilter"
+                                                    minTabWidth: 86
+                                                    model: [i18n("Keys + mouse"), i18n("Keys only"), i18n("Mouse only")]
+                                                    currentIndex: page.recordFilter
+                                                    onActivated: i => page.recordFilter = i
+                                                }
+                                                SynCheckBox {
+                                                    objectName: "trackMoves"
+                                                    text: i18n("Record pointer movement")
+                                                    enabled: page.recordFilter !== 1
+                                                    checked: page.trackMoves
+                                                    onToggled: page.trackMoves = checked
+                                                }
                                                 RowLayout {
                                                     visible: page.delayMode === 1
                                                     spacing: 10
@@ -959,7 +977,7 @@ Rectangle {
                                     text: "Save"
                                     primary: true
                                     implicitWidth: 90
-                                    enabled: page.dirty && page.events.length > 0 && !page.backend.readonly
+                                    enabled: page.dirty && page.events.length > 0 && !page.backend.readonly && !page.hasEmptyCommand
                                     onClicked: page.save()
                                 }
                             }
@@ -1121,7 +1139,7 @@ Rectangle {
                         Layout.fillWidth: true
                         readonly property var ev: page.sel >= 0 && page.sel < page.events.length ? page.events[page.sel] : null
                         active: ev !== null && !page.readOnly
-                        sourceComponent: !ev ? null : ev.type === "delay" ? delayEditor : ev.type === "key" ? keyEditor : ev.type === "button" ? buttonEditor : ev.type === "scroll" ? scrollEditor : null
+                        sourceComponent: !ev ? null : ev.type === "delay" ? delayEditor : ev.type === "key" ? keyEditor : ev.type === "button" ? buttonEditor : ev.type === "scroll" ? scrollEditor : ev.type === "media" ? mediaEditor : ev.type === "power" ? powerEditor : ev.type === "cursor" ? cursorEditor : ev.type === "run" ? runEditor : null
                     }
 
                     RowLayout {
@@ -1174,6 +1192,19 @@ Rectangle {
         z: 100
         visible: page.recording
         acceptedButtons: Qt.AllButtons
+        hoverEnabled: true
+        onPositionChanged: m => {
+            if (!page.trackMoves || page.recordFilter === 1) {
+                return;
+            }
+            const now = Date.now();
+            if (now - page.lastMove < 60) {
+                return;
+            }
+            page.lastMove = now;
+            const g = mapToGlobal(m.x, m.y);
+            page.record({ type: "cursor", x: Math.max(0, Math.round(g.x)), y: Math.max(0, Math.round(g.y)) });
+        }
         readonly property var codes: ({ [Qt.LeftButton]: 1, [Qt.RightButton]: 2, [Qt.MiddleButton]: 3, [Qt.BackButton]: 4, [Qt.ForwardButton]: 5 })
         function onStop(m) {
             const p = mapToItem(recordButton, m.x, m.y);
@@ -1282,6 +1313,132 @@ Rectangle {
             model: ["Up", "Down"]
             currentIndex: editor.ev && editor.ev.up ? 0 : 1
             onActivated: i => page.update(page.sel, { type: "scroll", up: i === 0 })
+        }
+    }
+
+    Component {
+        id: mediaEditor
+        ColumnLayout {
+            spacing: 8
+            QQC2.ComboBox {
+                objectName: "mediaKeyPick"
+                Layout.fillWidth: true
+                readonly property var usages: Object.keys(KeyNames.media).map(Number)
+                model: usages.map(u => KeyNames.media[u])
+                currentIndex: Math.max(0, usages.indexOf(editor.ev ? editor.ev.usage : 0))
+                onActivated: i => page.update(page.sel, { type: "media", usage: usages[i], down: editor.ev.down })
+            }
+            ModeTabs {
+                minTabWidth: 90
+                model: ["Press", "Release"]
+                currentIndex: editor.ev && editor.ev.down ? 0 : 1
+                onActivated: i => page.update(page.sel, { type: "media", usage: editor.ev.usage, down: i === 0 })
+            }
+            Text {
+                Layout.fillWidth: true
+                text: i18n("Plays as a media key press through the device. Check that it does what you expect on your hardware.")
+                color: Theme.textMuted
+                font.family: Theme.font
+                font.pixelSize: 11
+                wrapMode: Text.Wrap
+            }
+        }
+    }
+
+    Component {
+        id: powerEditor
+        ColumnLayout {
+            spacing: 8
+            QQC2.ComboBox {
+                objectName: "powerKeyPick"
+                Layout.fillWidth: true
+                readonly property var codes: [0x81, 0x82, 0x83]
+                model: [i18n("Power"), i18n("Sleep"), i18n("Wake")]
+                currentIndex: Math.max(0, codes.indexOf(editor.ev ? editor.ev.code : 0x83))
+                onActivated: i => page.update(page.sel, { type: "power", code: codes[i], down: editor.ev.down })
+            }
+            ModeTabs {
+                minTabWidth: 90
+                model: ["Press", "Release"]
+                currentIndex: editor.ev && editor.ev.down ? 0 : 1
+                onActivated: i => page.update(page.sel, { type: "power", code: editor.ev.code, down: i === 0 })
+            }
+            Text {
+                Layout.fillWidth: true
+                text: i18n("Power and Sleep act on the whole computer when the macro plays.")
+                color: Theme.warn
+                font.family: Theme.font
+                font.pixelSize: 11
+                wrapMode: Text.Wrap
+            }
+        }
+    }
+
+    Component {
+        id: cursorEditor
+        ColumnLayout {
+            spacing: 8
+            RowLayout {
+                spacing: 10
+                Text {
+                    text: "X"
+                    color: Theme.text
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize
+                }
+                QQC2.SpinBox {
+                    objectName: "cursorX"
+                    from: 0
+                    to: 65535
+                    editable: true
+                    value: editor.ev ? editor.ev.x : 0
+                    onValueModified: page.update(page.sel, { type: "cursor", x: value, y: editor.ev.y })
+                }
+                Text {
+                    text: "Y"
+                    color: Theme.text
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize
+                }
+                QQC2.SpinBox {
+                    objectName: "cursorY"
+                    from: 0
+                    to: 65535
+                    editable: true
+                    value: editor.ev ? editor.ev.y : 0
+                    onValueModified: page.update(page.sel, { type: "cursor", x: editor.ev.x, y: value })
+                }
+            }
+            Text {
+                Layout.fillWidth: true
+                text: i18n("Screen position in pixels from the top left. Where the pointer ends up also depends on the device's pointer settings.")
+                color: Theme.textMuted
+                font.family: Theme.font
+                font.pixelSize: 11
+                wrapMode: Text.Wrap
+            }
+        }
+    }
+
+    Component {
+        id: runEditor
+        ColumnLayout {
+            spacing: 8
+            QQC2.TextField {
+                objectName: "runCommand"
+                Layout.fillWidth: true
+                text: editor.ev ? editor.ev.command : ""
+                placeholderText: i18n("Command, e.g. konsole or xdg-open https://…")
+                onTextEdited: page.update(page.sel, { type: "run", command: text, slot: editor.ev.slot })
+            }
+            Text {
+                Layout.fillWidth: true
+                text: i18n("The macro presses a key combination reserved for this command (F14–F24 with modifiers) and Tsuba's service runs it, so it only works while the service is running. Each different command uses one of the 46 reserved combinations.")
+                color: Theme.textMuted
+                font.family: Theme.font
+                font.pixelSize: 11
+                wrapMode: Text.Wrap
+            }
         }
     }
 

@@ -5,6 +5,7 @@ mod backend;
 mod device_backend;
 mod i18n;
 mod studio_api;
+mod library_backend;
 mod synapse;
 mod tray;
 

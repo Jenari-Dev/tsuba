@@ -18,7 +18,7 @@ Rectangle {
     property bool showThirdParty: false
     property string note: ""
 
-    readonly property string noticeText: i18n("Tsuba is an independent open-source project. It is not affiliated with, authorised by or endorsed by Razer Inc. Razer, Synapse, Chroma, HyperShift, BlackWidow and Basilisk are trademarks of Razer Inc., named here only to identify compatible hardware.")
+    readonly property string noticeText: i18n("Tsuba is an independent open-source project, not affiliated with or endorsed by Razer Inc. Razer, Synapse, Chroma, HyperShift, BlackWidow and Basilisk are trademarks of Razer Inc., named here only to identify compatible hardware.")
 
     function detailLines() {
         const d = details;

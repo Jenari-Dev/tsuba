@@ -109,7 +109,7 @@ QtObject {
     readonly property color keyEdge: dark ? "#3a3a3a" : "#b9c1c5"
 
     // Where the project lives (the one place this address is written in QML).
-    readonly property string projectUrl: "https://github.com/JenAriDev/tsuba" // i18n-ok
+    readonly property string projectUrl: "https://github.com/Jenari-Dev/tsuba" // i18n-ok
     function docsUrl(name) {
         return projectUrl + "/blob/main/docs/" + name;
     }

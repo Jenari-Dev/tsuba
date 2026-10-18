@@ -1,4 +1,4 @@
-//! D-Bus interface `io.github.JenAriDev.Tsuba1.Device` (served at [`crate::dbus::PATH`]):
+//! D-Bus interface `io.github.Jenari_Dev.Tsuba1.Device` (served at [`crate::dbus::PATH`]):
 //! firmware features found by the read-only feature probe, on-board profile / factory reset,
 //! mouse lighting zones, lighting on every device at once, and lighting on battery.
 //!
@@ -360,7 +360,7 @@ fn logged<T>(what: String, r: fdo::Result<T>) -> fdo::Result<T> {
     r
 }
 
-#[interface(name = "io.github.JenAriDev.Tsuba1.Device")]
+#[interface(name = "io.github.Jenari_Dev.Tsuba1.Device")]
 impl DeviceIface {
     /// Firmware feature values for one on-board profile as JSON: `{"profile", "supported":
     /// [probe keys], "debounce", "scroll_accel_level", "smart_reel_threshold",

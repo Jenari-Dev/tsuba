@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
-"Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 22:04+0900\n"
+"Report-Msgid-Bugs-To: https://github.com/Jenari-Dev/tsuba/issues\n"
+"POT-Creation-Date: 2026-10-18 23:12+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6437,19 +6437,19 @@ msgstr ""
 msgid "Reset zoom and position"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:276
+#: crates/tsuba-gui/src/app_backend.rs:298
 msgid "Could not run tsubad: %1"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:403
+#: crates/tsuba-gui/src/app_backend.rs:425
 msgid "Started"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:414
+#: crates/tsuba-gui/src/app_backend.rs:436
 msgid "Started without the systemd service"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:416
+#: crates/tsuba-gui/src/app_backend.rs:438
 msgid "Could not start tsubad: %1"
 msgstr ""
 

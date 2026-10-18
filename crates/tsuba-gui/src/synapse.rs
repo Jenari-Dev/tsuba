@@ -12,9 +12,9 @@ use serde_json::{json, Value};
 use tsuba_core::synapse_import::{self as si, Plan};
 use zbus::blocking::Connection;
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const IFACE: &str = "io.github.JenAriDev.Tsuba1";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const IFACE: &str = "io.github.Jenari_Dev.Tsuba1";
 
 fn call<B, R>(conn: &Connection, method: &str, body: &B) -> Result<R, String>
 where

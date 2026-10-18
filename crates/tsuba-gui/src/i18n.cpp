@@ -22,8 +22,8 @@ void tsuba_set_language(const QString &language)
 
 void tsuba_set_app_identity()
 {
-    QGuiApplication::setDesktopFileName(QStringLiteral("io.github.jenaridev.tsuba"));
-    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("io.github.jenaridev.tsuba")));
+    QGuiApplication::setDesktopFileName(QStringLiteral("io.github.Jenari_Dev.Tsuba"));
+    QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("io.github.Jenari_Dev.Tsuba")));
 }
 
 QString tsuba_translate(const QString &context, const QString &message)

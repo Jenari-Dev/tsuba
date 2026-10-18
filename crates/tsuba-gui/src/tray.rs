@@ -11,8 +11,8 @@ use zbus::blocking::Connection;
 use zbus::interface;
 use zbus::zvariant::{ObjectPath, OwnedValue, Type, Value};
 
-pub const APP_ID: &str = "io.github.jenaridev.tsuba";
-const APP_PATH: &str = "/io/github/jenaridev/tsuba";
+pub const APP_ID: &str = "io.github.Jenari_Dev.Tsuba";
+const APP_PATH: &str = "/io/github/Jenari_Dev/Tsuba";
 
 /// What the tray or another launch asks of the running app.
 #[derive(Debug, Clone, PartialEq)]

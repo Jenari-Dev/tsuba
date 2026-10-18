@@ -26,7 +26,7 @@ const PORTAL: &str = "org.freedesktop.portal.Desktop";
 const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
 const IFACE: &str = "org.freedesktop.portal.GlobalShortcuts";
 /// How the desktop names this program in its shortcut settings (a reverse-DNS app id).
-const APP_ID: &str = "io.github.JenAriDev.Tsubad";
+const APP_ID: &str = "io.github.Jenari_Dev.Tsubad";
 /// Waiting for the desktop's approval dialog can take a while.
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(180);
 

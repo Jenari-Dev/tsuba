@@ -101,10 +101,10 @@ use serde_json::{json, Value};
 
 use crate::tray;
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const APP_IFACE: &str = "io.github.JenAriDev.Tsuba1.App";
-const PROJECT_URL: &str = "https://github.com/JenAriDev/tsuba";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const APP_IFACE: &str = "io.github.Jenari_Dev.Tsuba1.App";
+const PROJECT_URL: &str = "https://github.com/Jenari-Dev/tsuba";
 
 pub struct AppBackendRust {
     tray_available: bool,
@@ -128,8 +128,30 @@ fn config_home() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from(".config"))
 }
 
+const AUTOSTART_FILE: &str = "io.github.Jenari_Dev.Tsuba.desktop";
+/// App id used before the project moved to its GitHub organisation (kept only for the migration below).
+const LEGACY_APP_ID: &str = "io.github.jenaridev.tsuba";
+
 fn autostart_path() -> PathBuf {
-    config_home().join("autostart").join("io.github.jenaridev.tsuba.desktop")
+    config_home().join("autostart").join(AUTOSTART_FILE)
+}
+
+/// Early builds named the autostart entry after the old app id. If that file exists, replace it with
+/// one under the current name (same command line, new icon / id) and remove the old one, so the
+/// app is not started twice at login. Returns true when a migration happened.
+pub fn migrate_legacy_autostart_in(autostart_dir: &Path) -> bool {
+    let old = autostart_dir.join(format!("{LEGACY_APP_ID}.desktop"));
+    let Ok(text) = std::fs::read_to_string(&old) else { return false };
+    let new = autostart_dir.join(AUTOSTART_FILE);
+    if !new.exists() && std::fs::write(&new, text.replace(LEGACY_APP_ID, "io.github.Jenari_Dev.Tsuba")).is_err() {
+        return false;
+    }
+    std::fs::remove_file(&old).is_ok()
+}
+
+/// Run once at start-up.
+pub fn migrate_legacy_autostart() -> bool {
+    migrate_legacy_autostart_in(&config_home().join("autostart"))
 }
 
 /// The command for the autostart entry: the bare name when installed system-wide, else this binary's path.
@@ -169,7 +191,7 @@ fn exec_quote(arg: &str) -> String {
 
 pub fn autostart_entry(exec: &str) -> String {
     format!(
-        "[Desktop Entry]\nType=Application\nName=Tsuba\nComment=Tsuba tray icon and notifications\nExec={exec} --minimized\nIcon=io.github.jenaridev.tsuba\nTerminal=false\nX-GNOME-Autostart-enabled=true\nX-KDE-autostart-after=panel\n"
+        "[Desktop Entry]\nType=Application\nName=Tsuba\nComment=Tsuba tray icon and notifications\nExec={exec} --minimized\nIcon=io.github.Jenari_Dev.Tsuba\nTerminal=false\nX-GNOME-Autostart-enabled=true\nX-KDE-autostart-after=panel\n"
     )
 }
 
@@ -478,6 +500,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn legacy_autostart_file_is_replaced_by_the_new_one() {
+        let dir = std::env::temp_dir().join(format!("tsuba-autostart-test-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        assert!(!migrate_legacy_autostart_in(&dir), "nothing to migrate");
+        let old = dir.join(format!("{LEGACY_APP_ID}.desktop"));
+        std::fs::write(&old, format!("[Desktop Entry]\nExec=/opt/x/tsuba-app --minimized\nIcon={LEGACY_APP_ID}\n")).unwrap();
+        assert!(migrate_legacy_autostart_in(&dir));
+        assert!(!old.exists());
+        let new = std::fs::read_to_string(dir.join(AUTOSTART_FILE)).unwrap();
+        assert!(new.contains("Exec=/opt/x/tsuba-app --minimized") && new.contains("Icon=io.github.Jenari_Dev.Tsuba") && !new.contains(LEGACY_APP_ID));
+        assert!(!migrate_legacy_autostart_in(&dir), "idempotent");
+        // an existing new entry is kept; the old one still goes away
+        std::fs::write(&old, "[Desktop Entry]\nExec=old\n").unwrap();
+        std::fs::write(dir.join(AUTOSTART_FILE), "mine").unwrap();
+        assert!(migrate_legacy_autostart_in(&dir));
+        assert_eq!(std::fs::read_to_string(dir.join(AUTOSTART_FILE)).unwrap(), "mine");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn autostart_entry_starts_minimized_with_the_right_command() {
         assert_eq!(autostart_exec(Path::new("/usr/bin/tsuba-app")), "tsuba-app");
         assert_eq!(autostart_exec(Path::new("/home/x/.local/bin/tsuba-app (deleted)")), "/home/x/.local/bin/tsuba-app");
@@ -489,7 +532,7 @@ mod tests {
         assert_eq!(autostart_exec(Path::new("/opt/100%/t")), "/opt/100%%/t");
         assert_eq!(autostart_exec(Path::new("/opt/a;b/t")), "\"/opt/a;b/t\"");
         let e = autostart_entry("tsuba-app");
-        assert!(e.contains("Exec=tsuba-app --minimized\n") && e.starts_with("[Desktop Entry]\n") && e.contains("Icon=io.github.jenaridev.tsuba"));
+        assert!(e.contains("Exec=tsuba-app --minimized\n") && e.starts_with("[Desktop Entry]\n") && e.contains("Icon=io.github.Jenari_Dev.Tsuba"));
     }
 
     #[test]

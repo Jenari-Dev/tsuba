@@ -2,7 +2,7 @@ use cxx_qt_build::{CxxQtBuilder, QmlFile, QmlModule};
 
 fn main() {
     let builder = CxxQtBuilder::new_qml_module(
-        QmlModule::new("io.github.jenaridev.tsuba")
+        QmlModule::new("io.github.Jenari_Dev.Tsuba")
             .qml_file(QmlFile::from("qml/Theme.qml").singleton(true))
             .qml_file(QmlFile::from("qml/KeyNames.qml").singleton(true))
             .qml_file(QmlFile::from("qml/DeviceKinds.qml").singleton(true))

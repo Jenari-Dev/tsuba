@@ -395,9 +395,9 @@ use cxx_qt::{CxxQtType, Threading};
 use cxx_qt_lib::QString;
 use zbus::blocking::Connection;
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const IFACE: &str = "io.github.JenAriDev.Tsuba1";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const IFACE: &str = "io.github.Jenari_Dev.Tsuba1";
 
 #[derive(Default)]
 pub struct BackendRust {

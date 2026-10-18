@@ -1,5 +1,5 @@
 //! Lighting-related D-Bus methods that live on their own interface,
-//! `io.github.JenAriDev.Tsuba1.Lighting`, at the same object path as the main one:
+//! `io.github.Jenari_Dev.Tsuba1.Lighting`, at the same object path as the main one:
 //! who controls a device's lighting, which applications may control it, audio sources.
 
 use std::sync::Arc;
@@ -42,7 +42,7 @@ impl Lighting {
     }
 }
 
-#[interface(name = "io.github.JenAriDev.Tsuba1.Lighting")]
+#[interface(name = "io.github.Jenari_Dev.Tsuba1.Lighting")]
 impl Lighting {
     async fn get_lighting_owner(&self, pid: String) -> String {
         let me = Lighting { mgr: self.mgr.clone(), game: self.game.clone() };

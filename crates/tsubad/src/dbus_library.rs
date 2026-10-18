@@ -1,4 +1,4 @@
-//! D-Bus API of the profile / macro / shortcut work: interface `io.github.JenAriDev.Tsuba1.Library`
+//! D-Bus API of the profile / macro / shortcut work: interface `io.github.Jenari_Dev.Tsuba1.Library`
 //! at the same object path as the main interface. Every argument is a string (JSON where
 //! structured) and so is every reply, so the app can call all of it through one generic caller.
 
@@ -55,7 +55,7 @@ async fn is_owner(conn: &zbus::Connection, sender: Option<&str>, name: &'static 
     dbus.get_name_owner(name).await.is_ok_and(|o| o.as_str() == sender)
 }
 
-#[interface(name = "io.github.JenAriDev.Tsuba1.Library")]
+#[interface(name = "io.github.Jenari_Dev.Tsuba1.Library")]
 impl LibraryApi {
     /// Which library profiles bind each macro and which bindings lost their macro (JSON).
     async fn macro_usage(&self) -> fdo::Result<String> {
@@ -174,11 +174,11 @@ mod tests {
             let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
             let dir = std::env::temp_dir().join(format!("tsuba-focus-sender-{}", std::process::id()));
             let mgr = Arc::new(Manager::new(true, dir.join("config.toml"), tx).unwrap());
-            let daemon = build().name("io.github.JenAriDev.TestTsuba").unwrap().serve_at("/t", LibraryApi { mgr: mgr.clone() }).unwrap().build().await.unwrap();
+            let daemon = build().name("io.github.Jenari_Dev.TestTsuba").unwrap().serve_at("/t", LibraryApi { mgr: mgr.clone() }).unwrap().build().await.unwrap();
             let kwin = build().name("org.kde.KWin").unwrap().build().await.unwrap();
             let other = build().build().await.unwrap();
             let call = |c: zbus::Connection| async move {
-                c.call_method(Some("io.github.JenAriDev.TestTsuba"), "/t", Some("io.github.JenAriDev.Tsuba1.Library"), "FocusChanged", &("4242", "game", "game.exe", "Game")).await
+                c.call_method(Some("io.github.Jenari_Dev.TestTsuba"), "/t", Some("io.github.Jenari_Dev.Tsuba1.Library"), "FocusChanged", &("4242", "game", "game.exe", "Game")).await
             };
             assert!(call(other).await.is_err(), "another client reported the focus");
             assert!(mgr.actions.focus.lock().unwrap().is_none());

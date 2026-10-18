@@ -6,9 +6,9 @@ use crate::i18n::tr;
 use serde_json::{json, Value};
 use tsuba_core::chroma_profiles::{self as cp, ChromaProfile};
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const IFACE: &str = "io.github.JenAriDev.Tsuba1.Lighting";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const IFACE: &str = "io.github.Jenari_Dev.Tsuba1.Lighting";
 
 pub fn call(method: &str, arg: &str) -> String {
     let out = match method {

@@ -29,7 +29,7 @@ Rectangle {
         tick;
         if (!devb) {
             try {
-                devb = Qt.createQmlObject("import io.github.jenaridev.tsuba\nDeviceBackend {}", page, "DeviceBackend");   // i18n-ok
+                devb = Qt.createQmlObject("import io.github.Jenari_Dev.Tsuba\nDeviceBackend {}", page, "DeviceBackend");   // i18n-ok
             } catch (e) {
                 devb = null;
             }

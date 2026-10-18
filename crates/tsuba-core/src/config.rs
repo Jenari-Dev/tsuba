@@ -394,8 +394,8 @@ pub struct DialSlotConfig {
 
 const HEADER: &str = "\
 # Tsuba configuration. tsubad applies this to each device when it appears.
-# Edit by hand, then reload:  busctl --user call io.github.JenAriDev.Tsuba \\
-#   /io/github/JenAriDev/Tsuba io.github.JenAriDev.Tsuba1 Reload
+# Edit by hand, then reload:  busctl --user call io.github.Jenari_Dev.Tsuba \\
+#   /io/github/Jenari_Dev/Tsuba io.github.Jenari_Dev.Tsuba1 Reload
 # Effects: off | static {colour} | breathing {colours} | spectrum | wave {direction, speed}
 #          | reactive {speed, colour} | starlight {speed, colours} | custom {rows} | studio {studio}.
 #          Colours are RRGGBB.

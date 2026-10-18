@@ -62,7 +62,7 @@ QQC2.ScrollView {
     }
     function makeDevb() {
         try {
-            return Qt.createQmlObject("import io.github.jenaridev.tsuba\nDeviceBackend {}", tab, "DeviceBackend");
+            return Qt.createQmlObject("import io.github.Jenari_Dev.Tsuba\nDeviceBackend {}", tab, "DeviceBackend");
         } catch (e) {
             return null;
         }

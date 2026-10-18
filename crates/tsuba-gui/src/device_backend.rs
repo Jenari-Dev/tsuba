@@ -1,4 +1,4 @@
-//! QML-facing client of tsubad's `io.github.JenAriDev.Tsuba1.Device` interface: firmware
+//! QML-facing client of tsubad's `io.github.Jenari_Dev.Tsuba1.Device` interface: firmware
 //! features (probe-gated), resets, mouse zones, lighting on every device, lighting on battery.
 //! Instantiated by the device pages that use it (`DeviceBackend {}`).
 
@@ -68,9 +68,9 @@ use cxx_qt::CxxQtType;
 use cxx_qt_lib::QString;
 use zbus::blocking::Connection;
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const IFACE: &str = "io.github.JenAriDev.Tsuba1.Device";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const IFACE: &str = "io.github.Jenari_Dev.Tsuba1.Device";
 
 #[derive(Default)]
 pub struct DeviceBackendRust {

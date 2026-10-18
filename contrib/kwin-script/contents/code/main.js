@@ -3,7 +3,7 @@
 // process id, class, name and title to tsubad over D-Bus; nothing else leaves KWin and
 // nothing is stored.
 
-const TSUBA = ["io.github.JenAriDev.Tsuba", "/io/github/JenAriDev/Tsuba", "io.github.JenAriDev.Tsuba1.Library", "FocusChanged"];
+const TSUBA = ["io.github.Jenari_Dev.Tsuba", "/io/github/Jenari_Dev/Tsuba", "io.github.Jenari_Dev.Tsuba1.Library", "FocusChanged"];
 
 function report(w) {
     if (!w) {

@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 
 [Service]
 Type=dbus
-BusName=io.github.JenAriDev.Tsuba
+BusName=io.github.Jenari_Dev.Tsuba
 ExecStart=%h/.local/bin/tsubad
 Restart=on-failure
 RestartSec=2

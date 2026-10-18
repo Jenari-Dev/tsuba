@@ -156,7 +156,7 @@ process.stdout.write(JSON.stringify(calls));
         assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
         let calls: Vec<Vec<String>> = serde_json::from_slice(&out.stdout).unwrap();
         let svc = |args: &[&str]| -> Vec<String> {
-            ["io.github.JenAriDev.Tsuba", "/io/github/JenAriDev/Tsuba", "io.github.JenAriDev.Tsuba1.Library", "FocusChanged"].iter().chain(args).map(|s| s.to_string()).collect()
+            ["io.github.Jenari_Dev.Tsuba", "/io/github/Jenari_Dev/Tsuba", "io.github.Jenari_Dev.Tsuba1.Library", "FocusChanged"].iter().chain(args).map(|s| s.to_string()).collect()
         };
         assert_eq!(calls[0], svc(&["4242", "steam_app_1245620", "eldenring.exe", "ELDEN RING"]), "reports the focused window when it starts");
         assert_eq!(calls[1], svc(&["0", "", "", ""]), "no window: an empty report");

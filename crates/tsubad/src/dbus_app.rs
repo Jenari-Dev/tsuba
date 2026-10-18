@@ -14,7 +14,7 @@ pub struct App {
     pub read_only: bool,
 }
 
-#[interface(name = "io.github.JenAriDev.Tsuba1.App")]
+#[interface(name = "io.github.Jenari_Dev.Tsuba1.App")]
 impl App {
     /// Notification settings as JSON (see [`Settings`]).
     async fn get_notification_settings(&self) -> String {

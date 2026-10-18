@@ -26,9 +26,9 @@ install -Dm644 -t "$dest/usr/share/tsuba/devicedb" data/devicedb/*.toml
 install -Dm644 "$shim/x64/RzChromaSDK64.dll" "$dest/usr/share/tsuba/game-lighting/x64/RzChromaSDK64.dll"
 install -Dm644 "$shim/x86/RzChromaSDK.dll" "$dest/usr/share/tsuba/game-lighting/x86/RzChromaSDK.dll"
 
-install -Dm644 contrib/io.github.jenaridev.tsuba.desktop -t "$dest/usr/share/applications"
-sed -i 's|^Exec=.*|Exec=tsuba-app|' "$dest/usr/share/applications/io.github.jenaridev.tsuba.desktop"
-install -Dm644 contrib/io.github.jenaridev.tsuba.svg -t "$dest/usr/share/icons/hicolor/scalable/apps"
+install -Dm644 contrib/io.github.Jenari_Dev.Tsuba.desktop -t "$dest/usr/share/applications"
+sed -i 's|^Exec=.*|Exec=tsuba-app|' "$dest/usr/share/applications/io.github.Jenari_Dev.Tsuba.desktop"
+install -Dm644 contrib/io.github.Jenari_Dev.Tsuba.svg -t "$dest/usr/share/icons/hicolor/scalable/apps"
 
 for mo in "$locale"/*/LC_MESSAGES/tsuba.mo; do
     [ -e "$mo" ] || continue

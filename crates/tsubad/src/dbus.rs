@@ -1,7 +1,7 @@
 //! D-Bus API on the session bus.
 //!
-//! Bus name `io.github.JenAriDev.Tsuba`, object `/io/github/JenAriDev/Tsuba`,
-//! interface `io.github.JenAriDev.Tsuba1`. Structured data is passed as JSON.
+//! Bus name `io.github.Jenari_Dev.Tsuba`, object `/io/github/Jenari_Dev/Tsuba`,
+//! interface `io.github.Jenari_Dev.Tsuba1`. Structured data is passed as JSON.
 
 use std::sync::Arc;
 
@@ -14,8 +14,8 @@ use zbus::{fdo, interface, object_server::SignalEmitter};
 use crate::library::Mirror;
 use crate::manager::Manager;
 
-pub const BUS_NAME: &str = "io.github.JenAriDev.Tsuba";
-pub const PATH: &str = "/io/github/JenAriDev/Tsuba";
+pub const BUS_NAME: &str = "io.github.Jenari_Dev.Tsuba";
+pub const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
 
 pub struct Tsuba {
     pub mgr: Arc<Manager>,
@@ -48,7 +48,7 @@ impl Tsuba {
     }
 }
 
-#[interface(name = "io.github.JenAriDev.Tsuba1")]
+#[interface(name = "io.github.Jenari_Dev.Tsuba1")]
 impl Tsuba {
     /// (pid, name, kind) for every attached device.
     async fn list_devices(&self) -> Vec<(String, String, String)> {

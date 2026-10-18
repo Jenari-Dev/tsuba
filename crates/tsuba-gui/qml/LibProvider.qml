@@ -18,7 +18,7 @@ Item {
         if (!lib && !tried) {
             tried = true;
             try {
-                lib = Qt.createQmlObject("import io.github.jenaridev.tsuba\nLibraryBackend {}", provider, "LibProvider.qml"); // i18n-ok
+                lib = Qt.createQmlObject("import io.github.Jenari_Dev.Tsuba\nLibraryBackend {}", provider, "LibProvider.qml"); // i18n-ok
             } catch (e) {
                 // Under the headless QML tests the app's module doesn't exist: no noise there.
                 if (String(e).indexOf("is not installed") < 0) { // i18n-ok

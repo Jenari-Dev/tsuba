@@ -48,10 +48,10 @@ use cxx_qt::CxxQtType;
 use cxx_qt_lib::QString;
 use zbus::blocking::Connection;
 
-const BUS: &str = "io.github.JenAriDev.Tsuba";
-const PATH: &str = "/io/github/JenAriDev/Tsuba";
-const MAIN: &str = "io.github.JenAriDev.Tsuba1";
-const LIBRARY: &str = "io.github.JenAriDev.Tsuba1.Library";
+const BUS: &str = "io.github.Jenari_Dev.Tsuba";
+const PATH: &str = "/io/github/Jenari_Dev/Tsuba";
+const MAIN: &str = "io.github.Jenari_Dev.Tsuba1";
+const LIBRARY: &str = "io.github.Jenari_Dev.Tsuba1.Library";
 
 #[derive(Default)]
 pub struct LibraryBackendRust {

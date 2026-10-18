@@ -9,12 +9,12 @@ DeviceResetCard.qml: reset profile
 # PerformanceTab: QML source for a runtime-created object, and a daemon mode id compared by value
 PerformanceTab.qml: DeviceBackend
 PerformanceTab.qml: Driver
-PerformanceTab.qml: import io.github.jenaridev.tsuba\nDeviceBackend {}
+PerformanceTab.qml: import io.github.Jenari_Dev.Tsuba\nDeviceBackend {}
 # LightingTab: JSON default, runtime-created object source, default colour hex
 LightingTab.qml: {\"profiles\": []}
 LightingTab.qml: DeviceBackend
 LightingTab.qml: 0080ff
-LightingTab.qml: import io.github.jenaridev.tsuba\nDeviceBackend {}
+LightingTab.qml: import io.github.Jenari_Dev.Tsuba\nDeviceBackend {}
 # StudioPage: device ids, demo layer names (headless UI check), keyboard shortcut sequences, JSON default
 StudioPage.qml: 00aa
 StudioPage.qml: 0080ff

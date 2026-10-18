@@ -7,7 +7,7 @@ Version:        0.1.0
 Release:        1%{?dist}
 Summary:        Open-source configuration for Razer keyboards and mice
 License:        GPL-2.0-or-later
-URL:            https://github.com/JenAriDev/tsuba
+URL:            https://github.com/Jenari-Dev/tsuba
 Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
@@ -56,6 +56,6 @@ udevadm control --reload-rules >/dev/null 2>&1 || :
 %{_prefix}/lib/systemd/user/tsubad.service
 %{_prefix}/lib/udev/rules.d/70-tsuba.rules
 %{_datadir}/tsuba
-%{_datadir}/applications/io.github.jenaridev.tsuba.desktop
-%{_datadir}/icons/hicolor/scalable/apps/io.github.jenaridev.tsuba.svg
+%{_datadir}/applications/io.github.Jenari_Dev.Tsuba.desktop
+%{_datadir}/icons/hicolor/scalable/apps/io.github.Jenari_Dev.Tsuba.svg
 %{_datadir}/locale/*/LC_MESSAGES/tsuba.mo

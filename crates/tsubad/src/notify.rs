@@ -279,7 +279,7 @@ impl Sink for DBusSink {
                 }
             }
             let mut hints: HashMap<&str, Value> = HashMap::new();
-            hints.insert("desktop-entry", Value::from("io.github.jenaridev.tsuba"));
+            hints.insert("desktop-entry", Value::from("io.github.Jenari_Dev.Tsuba"));
             hints.insert("transient", Value::from(true));
             hints.insert("urgency", Value::from(if note.critical { 2u8 } else { 1u8 }));
             if sound {
@@ -346,7 +346,7 @@ impl Notifier {
     pub fn test(&self) {
         let s = self.settings();
         self.sink.send(
-            &Note { key: "test".into(), title: "Tsuba".into(), body: "Notifications are working.".into(), icon: "io.github.jenaridev.tsuba", critical: false },
+            &Note { key: "test".into(), title: "Tsuba".into(), body: "Notifications are working.".into(), icon: "io.github.Jenari_Dev.Tsuba", critical: false },
             &s,
         );
     }

@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import io.github.jenaridev.tsuba
+import io.github.Jenari_Dev.Tsuba
 
 QQC2.ApplicationWindow {
     id: root

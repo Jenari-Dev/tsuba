@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
-"Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 22:04+0900\n"
+"Report-Msgid-Bugs-To: https://github.com/Jenari-Dev/tsuba/issues\n"
+"POT-Creation-Date: 2026-10-18 23:12+0900\n"
 "PO-Revision-Date: 2026-10-18 22:00+0900\n"
 "Last-Translator: Claude (machine translation, needs native review)\n"
 "Language-Team: Japanese\n"
@@ -1442,8 +1442,8 @@ msgid ""
 "This profile file would run the following on your computer when its keys are "
 "pressed. Only keep them if you trust where the file came from."
 msgstr ""
-"このプロファイルファイルは、キーを押すと次の内容をこのコンピューターで実行します。"
-"ファイルの入手元を信頼できる場合のみ残してください。"
+"このプロファイルファイルは、キーを押すと次の内容をこのコンピューターで実行し"
+"ます。ファイルの入手元を信頼できる場合のみ残してください。"
 
 #: crates/tsuba-gui/qml/DevicePage.qml:177
 msgid "Key %1: %2"
@@ -6769,19 +6769,19 @@ msgstr "フィット"
 msgid "Reset zoom and position"
 msgstr "ズームと位置をリセット"
 
-#: crates/tsuba-gui/src/app_backend.rs:276
+#: crates/tsuba-gui/src/app_backend.rs:298
 msgid "Could not run tsubad: %1"
 msgstr "tsubad を実行できませんでした: %1"
 
-#: crates/tsuba-gui/src/app_backend.rs:403
+#: crates/tsuba-gui/src/app_backend.rs:425
 msgid "Started"
 msgstr "起動しました"
 
-#: crates/tsuba-gui/src/app_backend.rs:414
+#: crates/tsuba-gui/src/app_backend.rs:436
 msgid "Started without the systemd service"
 msgstr "systemd サービスを使わずに起動しました"
 
-#: crates/tsuba-gui/src/app_backend.rs:416
+#: crates/tsuba-gui/src/app_backend.rs:438
 msgid "Could not start tsubad: %1"
 msgstr "tsubad を起動できませんでした: %1"
 

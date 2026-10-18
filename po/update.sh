@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-common="--from-code=UTF-8 --sort-by-file --add-comments=TRANSLATORS --package-name=tsuba --msgid-bugs-address=https://github.com/JenAriDev/tsuba/issues"
+common="--from-code=UTF-8 --sort-by-file --add-comments=TRANSLATORS --package-name=tsuba --msgid-bugs-address=https://github.com/Jenari-Dev/tsuba/issues"
 # shellcheck disable=SC2086
 xgettext $common --language=JavaScript \
     --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3 \

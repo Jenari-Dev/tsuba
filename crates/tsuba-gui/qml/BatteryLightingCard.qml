@@ -9,10 +9,6 @@ SynCard {
     id: card
 
     required property var host
-    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
-    function tr(translated, plain) {
-        return typeof i18n === "function" ? translated() : plain;
-    }
     property var saved: null
     property string colour: "44d62c"
     property real level: 20
@@ -36,9 +32,9 @@ SynCard {
     function pick(i, lvl) {
         const l = [null, { effect: { type: "off" } }, { effect: { type: "spectrum" }, brightness: Math.round(lvl) }, { effect: { type: "static", colour: colour }, brightness: Math.round(lvl) }][i];
         if (host.devb.set_battery_lighting(host.pid, JSON.stringify(l))) {
-            host.result = i === 0 ? tr(() => i18n("Lighting on battery: same as plugged in"), "Lighting on battery: same as plugged in") : tr(() => i18n("Lighting on battery saved"), "Lighting on battery saved");
+            host.setResult(i === 0 ? i18n("Lighting on battery: same as plugged in") : i18n("Lighting on battery saved"), false);
         } else {
-            host.result = tr(() => i18n("Failed: %1", host.devb.status), "Failed: " + host.devb.status);
+            host.setResult(i18n("Failed: %1", host.devb.status), true);
         }
         load();
     }

@@ -25,3 +25,11 @@ void tsuba_set_app_identity()
     QGuiApplication::setDesktopFileName(QStringLiteral("io.github.jenaridev.tsuba"));
     QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("io.github.jenaridev.tsuba")));
 }
+
+QString tsuba_translate(const QString &context, const QString &message)
+{
+    const QByteArray ctx = context.toUtf8();
+    const QByteArray msg = message.toUtf8();
+    // KLocalizedString keeps the pointers only until toString() returns.
+    return (ctx.isEmpty() ? ki18n(msg.constData()) : ki18nc(ctx.constData(), msg.constData())).toString();
+}

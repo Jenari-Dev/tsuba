@@ -12,3 +12,7 @@ void tsuba_set_language(const QString &language);
 // Tie the windows to io.github.jenaridev.tsuba.desktop (Wayland app id → launcher/taskbar icon)
 // and set the window icon from the icon theme.
 void tsuba_set_app_identity();
+
+// The translation of an English UI string made in Rust (see i18n.rs `tr`); `context` may be empty.
+// Placeholders %1, %2... are substituted by the caller.
+QString tsuba_translate(const QString &context, const QString &message);

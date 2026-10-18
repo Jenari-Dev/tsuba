@@ -38,7 +38,7 @@ Rectangle {
         devs.forEach(d => {
             // Library profiles (ids); on-board slot numbers in old links show as "Slot n".
             const p = JSON.parse(backend.library_profiles(d.pid) || "{\"profiles\": []}");
-            dp[d.pid] = p.profiles.map(x => ({ id: x.id, name: x.name + (x.pinned_slot ? "  (slot " + x.pinned_slot + ")" : "") }));
+            dp[d.pid] = p.profiles.map(x => ({ id: x.id, name: x.pinned_slot ? i18n("%1  (slot %2)", x.name, x.pinned_slot) : x.name }));
         });
         deviceProfiles = dp;
         const po = {};
@@ -92,8 +92,13 @@ Rectangle {
         }
         scanDialog.visible = false;
     }
+    // Identity of a link as the daemon reports it as running (its name, else its match text).
+    function linkKey(l) {
+        return l.name !== "" ? l.name : l.matches;
+    }
     function label(l) {
-        return l.name !== "" ? l.name : (l.matches !== "" ? l.matches : "New link");
+        const k = linkKey(l);
+        return k !== "" ? k : i18n("New link");
     }
 
     Component.onCompleted: {
@@ -150,25 +155,25 @@ Rectangle {
                 RowLayout {
                     Layout.fillWidth: true
                     SectionLabel {
-                        caption: "Linked games"
+                        caption: i18n("Linked games")
                     }
                     HelpButton {
                         Layout.leftMargin: 6
                         size: 16
-                        text: "Link a game or app to device profiles and a Lighting Studio profile. While it runs, your devices switch to those; when it closes they switch back. Games are found by matching their process name, command line or install folder (Steam and Proton games work too)."
+                        text: i18n("Link a game or app to device profiles and a Lighting Studio profile. While it runs, your devices switch to those; when it closes they switch back. Games are found by matching their process name, command line or install folder (Steam and Proton games work too).")
                     }
                     Item {
                         Layout.fillWidth: true
                     }
                     SynButton {
                         objectName: "scanGamesButton"
-                        text: "Scan for games"
-                        implicitWidth: 130
+                        text: i18n("Scan for games")
+                        Layout.minimumWidth: 130
                         onClicked: page.scanGames()
                     }
                     SynButton {
-                        text: "+ Add"
-                        implicitWidth: 72
+                        text: i18nc("button: add a new linked game", "+ Add")
+                        Layout.minimumWidth: 72
                         onClicked: {
                             page.loadChoices();
                             page.store(page.links.concat([{ name: "", matches: "", enabled: true, device_profiles: {}, chroma: null }]));
@@ -178,7 +183,7 @@ Rectangle {
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: page.active ? "Running now: " + page.active : "No linked game running"
+                    text: page.active ? i18n("Running now: %1", page.active) : i18n("No linked game running")
                     color: page.active ? Theme.accent : Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -191,7 +196,7 @@ Rectangle {
                         required property int index
                         Layout.fillWidth: true
                         Layout.preferredHeight: 54
-                        color: page.sel === index ? Theme.accentTint : (lh.hovered ? "#14ffffff" : Theme.bg)
+                        color: page.sel === index ? Theme.accentTint : (lh.hovered ? Theme.hoverTint : Theme.bg)
                         border.color: page.sel === index ? Theme.accent : Theme.borderSoft
                         RowLayout {
                             anchors.fill: parent
@@ -222,7 +227,7 @@ Rectangle {
                                 Text {
                                     width: parent.width
                                     textFormat: Text.PlainText
-                                    text: modelData.matches.indexOf("dir:") === 0 ? "folder " + modelData.matches.slice(4) : (modelData.matches !== "" ? "matches \"" + modelData.matches + "\"" : "pick a program")
+                                    text: modelData.matches.indexOf("dir:") === 0 ? i18n("folder %1", modelData.matches.slice(4)) : (modelData.matches !== "" ? i18n("matches “%1”", modelData.matches) : i18n("pick a program"))
                                     color: Theme.textDim
                                     font.family: Theme.font
                                     font.pixelSize: 11
@@ -230,8 +235,8 @@ Rectangle {
                                 }
                             }
                             Text {
-                                visible: page.active !== null && page.active === page.label(modelData)
-                                text: "RUNNING"
+                                visible: page.active !== null && page.active === page.linkKey(modelData)
+                                text: i18n("RUNNING")
                                 color: Theme.accent
                                 font.family: Theme.font
                                 font.pixelSize: 10
@@ -252,7 +257,7 @@ Rectangle {
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: "When several linked games run, the one higher in this list wins."
+                    text: i18n("When several linked games run, the one higher in this list wins.")
                     color: Theme.textMuted
                     font.family: Theme.font
                     font.pixelSize: 11
@@ -272,16 +277,16 @@ Rectangle {
                 spacing: 10
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "LINKED GAMES"
+                    text: i18n("LINKED GAMES")
                     color: Theme.text
                     font.family: Theme.font
                     font.pixelSize: Theme.heading
                     font.letterSpacing: 2
                 }
                 Text {
-                    width: 480
+                    width: Math.min(480, page.width - 120)
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Link a game or app to device profiles and a Lighting Studio profile. They switch on when it starts and switch back when it closes. Steam/Proton games work too."
+                    text: i18n("Link a game or app to device profiles and a Lighting Studio profile. They switch on when it starts and switch back when it closes. Steam/Proton games work too.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -305,12 +310,12 @@ Rectangle {
                     spacing: 12
                     QQC2.TextField {
                         Layout.preferredWidth: 320
-                        placeholderText: "Name (optional)"
+                        placeholderText: i18n("Name (optional)")
                         text: parent.parent.cur ? parent.parent.cur.name : ""
                         onEditingFinished: page.edit(l => l.name = text)
                     }
                     SynCheckBox {
-                        text: "Enabled"
+                        text: i18nc("checkbox: this link is active", "Enabled")
                         checked: !!parent.parent.cur && parent.parent.cur.enabled
                         onToggled: page.edit(l => l.enabled = checked)
                     }
@@ -333,27 +338,27 @@ Rectangle {
                     SynButton {
                         visible: page.confirmRemove
                         text: i18n("Keep")
-                        implicitWidth: 72
+                        Layout.minimumWidth: 72
                         onClicked: page.confirmRemove = false
                     }
                     SynButton {
                         objectName: "confirmRemoveLink"
                         visible: page.confirmRemove
-                        text: "Remove"
+                        text: i18n("Remove")
                         primary: true
-                        implicitWidth: 84
+                        Layout.minimumWidth: 84
                         onClicked: page.removeSelected()
                     }
                 }
 
                 SectionLabel {
-                    caption: "Program"
+                    caption: i18nc("noun: the program to match", "Program")
                 }
                 RowLayout {
                     spacing: 10
                     QQC2.ComboBox {
                         Layout.preferredWidth: 320
-                        model: ["Pick a running program…"].concat(page.programs)
+                        model: [i18n("Pick a running program…")].concat(page.programs)
                         onActivated: i => {
                             if (i > 0) {
                                 const p = page.programs[i - 1];
@@ -365,29 +370,29 @@ Rectangle {
                         }
                     }
                     SynButton {
-                        text: "Refresh"
-                        implicitWidth: 84
+                        text: i18n("Refresh")
+                        Layout.minimumWidth: 84
                         onClicked: page.loadChoices()
                     }
                 }
                 RowLayout {
                     spacing: 10
                     Text {
-                        text: "or match text"
+                        text: i18n("or match text")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
                     }
                     QQC2.TextField {
                         Layout.preferredWidth: 320
-                        placeholderText: "e.g. cs2  or  eldenring.exe"
+                        placeholderText: i18n("e.g. cs2  or  eldenring.exe")
                         text: parent.parent.cur ? parent.parent.cur.matches : ""
                         onEditingFinished: page.edit(l => l.matches = text.trim())
                     }
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: "Matched against running process names and command lines (case doesn't matter). Start the game first to pick it from the list. Text starting with dir: followed by a folder matches any program running from inside that folder."
+                    text: i18n("Matched against running process names and command lines (case doesn't matter). Start the game first to pick it from the list. Text starting with dir: followed by a folder matches any program running from inside that folder.")
                     color: Theme.textMuted
                     font.family: Theme.font
                     font.pixelSize: 11
@@ -395,7 +400,7 @@ Rectangle {
                 }
 
                 SectionLabel {
-                    caption: "While it runs"
+                    caption: i18n("While it runs")
                 }
                 Repeater {
                     model: page.devs
@@ -407,6 +412,7 @@ Rectangle {
                         Text {
                             Layout.preferredWidth: 200
                             text: modelData.name.replace(" (wired)", "")
+                            elide: Text.ElideRight
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
@@ -416,7 +422,7 @@ Rectangle {
                         readonly property bool legacy: typeof want === "number"
                         QQC2.ComboBox {
                             Layout.preferredWidth: 260
-                            model: ["Don't change profile"].concat(opts.map(o => o.name)).concat(parent.legacy ? ["On-board slot " + parent.want] : [])
+                            model: [i18n("Don't change profile")].concat(opts.map(o => o.name)).concat(parent.legacy ? [i18n("On-board slot %1", parent.want)] : [])
                             currentIndex: parent.want === undefined ? 0 : (parent.legacy ? opts.length + 1 : 1 + opts.findIndex(o => o.id === parent.want))
                             onActivated: i => page.edit(l => {
                                 if (i === 0) {
@@ -432,7 +438,8 @@ Rectangle {
                     spacing: 12
                     Text {
                         Layout.preferredWidth: 200
-                        text: "Studio lighting"
+                        text: i18n("Studio lighting")
+                        elide: Text.ElideRight
                         color: Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
@@ -440,7 +447,8 @@ Rectangle {
                     QQC2.ComboBox {
                         Layout.preferredWidth: 260
                         readonly property var cur: page.sel >= 0 && page.links[page.sel] ? page.links[page.sel] : null
-                        model: ["Don't change lighting"].concat(page.chromaNames)
+                        model: [i18n("Don't change lighting")].concat(page.chromaNames)
+
                         currentIndex: cur && cur.chroma ? 1 + page.chromaNames.indexOf(cur.chroma) : 0
                         onActivated: i => page.edit(l => l.chroma = i === 0 ? null : page.chromaNames[i - 1])
                     }

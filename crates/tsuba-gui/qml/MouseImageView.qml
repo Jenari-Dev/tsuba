@@ -137,7 +137,7 @@ Item {
             height: root.height
             preferredRendererType: Shape.CurveRenderer
             ShapePath {
-                strokeColor: c.lit ? Theme.accent : "#6e6e6e"
+                strokeColor: c.lit ? Theme.accent : Theme.textMuted
                 strokeWidth: c.isSel ? 2 : 1
                 fillColor: "transparent"
                 startX: c.leftSide ? c.x + c.width + 4 : c.x - 4
@@ -159,7 +159,7 @@ Item {
             width: 5
             height: 5
             radius: 2.5
-            color: c.lit ? Theme.accent : "#9a9a9a"
+            color: c.lit ? Theme.accent : Theme.textDim
         }
         Rectangle {
             // Dot at the label end of the line.
@@ -168,7 +168,7 @@ Item {
             width: 5
             height: 5
             radius: 2.5
-            color: c.lit ? Theme.accent : "#9a9a9a"
+            color: c.lit ? Theme.accent : Theme.textDim
         }
         // Plain text label (function name); selected = text on a raised chip.
         Rectangle {
@@ -261,7 +261,7 @@ Item {
             layer.enabled: !inset.soft
             Rectangle {
                 anchors.fill: parent
-                color: "#0d0d0d"
+                color: "#0d0d0d"   // device drawing: intentional
             }
             Image {
                 x: parent.width / 2 + ((root.botRect[0] - (inset.ins ? inset.ins.cx : 0)) * inset.sc)
@@ -278,7 +278,7 @@ Item {
             Rectangle {
                 visible: inset.soft && inset.photo
                 anchors.fill: parent
-                color: "#8c000000"
+                color: "#8c000000"   // device drawing: intentional
             }
             Rectangle {
                 visible: inset.soft
@@ -337,7 +337,7 @@ Item {
         }
         TapHandler {
             onTapped: {
-                root.picked(14, "Profile Button");
+                root.picked(14, i18n("Profile Button"));
             }
         }
     }

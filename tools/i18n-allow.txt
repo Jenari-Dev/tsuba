@@ -1,0 +1,48 @@
+# ColourPanel: preset swatch hex colours (data, not text)
+ColourPanel.qml: 1fc9a7
+ColourPanel.qml: 0080ff
+ColourPanel.qml: 7a3cff
+# LightingPage: demo LED colour used by the headless UI check
+LightingPage.qml: 2080ff
+# DeviceResetCard: fallback confirmation phrase typed by the user; the daemon checks the exact text
+DeviceResetCard.qml: reset profile 
+# PerformanceTab: QML source for a runtime-created object, and a daemon mode id compared by value
+PerformanceTab.qml: DeviceBackend
+PerformanceTab.qml: Driver
+PerformanceTab.qml: import io.github.jenaridev.tsuba\nDeviceBackend {}
+# LightingTab: JSON default, runtime-created object source, default colour hex
+LightingTab.qml: {\"profiles\": []}
+LightingTab.qml: DeviceBackend
+LightingTab.qml: 0080ff
+LightingTab.qml: import io.github.jenaridev.tsuba\nDeviceBackend {}
+# StudioPage: device ids, demo layer names (headless UI check), keyboard shortcut sequences, JSON default
+StudioPage.qml: 00aa
+StudioPage.qml: 0080ff
+StudioPage.qml: Underglow stars
+StudioPage.qml: Ctrl+Z
+StudioPage.qml: Ctrl+Shift+Z
+StudioPage.qml: Ctrl+Y
+StudioPage.qml: {\"profiles\": []}
+# LedEditor: LED palette hex colours (data, not text)
+LedEditor.qml: 00ffff
+LedEditor.qml: 0060ff
+# LinkedGamesPage: JSON fallbacks for daemon replies
+LinkedGamesPage.qml: {\"links\": []}
+LinkedGamesPage.qml: {\"profiles\": []}
+# GameScanDialog / LaunchEditor / ShortcutCatalogue / AudioEditor: internal stage ids and URL scheme, never shown
+GameScanDialog.qml: dir:
+LaunchEditor.qml: launch:
+LaunchEditor.qml: https://
+LaunchEditor.qml: url:
+ShortcutCatalogue.qml: shortcut:
+ShortcutCatalogue.qml: shortcut:custom
+AudioEditor.qml: audio:
+AudioEditor.qml: audio:out:
+AudioEditor.qml: audio:in:
+# GameLightingPage: launcher product names
+GameLightingPage.qml: Steam
+GameLightingPage.qml: Lutris
+GameLightingPage.qml: Heroic
+GameLightingPage.qml: Bottles
+# LedKeyboard: device data name of the Command dial LED
+LedKeyboard.qml: Command dial

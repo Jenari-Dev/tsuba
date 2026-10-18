@@ -14,7 +14,7 @@ jobs:
         run: |
           pacman -Syu --noconfirm --needed base-devel git rust clang pkgconf \
             qt6-base qt6-declarative qt6-svg ki18n qqc2-breeze-style \
-            libpipewire libpulse mingw-w64-gcc ttf-roboto
+            libpipewire libpulse mingw-w64-gcc ttf-roboto gettext python
 
       - uses: actions/checkout@v4
 
@@ -29,6 +29,12 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           QT_QUICK_BACKEND: software
         run: crates/tsuba-gui/tests/qml/run.sh
+
+      - name: Translations compile and are complete
+        run: |
+          po/build.sh target/locale
+          po/update.sh
+          for f in po/*.po; do msgfmt --check --statistics -o /dev/null "$f" 2>&1 | tee /tmp/st.txt; ! grep -Eq 'untranslated|fuzzy' /tmp/st.txt; done
 
       - name: Game lighting bridge DLLs
         run: make -C shim

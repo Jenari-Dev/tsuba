@@ -44,7 +44,7 @@ ColumnLayout {
             return r;
         }
         const us = KeyNames.textToEvents(text, delay);
-        return { events: us.events, skipped: us.skipped, layout: "US (built in)" };
+        return { events: us.events, skipped: us.skipped, layout: i18n("US (built in)") };
     }
     function restage() {
         if (text.length === 0) {
@@ -57,7 +57,8 @@ ColumnLayout {
         const label = i18n("Type “%1”", text.length > 24 ? text.slice(0, 24) + "…" : text.replace(/\n/g, " "));
         panel.stage("text", label, () => r.skipped.length > 0 || r.events.length === 0
             ? panel.assignAction({ type: "type", text: text })
-            : panel.assignEventsMacro("Text: " + text.slice(0, 24).replace(/\n/g, " "), r.events));
+            : panel.assignEventsMacro(i18n("Text: %1", text.slice(0, 24).replace(/\n/g, " ")), r.events));
+
     }
 
     QQC2.TextField {

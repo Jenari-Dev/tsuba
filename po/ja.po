@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
 "Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 20:40+0900\n"
+"POT-Creation-Date: 2026-10-18 21:39+0900\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -48,13 +48,13 @@ msgstr "プロジェクトのページ"
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:111 crates/tsuba-gui/qml/Main.qml:627
-#: crates/tsuba-gui/qml/SettingsPage.qml:465
+#: crates/tsuba-gui/qml/AboutPage.qml:111 crates/tsuba-gui/qml/Main.qml:634
+#: crates/tsuba-gui/qml/SettingsPage.qml:467
 msgid "Troubleshooting"
 msgstr "トラブルシューティング"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:115 crates/tsuba-gui/qml/Main.qml:630
-#: crates/tsuba-gui/qml/SettingsPage.qml:483
+#: crates/tsuba-gui/qml/AboutPage.qml:115 crates/tsuba-gui/qml/Main.qml:637
+#: crates/tsuba-gui/qml/SettingsPage.qml:485
 msgid "Report a problem"
 msgstr "問題を報告"
 
@@ -96,17 +96,1290 @@ msgstr "このコンピューター"
 msgid "Include these lines when you report a problem."
 msgstr "問題を報告するときは、これらの行を添えてください。"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:182
+#: crates/tsuba-gui/qml/AboutPage.qml:180
 msgid "Copy details"
 msgstr "詳細をコピー"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:196
+#: crates/tsuba-gui/qml/AboutPage.qml:194
 msgid "Independent project"
 msgstr "独立したプロジェクト"
+
+#: crates/tsuba-gui/qml/ApproxNote.qml:13
+msgid "Approximate drawing — key positions may differ on your model."
+msgstr ""
+
+#: crates/tsuba-gui/qml/ApproxNote.qml:21
+#, fuzzy
+msgid "Use my own picture…"
+msgstr "自分の画像"
+
+#: crates/tsuba-gui/qml/AreaPicker.qml:65
+msgid ""
+"Your screen appears here while Ambient is running.\n"
+"Drag to choose the area."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:46
+msgid "Play as a sequence (experimental)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:46
+msgid "Play once"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:46
+msgid "Repeat a number of times"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:46
+#: crates/tsuba-gui/qml/MouseEditor.qml:107
+msgid "Repeat while held"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:46
+msgid "Toggle continuous playback"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:128
+#: crates/tsuba-gui/qml/KeyNames.qml:158
+#, fuzzy
+msgid "Macro: %1"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:147
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:656
+#, fuzzy
+msgid "Sensitivity stage down"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:147
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:656
+#, fuzzy
+msgid "Sensitivity stage up"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:148
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:822
+#, fuzzy
+msgid "Next profile"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:148
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:822
+msgid "Previous profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:148
+msgid "Sensitivity clutch (hold)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:149
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:989
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:992
+msgid "Brightness down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:149
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:989
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:992
+msgid "Brightness up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:149
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:993
+#, fuzzy
+msgid "Lighting on / off"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:197
+#: crates/tsuba-gui/qml/GameLightingPage.qml:421
+msgid "Default"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:198
+msgid "Keyboard function"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:199
+msgid "Mouse function"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:200
+#: crates/tsuba-gui/qml/LightingTab.qml:742
+#: crates/tsuba-gui/qml/PerformanceTab.qml:271
+#: crates/tsuba-gui/qml/StudioPage.qml:2340
+#, fuzzy
+msgid "Sensitivity"
+msgstr "%1: 感度 %2 DPI"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:201
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:725
+#: crates/tsuba-gui/qml/HomePage.qml:388 crates/tsuba-gui/qml/Main.qml:477
+#: crates/tsuba-gui/qml/StudioPage.qml:174
+msgid "Macro"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:202
+msgid "Inter-device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:203
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+msgid "Switch profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:204
+#, fuzzy
+msgid "Lighting effect"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:205
+#: crates/tsuba-gui/qml/KeyNames.qml:185
+msgid "Shift layer"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:206
+msgid "Launch program / website"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:207
+msgid "Multimedia"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:208
+msgid "Audio"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:209
+msgid "Shortcuts"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:210
+msgid "Text function"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:211
+msgid "System (power / sleep)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:212
+#: crates/tsuba-gui/qml/MacrosPage.qml:703
+#: crates/tsuba-gui/qml/StudioPage.qml:42
+#: crates/tsuba-gui/qml/StudioPage.qml:58
+#, fuzzy
+msgid "Scroll wheel"
+msgstr "%1: スクロールホイール クリック感あり"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:213
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1064
+msgid "Disable"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:305
+msgid " (turbo %1/s)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:352
+msgid "CANCEL"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:374
+msgid "SAVE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:412
+msgid "Select a key or button"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:459
+msgid "SELECT A FUNCTION"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:484
+msgid ""
+"Fn is the keyboard's shift-layer key and can't be remapped (the firmware "
+"reserves it)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:484
+msgid ""
+"This key turns the shift layer on, so it can't have a shift-layer assignment."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:540
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:558
+msgid "Default: "
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:540
+msgid "Factory default for this button isn't known yet."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:553
+#, fuzzy
+msgid "Reset to default"
+msgstr "Tsuba の既定に戻す"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:586
+msgid "Click here, then press a key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:586
+msgid "Press a key or combination…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:602
+msgid "OR PICK A KEY"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:611
+msgid "Turbo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:633
+#: crates/tsuba-gui/qml/MouseEditor.qml:126
+msgid "per second"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:656
+msgid "Cycle down sensitivity stages"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:656
+msgid "Cycle up sensitivity stages"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:668
+msgid "Clutch"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:682
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:702
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:846
+msgid "Select"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:684
+#, fuzzy
+msgid "Sensitivity clutch %1 DPI"
+msgstr "%1: 感度 %2 DPI"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:690
+msgid "Jump to stage"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:704
+msgid "Jump to stage %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:717
+msgid "No macros yet. Record one in the Macros module (Home → Macros)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:741
+msgid "Playback option"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:759
+msgid "Times"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:774
+#, fuzzy
+msgid "Manage macros"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+msgid "Mute"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+msgid "Next track"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+#, fuzzy
+msgid "Play / Pause"
+msgstr "再生 / 一時停止"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+#, fuzzy
+msgid "Previous track"
+msgstr "前へ"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+msgid "Stop"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+#: crates/tsuba-gui/qml/AudioEditor.qml:42
+#, fuzzy
+msgid "Volume down"
+msgstr "音量を下げる"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:795
+#: crates/tsuba-gui/qml/AudioEditor.qml:42
+#, fuzzy
+msgid "Volume up"
+msgstr "音量を上げる"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:815
+msgid ""
+"There is only one profile. Add another in the profile menu (•••) so this key "
+"has something to switch to."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:822
+msgid "Cycle backward"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:822
+msgid "Cycle forward"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:834
+msgid "Switch to on-board slot"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:848
+msgid "Switch to slot %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:860
+msgid ""
+"While this is held, every key and button uses its shift-layer assignment "
+"(edit those on the SHIFT LAYER tab). Razer's own software calls this "
+"HyperShift."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:867
+msgid "Make this the shift-layer key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:870
+msgid "Shift-layer key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:880
+#: crates/tsuba-gui/qml/MacrosPage.qml:1364
+msgid "Power"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:880
+#: crates/tsuba-gui/qml/MacrosPage.qml:1364
+msgid "Sleep"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:880
+#: crates/tsuba-gui/qml/MacrosPage.qml:1364
+msgid "Wake"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:897
+msgid "Cycle scroll stages down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:897
+msgid "Cycle scroll stages up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:897
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll stage down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:897
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll stage up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:897
+msgid "Tactile / free-spin toggle"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:933
+msgid "Connect another Razer device to use this."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:961
+msgid "Clutch DPI"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:984
+#: crates/tsuba-gui/qml/StudioPage.qml:41
+#: crates/tsuba-gui/qml/StudioPage.qml:187
+#, fuzzy
+msgid "All devices"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:984
+#, fuzzy
+msgid "This device"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:991
+msgid "Next effect"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:991
+#, fuzzy
+msgid "Previous effect"
+msgstr "前へ"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:994
+#: crates/tsuba-gui/qml/LightingTab.qml:91
+msgid "Spectrum cycling"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:995
+#: crates/tsuba-gui/qml/LightingTab.qml:92
+#: crates/tsuba-gui/qml/StudioPage.qml:151
+#: crates/tsuba-gui/qml/StudioPage.qml:907
+msgid "Wave"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:996
+msgid "Breathing (random)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:997
+#: crates/tsuba-gui/qml/LightingTab.qml:94
+#: crates/tsuba-gui/qml/StudioPage.qml:154
+msgid "Starlight"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:998
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:51
+#, fuzzy
+msgid "Lighting off"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1027
+msgid "LIGHTING PROFILES (LIGHTING STUDIO)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1030
+msgid "Apply “%1”"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1030
+msgid "Next lighting profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1030
+msgid "Previous lighting profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1062
+msgid "Disable this button"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1062
+msgid "Disable this key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1073
+msgid "Selected: %1 — press SAVE to apply"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1111
+msgid "Remapped keys also apply at the login screen"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1120
+msgid ""
+"Tsuba saves remaps in the keyboard or mouse itself, so they work everywhere, "
+"including when you type your password at the login screen, in the BIOS and "
+"on other computers. If you remap letters or numbers, keep that in mind "
+"before you log out."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AssignmentPanel.qml:1128
+msgid "OK, don't show again"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:40
+msgid "SPEAKERS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:42
+msgid "Mute / unmute"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:42
+msgid "Next audio output"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:42
+msgid "Previous audio output"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:50
+msgid "MICROPHONE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:52
+msgid "Mic mute / unmute"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:52
+#, fuzzy
+msgid "Microphone volume down"
+msgstr "音量を下げる"
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:52
+#, fuzzy
+msgid "Microphone volume up"
+msgstr "音量を上げる"
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:61
+msgid "SWITCH TO AN OUTPUT"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:64
+msgid "No audio outputs found."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:74
+#: crates/tsuba-gui/qml/AudioEditor.qml:101
+msgid "  (now)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:81
+msgid "Use this output"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:85
+#: crates/tsuba-gui/qml/StudioPage.qml:2301
+msgid "Output: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:88
+msgid "SWITCH TO AN INPUT"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:91
+msgid "No audio inputs found."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:108
+msgid "Use this input"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AudioEditor.qml:111
+#: crates/tsuba-gui/qml/StudioPage.qml:2301
+#, fuzzy
+msgid "Input: %1"
+msgstr "ヒント: %1"
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:35
+msgid "Lighting on battery saved"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:35
+msgid "Lighting on battery: same as plugged in"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:37
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:19
+#: crates/tsuba-gui/qml/LightingTab.qml:75
+#: crates/tsuba-gui/qml/LightingTab.qml:238
+#: crates/tsuba-gui/qml/LightingTab.qml:245
+#: crates/tsuba-gui/qml/LightingTab.qml:530
+#: crates/tsuba-gui/qml/MacroList.qml:113
+#: crates/tsuba-gui/qml/MacroList.qml:119
+#: crates/tsuba-gui/qml/MacroList.qml:124
+#: crates/tsuba-gui/qml/MacroList.qml:135
+#: crates/tsuba-gui/qml/MacrosPage.qml:80
+#: crates/tsuba-gui/qml/MacrosPage.qml:147
+#: crates/tsuba-gui/qml/MacrosPage.qml:166
+#: crates/tsuba-gui/qml/PerformanceTab.qml:60
+#: crates/tsuba-gui/qml/PerformanceTab.qml:93
+#: crates/tsuba-gui/qml/PerformanceTab.qml:108
+#: crates/tsuba-gui/qml/PerformanceTab.qml:156
+#: crates/tsuba-gui/qml/StudioPage.qml:773
+#: crates/tsuba-gui/qml/StudioPage.qml:783
+#: crates/tsuba-gui/qml/StudioPage.qml:804
+#: crates/tsuba-gui/qml/StudioPage.qml:810
+#: crates/tsuba-gui/qml/StudioPage.qml:1022
+msgid "Failed: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:44
+#: crates/tsuba-gui/qml/PerformanceTab.qml:483
+#, fuzzy
+msgid "Lighting on battery"
+msgstr "バッテリー残量が少ないとき"
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:45
+msgid ""
+"Use different, more battery-friendly lighting while the device runs "
+"wirelessly. Tsuba switches back to your normal lighting when the device is "
+"plugged in or on its charger. Tsuba needs to be running in the background "
+"(tsubad) for the switch."
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:51
+msgid "Same as plugged in"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:51
+msgid "Spectrum cycling, dimmed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:51
+msgid "Static colour, dimmed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:60
+#: crates/tsuba-gui/qml/LightingTab.qml:342
+msgid "Brightness"
+msgstr ""
+
+#: crates/tsuba-gui/qml/BatteryLightingCard.qml:94
+#, fuzzy
+msgid "Colour on battery"
+msgstr "バッテリー残量が少ないとき"
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:31
+msgid "Key response"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:32
+msgid ""
+"How long the keyboard ignores a key's contacts bouncing after it is pressed "
+"(make) and released (break). Shorter times register fast repeated presses "
+"sooner; if keys start to double-type, go back to Standard. The values are "
+"stored on the keyboard."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:33
+msgid "Debounce times of the key switches, in milliseconds."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:38
+msgid "Timing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:46
+msgid "Custom"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:46
+#: crates/tsuba-gui/qml/LightingTab.qml:731
+msgid "Fast"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:46
+msgid "Standard"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:60
+msgid "Press"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:60
+msgid "Press mask"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:60
+msgid "Release"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:60
+msgid "Release mask"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:92
+#: crates/tsuba-gui/qml/LightingTab.qml:523
+#: crates/tsuba-gui/qml/LightingTab.qml:834
+msgid "Apply"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DebounceCard.qml:99
+msgid "Now: press %1 / %2 ms, release %3 / %4 ms"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:12
+msgctxt "device kind"
+msgid "Keyboard"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:13
+msgctxt "device kind"
+msgid "Laptop keyboard"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:14
+msgctxt "device kind"
+msgid "Keypad"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:15
+msgctxt "device kind"
+msgid "Mouse"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:16
+msgctxt "device kind"
+msgid "Mousemat"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:17
+msgctxt "device kind"
+msgid "Mouse dock"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:18
+msgctxt "device kind"
+msgid "Headset stand"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:19
+msgctxt "device kind"
+msgid "Headset"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:20
+msgctxt "device kind"
+msgid "Speaker"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:21
+msgctxt "device kind"
+msgid "External GPU box"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:22
+msgctxt "device kind"
+msgid "Monitor"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:23
+msgctxt "device kind"
+msgid "Accessory"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:24
+msgctxt "device kind"
+msgid "Wireless receiver"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:25
+#, fuzzy
+msgctxt "device kind"
+msgid "Device"
+msgstr "デバイス"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:33
+msgctxt "device group heading"
+msgid "Keyboards"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:34
+msgctxt "device group heading"
+msgid "Laptop keyboards"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:35
+msgctxt "device group heading"
+msgid "Keypads"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:36
+msgctxt "device group heading"
+msgid "Mice"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:37
+msgctxt "device group heading"
+msgid "Mousemats"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:38
+msgctxt "device group heading"
+msgid "Mouse docks"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:39
+msgctxt "device group heading"
+msgid "Headset stands"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:40
+msgctxt "device group heading"
+msgid "Headsets"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:41
+msgctxt "device group heading"
+msgid "Speakers"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:42
+msgctxt "device group heading"
+msgid "External GPU boxes"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:43
+msgctxt "device group heading"
+msgid "Monitors"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:44
+msgctxt "device group heading"
+msgid "Accessories"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:45
+msgctxt "device group heading"
+msgid "Wireless receivers"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:46
+#, fuzzy
+msgctxt "device group heading"
+msgid "Other devices"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:98
+msgctxt "device tab"
+msgid "Customize"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:99
+msgctxt "device tab"
+msgid "Performance"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:100
+#, fuzzy
+msgctxt "device tab"
+msgid "Lighting"
+msgstr "ライト"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:101
+msgctxt "device tab"
+msgid "Power"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:102
+msgctxt "device tab"
+msgid "Info"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:145
+#, fuzzy
+msgctxt "device feature"
+msgid "Adjustable sensitivity (DPI) stages"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:146
+#, fuzzy
+msgctxt "device feature"
+msgid "Battery level"
+msgstr "満充電"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:147
+msgctxt "device feature"
+msgid "Wireless"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:148
+msgctxt "device feature"
+msgid "Sleep timer"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:149
+msgctxt "device feature"
+msgid "Charging light"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:150
+msgctxt "device feature"
+msgid "Tactile / free-spin wheel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:151
+msgctxt "device feature"
+msgid "Scroll acceleration"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:152
+msgctxt "device feature"
+msgid "Auto free-spin wheel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:153
+msgctxt "device feature"
+msgid "Dial"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:154
+msgctxt "device feature"
+msgid "Dedicated macro keys"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:155
+#, fuzzy
+msgctxt "device feature"
+msgid "On-board macros"
+msgstr "オンボードプロファイル %1"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:156
+msgctxt "device feature"
+msgid "Game mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:157
+msgctxt "device feature"
+msgid "Optical key switches"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:163
+msgctxt "lighting effect"
+msgid "Off"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:164
+#, fuzzy
+msgctxt "lighting effect"
+msgid "Static"
+msgstr "自動"
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:165
+msgctxt "lighting effect"
+msgid "Breathing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:166
+msgctxt "lighting effect"
+msgid "Spectrum cycling"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:167
+msgctxt "lighting effect"
+msgid "Wave"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:168
+msgctxt "lighting effect"
+msgid "Reactive"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:169
+msgctxt "lighting effect"
+msgid "Starlight"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:170
+msgctxt "lighting effect"
+msgid "Ripple"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:171
+msgctxt "lighting effect"
+msgid "Wheel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:172
+msgctxt "lighting effect"
+msgid "Per-LED colours"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:187
+msgid "%1 macro key"
+msgid_plural "%1 macro keys"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:205
+msgctxt "device support status"
+msgid "Not supported"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:206
+msgctxt "device support status"
+msgid "Tested"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceKinds.qml:207
+msgctxt "device support status"
+msgid "Untested"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:21
+msgid "Status lights"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:22
+msgid ""
+"Lights the device itself controls: the colour that marks the active on-board "
+"profile, indicator LEDs and the animation shown when the device powers on. "
+"These settings are stored on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:38
+msgid "Profile %1 colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:59
+msgid "Indicator LEDs"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:77
+msgid "Indicator %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:93
+msgid "Power-on animation"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceLedsCard.qml:105
+#, fuzzy
+msgid "Profile colour"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:68
+#, fuzzy
+msgid "Imported %1 profile"
+msgid_plural "Imported %1 profiles"
+msgstr[0] "問題を報告"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:75
+msgid "Exported “%1”"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:80
+#, fuzzy
+msgid "Exported %1 profile"
+msgid_plural "Exported %1 profiles"
+msgstr[0] "問題を報告"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:97
+msgid "“%1” no longer changes the lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:97
+msgid "“%1” now keeps its own lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:105
+#, fuzzy
+msgid "Import profiles"
+msgstr "問題を報告"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:107
+#: crates/tsuba-gui/qml/DevicePage.qml:115
+msgid "All files (*)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:107
+msgid "Tsuba profiles (*.tsuba-profile.json *.json)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:112
+#, fuzzy
+msgid "Export profile"
+msgstr "問題を報告"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:115
+msgid "Tsuba profiles (*.tsuba-profile.json)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:120
+msgid "Export the chosen profiles to a folder"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:277
+msgid "%1 GAMES"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:687
+msgid "New from factory defaults"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:741
+msgid "Lighting follows this profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:741
+msgid "✓ Lighting follows this profile (%1)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:753
+msgid "Import…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:763
+#, fuzzy
+msgid "Export…"
+msgstr "診断情報をエクスポート…"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:774
+msgid "Export several…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:811
+#, fuzzy
+msgid "Export profiles"
+msgstr "問題を報告"
+
+#: crates/tsuba-gui/qml/DevicePage.qml:818
+#: crates/tsuba-gui/qml/GameScanDialog.qml:113
+msgid "Select all"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:899
+msgid "New profile with factory settings"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:930
+msgid "Created “%1” with factory settings"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:27
+#: crates/tsuba-gui/qml/DialEditor.qml:342
+#: crates/tsuba-gui/qml/StudioPage.qml:1868
+msgid "Reset"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:28
+msgid ""
+"Resetting a profile puts the key assignments, sensitivity and other settings "
+"stored in that on-board profile back to the factory defaults. A factory "
+"reset erases every on-board profile and macro of the device. Your profiles "
+"in Tsuba's library are kept either way; activate one again to put its "
+"settings back on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:35
+msgid "Reset profile %1…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:45
+msgid "Factory reset…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:71
+#, fuzzy
+msgid "Reset on-board profile %1"
+msgstr "オンボードプロファイル %1"
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:75
+msgid ""
+"This puts on-board profile %1 back to its factory settings. It can't be "
+"undone on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:78
+msgid "Type \"%1\" to confirm:"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:90
+#, fuzzy
+msgid "Reset profile"
+msgstr "問題を報告"
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:99
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:148
+#: crates/tsuba-gui/qml/DialEditor.qml:335
+#: crates/tsuba-gui/qml/MacroList.qml:544
+msgid "Cancel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:113
+msgid "Factory reset"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:117
+msgid ""
+"This erases every on-board profile and macro of %1 and restores its factory "
+"settings. It can't be undone on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:123
+msgid "I understand the on-board profiles and macros will be erased"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:126
+msgid "Type the device name \"%1\" to confirm:"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceResetCard.qml:139
+msgid "Erase and reset"
+msgstr ""
 
 #: crates/tsuba-gui/qml/DeviceStateBanner.qml:84
 msgid "Dismiss"
 msgstr "閉じる"
+
+#: crates/tsuba-gui/qml/DialEditor.qml:41
+msgid "Command dial"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:42
+msgid ""
+"The dial on top of the keyboard has several modes (for example volume, "
+"brightness, scroll). Pressing it cycles the mode; turning it acts on the "
+"current mode. Drag a mode (or use the arrows) to change the order the dial "
+"steps through. You can re-assign the dial press from Customize, which stops "
+"it switching modes."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:43
+msgid ""
+"Press the dial to step to the next mode (Shift + press goes back). The "
+"dial's LED shows the active mode's colour. Click a mode to make it active; "
+"switch modes off to skip them."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:86
+#, fuzzy
+msgid "Dial press reset to default"
+msgstr "Tsuba の既定に戻す"
+
+#: crates/tsuba-gui/qml/DialEditor.qml:119
+msgid "Command dial saved"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:128
+msgid "Dial order saved"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:137
+msgid "Dial modes are back to the stock order"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:143
+msgid "Dial mode colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:154
+msgid ""
+"The dial press is remapped to %1 — pressing the dial runs that instead of "
+"switching modes."
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:167
+msgid "Reset dial press"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:284
+#: crates/tsuba-gui/qml/StudioPage.qml:1046
+msgid "ACTIVE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:304
+msgid " is the active dial mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:320
+msgid "Reset modes to stock"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DialEditor.qml:326
+msgid "Put the modes back in the stock order and switch the stock ones on?"
+msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:57
 msgid "Make it yours"
@@ -171,27 +1444,27 @@ msgid "Check again"
 msgstr "もう一度確認"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:150
-#: crates/tsuba-gui/qml/SettingsPage.qml:181
+#: crates/tsuba-gui/qml/SettingsPage.qml:183
 msgid "Theme"
 msgstr "テーマ"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:185
+#: crates/tsuba-gui/qml/SettingsPage.qml:187
 msgid "Automatic"
 msgstr "自動"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:185
+#: crates/tsuba-gui/qml/SettingsPage.qml:187
 msgid "Dark"
 msgstr "ダーク"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:185
+#: crates/tsuba-gui/qml/SettingsPage.qml:187
 msgid "Light"
 msgstr "ライト"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:166
-#: crates/tsuba-gui/qml/SettingsPage.qml:294
+#: crates/tsuba-gui/qml/SettingsPage.qml:296
 msgid "Language"
 msgstr "言語"
 
@@ -212,6 +1485,7 @@ msgid "Skip"
 msgstr "スキップ"
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:222
+#: crates/tsuba-gui/qml/StudioPage.qml:61
 msgid "Back"
 msgstr "戻る"
 
@@ -222,6 +1496,388 @@ msgstr "はじめる"
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:229
 msgid "Next"
 msgstr "次へ"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:34
+msgid "Your tsubad doesn't have game lighting yet"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:34
+#, fuzzy
+msgid "tsubad isn't running"
+msgstr "tsubad 停止中"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:37
+#, fuzzy
+msgid "Game lighting is off"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:40
+msgid "%1 is controlling your lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:40
+msgid "A game is controlling your lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:44
+#, fuzzy
+msgid "%1 is connected"
+msgstr "tsubad 接続済み"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:44
+#, fuzzy
+msgid "A game is connected"
+msgstr "tsubad 接続済み"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:46
+msgid "Waiting for a game"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:50
+msgid "Start it with: systemctl --user start tsubad"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:50
+msgid ""
+"Update Tsuba and restart tsubad (systemctl --user restart tsubad) to use "
+"game lighting."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:53
+msgid "Games can't change your lighting. Turn it on to let them."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:56
+#: crates/tsuba-gui/qml/MacroList.qml:262
+#: crates/tsuba-gui/qml/MacroList.qml:520
+#: crates/tsuba-gui/qml/MacrosPage.qml:1177
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:152
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:695
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:696
+msgctxt "list separator"
+msgid ", "
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:56
+msgid "Devices: %1. Your own lighting comes back when the game closes."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:59
+msgid "None of your devices is showing its lighting right now."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:61
+#, fuzzy
+msgid ""
+"Start a game that supports Razer Chroma. It takes over your lighting while "
+"it runs."
+msgstr ""
+"ゲームライティングを使うと、Razer Chroma に対応したゲームがデバイスのライティ"
+"ングを制御できます。"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:87
+msgid "Couldn't change the rule."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:95
+#: crates/tsuba-gui/qml/GameLightingPage.qml:334
+msgid "Couldn't change the setting."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:102
+msgid "Installed automatically in %1 new game."
+msgid_plural "Installed automatically in %1 new games."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:116
+#, fuzzy
+msgctxt "status of the bridge library in a game"
+msgid "Installed"
+msgstr "インストールガイド"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:117
+msgctxt "status of the bridge library in a game"
+msgid "Not installed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:118
+msgid "Update available"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:119
+msgid "Incomplete"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:120
+#, fuzzy
+msgid "Another library is installed"
+msgstr "Tsuba サービスがインストールされていません"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:121
+msgid "Not a Wine prefix"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:125
+msgid "Added by you"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:145
+msgid "Test failed: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:158
+msgid "Choose a Wine prefix (the folder with drive_c)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:164
+msgid "Prefix added."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:217
+msgid "GAME LIGHTING"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:226
+msgid ""
+"Games that support Razer Chroma can colour your keyboard, mouse and other "
+"devices while they run, for example health bars, ammo or alerts. Tsuba runs "
+"the local lighting service those games look for. Windows games in Wine or "
+"Proton also need Tsuba's bridge library inside their prefix: install it "
+"below. When the game closes, your own lighting comes back."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:282
+msgctxt "button: run a lighting test"
+msgid "Test"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:282
+#, fuzzy
+msgid "Testing…"
+msgstr "書き込み中…"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:292
+msgid ""
+"Sends a moving rainbow to your keyboard and mouse for three seconds, the "
+"same way a game would, then gives the lighting back."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:327
+msgid "Allow websites to control lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:341
+msgid ""
+"Some lighting apps and demos run in a web browser and use the same local "
+"lighting service as games. They only work with this on. While it's on, any "
+"website you have open could change your lighting, so leave it off unless you "
+"use such an app. Games don't need it."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:354
+#, fuzzy
+msgid "Applications"
+msgstr "通知"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:358
+msgid ""
+"Every program that connects to Tsuba's lighting service is listed here the "
+"first time it does. Block one to stop it from ever controlling your lighting "
+"(a blocked program that is running is disconnected at once). Programs are "
+"told apart by their process name."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:366
+msgid "Only allow applications I have approved"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:374
+msgid ""
+"No program has connected yet. When a game does, it appears here so you can "
+"allow or block it."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:410
+msgid "allowed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:410
+msgid "blocked"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:410
+#, fuzzy
+msgid "connected now"
+msgstr "tsubad 接続済み"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:411
+msgctxt "program file name and its state"
+msgid "%1 · %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:421
+msgid "Allow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:421
+msgid "Block"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:435
+msgid "Windows games (Wine and Proton)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:439
+msgid ""
+"Each Wine or Proton game has its own Windows folder (a prefix). Installing "
+"copies Tsuba's bridge library into it so the game finds a lighting service. "
+"Tsuba never replaces a library it didn't install, and removing takes out "
+"only its own files. Restart a running game after installing. Linux-native "
+"games don't need this."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:445
+msgid "Add a prefix…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:449
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:467
+msgid "Rescan"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:456
+msgid "Install for all"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:463
+msgid "Install automatically for new games"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:467
+msgid "Couldn't save the setting."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:475
+msgid ""
+"The bridge library isn't installed on this computer (Tsuba's package puts it "
+"in /usr/share/tsuba/game-lighting), so it can't be added to games yet."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:546
+msgctxt "game source (Steam, Lutris…) and the folder path"
+msgid "%1 · %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:565
+msgctxt "button: repair the bridge library"
+msgid "Repair"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:565
+msgctxt "button: update the bridge library"
+msgid "Update"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:573
+#, fuzzy
+msgctxt "button: install the bridge library"
+msgid "Install"
+msgstr "インストールガイド"
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:573
+msgctxt "button: remove the bridge library"
+msgid "Remove"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameLightingPage.qml:587
+msgid ""
+"No Wine or Proton games found. Steam games appear here after their first "
+"launch with Proton; use “Add a prefix…” for others."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:13
+msgid "Alt+Tab (switch window)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:14
+msgid "Alt+F4 (close window)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:15
+msgid "Alt+Space / Alt+F2 (launcher)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:16
+msgid "Windows key (launcher, overview, Windows-key shortcuts)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:17
+msgid "Ctrl+Esc (task manager)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:26
+msgid "Block every desktop shortcut"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameModeCombos.qml:57
+msgid ""
+"Only these shortcuts are taken away from the desktop while Game Mode is on, "
+"and given back when it ends (also after a crash, at the next start)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:91
+msgid "SCAN FOR GAMES"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:97
+msgid "%1 game found"
+msgid_plural "%1 games found"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:109
+msgid "Search games"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:180
+msgid "LINKED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:230
+msgid "No game matches “%1”."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:230
+msgid ""
+"No installed games were found. Tsuba looks for Steam, Lutris, Heroic and "
+"Bottles; you can still add any game by hand."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:243
+msgid "%1 game selected"
+msgid_plural "%1 games selected"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:243
+msgid ""
+"Pick the games to link. Each is recognised by its install folder while it "
+"runs."
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:251
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:783
+msgctxt "button: close dialog"
+msgid "Close"
+msgstr ""
+
+#: crates/tsuba-gui/qml/GameScanDialog.qml:257
+msgid "Add selected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HelpButton.qml:41
+#, fuzzy
+msgctxt "button: show help"
+msgid "Help"
+msgstr "ヘルプ"
 
 #: crates/tsuba-gui/qml/HomePage.qml:122
 msgid "WIRED"
@@ -238,10 +1894,6 @@ msgstr "未検証"
 #: crates/tsuba-gui/qml/HomePage.qml:246
 msgid "On-board profile %1"
 msgstr "オンボードプロファイル %1"
-
-#: crates/tsuba-gui/qml/HomePage.qml:284
-msgid "Other"
-msgstr "その他"
 
 #: crates/tsuba-gui/qml/HomePage.qml:288
 msgid ""
@@ -289,6 +1941,7 @@ msgstr ""
 "す。"
 
 #: crates/tsuba-gui/qml/HomePage.qml:310
+#: crates/tsuba-gui/qml/StudioPage.qml:1878
 msgid "Devices"
 msgstr "デバイス"
 
@@ -296,7 +1949,9 @@ msgstr "デバイス"
 msgid "Modules"
 msgstr "モジュール"
 
-#: crates/tsuba-gui/qml/HomePage.qml:381 crates/tsuba-gui/qml/Main.qml:117
+#: crates/tsuba-gui/qml/HomePage.qml:381
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:20
+#: crates/tsuba-gui/qml/Main.qml:117
 msgid "Lighting Studio"
 msgstr "Lighting Studio"
 
@@ -304,12 +1959,9 @@ msgstr "Lighting Studio"
 msgid "Needs a per-LED device"
 msgstr "LED を個別に制御できるデバイスが必要です"
 
-#: crates/tsuba-gui/qml/HomePage.qml:388 crates/tsuba-gui/qml/Main.qml:470
-msgid "Macro"
-msgstr "マクロ"
-
-#: crates/tsuba-gui/qml/HomePage.qml:393 crates/tsuba-gui/qml/Main.qml:122
-#: crates/tsuba-gui/qml/Main.qml:476
+#: crates/tsuba-gui/qml/HomePage.qml:393
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:158
+#: crates/tsuba-gui/qml/Main.qml:122 crates/tsuba-gui/qml/Main.qml:483
 msgid "Linked games"
 msgstr "ゲーム連携"
 
@@ -322,7 +1974,7 @@ msgid "Games light up your devices"
 msgstr "ゲームがデバイスを光らせます"
 
 #: crates/tsuba-gui/qml/HomePage.qml:406 crates/tsuba-gui/qml/Main.qml:130
-#: crates/tsuba-gui/qml/Main.qml:628 crates/tsuba-gui/qml/SetupGuide.qml:155
+#: crates/tsuba-gui/qml/Main.qml:635 crates/tsuba-gui/qml/SetupGuide.qml:155
 msgid "Supported devices"
 msgstr "対応デバイス"
 
@@ -333,6 +1985,2163 @@ msgstr "Tsuba が知っているすべてのモデルを見る"
 #: crates/tsuba-gui/qml/HomePage.qml:429
 msgid "Tip: %1"
 msgstr "ヒント: %1"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:17
+msgctxt "key name"
+msgid "Space"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:21
+msgctxt "arrow key"
+msgid "Down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:21
+msgctxt "arrow key"
+msgid "Left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:21
+#, fuzzy
+msgctxt "arrow key"
+msgid "Right"
+msgstr "ライト"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:21
+msgctxt "arrow key"
+msgid "Up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:22
+msgctxt "numpad key"
+msgid "Num *"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:22
+msgctxt "numpad key"
+msgid "Num -"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:22
+msgctxt "numpad key"
+msgid "Num /"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:23
+msgctxt "numpad key"
+msgid "Num +"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:23
+msgctxt "numpad key"
+msgid "Num Enter"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:24
+msgctxt "numpad key"
+msgid "Num ."
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:27
+msgctxt "numpad key, %1 is a digit"
+msgid "Num %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:36
+msgctxt "media key"
+msgid "Mute"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:36
+#, fuzzy
+msgctxt "media key"
+msgid "Next"
+msgstr "次へ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:36
+#, fuzzy
+msgctxt "media key"
+msgid "Previous"
+msgstr "前へ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:37
+#, fuzzy
+msgctxt "media key"
+msgid "Play / Pause"
+msgstr "再生 / 一時停止"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:37
+#, fuzzy
+msgctxt "media key"
+msgid "Volume down"
+msgstr "音量を下げる"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:37
+#, fuzzy
+msgctxt "media key"
+msgid "Volume up"
+msgstr "音量を上げる"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:38
+msgctxt "media key"
+msgid "Stop"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:56
+msgctxt "modifier key, left side"
+msgid "Left %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:56
+#, fuzzy
+msgctxt "modifier key, right side"
+msgid "Right %1"
+msgstr "ライト"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:73
+msgid "macro 0x%1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:76
+msgid "%1 (×%2)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:78
+msgid "%1 (while held)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:80
+msgid "%1 (toggle)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:82
+msgid "%1 (sequence)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:92 crates/tsuba-gui/qml/KeyNames.qml:114
+msgctxt "short key legend"
+msgid "App"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:108
+#, fuzzy
+msgctxt "short key legend"
+msgid "Macro"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:112
+msgctxt "short key legend for the Shift layer key"
+msgid "Shift"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:117
+msgctxt "short key legend"
+msgid "Turbo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:119
+msgctxt "short key legend"
+msgid "Media"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:127
+msgctxt "mouse output"
+msgid "Left click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:127
+msgctxt "mouse output"
+msgid "Right click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:127
+msgctxt "mouse output"
+msgid "Scroll click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:128
+msgctxt "mouse output"
+msgid "Mouse button 4"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:128
+msgctxt "mouse output"
+msgid "Mouse button 5"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:128
+msgctxt "mouse output"
+msgid "Scroll up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:129
+#, fuzzy
+msgctxt "mouse output"
+msgid "Scroll down"
+msgstr "音量を下げる"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:129
+msgctxt "mouse output"
+msgid "Scroll left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:129
+msgctxt "mouse output"
+msgid "Scroll right"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:131
+msgctxt "system key"
+msgid "Power"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:131
+msgctxt "system key"
+msgid "Sleep"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:131
+msgctxt "system key"
+msgid "Wake"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:135
+msgctxt "presses per second"
+msgid "%1/s"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:141
+msgid "Not assignable"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:149
+msgid "Disabled"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:151
+msgid "Mouse button %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:153
+msgid "Keyboard: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:162
+#, fuzzy
+msgid "Sensitivity: stage up"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:164
+#, fuzzy
+msgid "Sensitivity: stage down"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:166
+#, fuzzy
+msgid "Sensitivity: stage %1"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:168
+#, fuzzy
+msgid "Sensitivity clutch"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:168
+msgid "Sensitivity: clutch %1 x %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:170
+msgid "Sensitivity: cycle up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:172
+msgid "Sensitivity: cycle down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+msgid "Profile cycle down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+msgid "Profile cycle up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+#, fuzzy
+msgid "Profile down"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+#, fuzzy
+msgid "Profile up"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:177
+#, fuzzy
+msgid "Switch to profile %1"
+msgstr "オンボードプロファイル %1"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:179
+#, fuzzy
+msgid "System: %1"
+msgstr "システム"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:181
+msgid "Multimedia: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:183
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Double click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:187 crates/tsuba-gui/qml/KeyNames.qml:192
+msgid "Turbo: %1 (%2)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:191
+msgid "Repeat scroll left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:191
+msgid "Repeat scroll right"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:192
+msgid "button %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:195
+msgid "Software action"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:197
+#, fuzzy
+msgid "Device key %1"
+msgstr "デバイス"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:197
+msgid "Fn (shift-layer key)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll mode toggle"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll stage cycle down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:199
+msgid "Scroll stage cycle up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:260 crates/tsuba-gui/qml/KeyNames.qml:306
+msgctxt "keyboard shortcut"
+msgid "Copy"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:260 crates/tsuba-gui/qml/KeyNames.qml:306
+msgctxt "keyboard shortcut"
+msgid "Cut"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:260 crates/tsuba-gui/qml/KeyNames.qml:306
+msgctxt "keyboard shortcut"
+msgid "Paste"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:260 crates/tsuba-gui/qml/KeyNames.qml:307
+#: crates/tsuba-gui/qml/KeyNames.qml:322
+msgctxt "keyboard shortcut"
+msgid "Redo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:260 crates/tsuba-gui/qml/KeyNames.qml:307
+#: crates/tsuba-gui/qml/KeyNames.qml:322
+msgctxt "keyboard shortcut"
+msgid "Undo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:261 crates/tsuba-gui/qml/KeyNames.qml:311
+msgctxt "keyboard shortcut"
+msgid "Close tab"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:261 crates/tsuba-gui/qml/KeyNames.qml:307
+msgctxt "keyboard shortcut"
+msgid "Find"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:261 crates/tsuba-gui/qml/KeyNames.qml:311
+msgctxt "keyboard shortcut"
+msgid "New tab"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:261 crates/tsuba-gui/qml/KeyNames.qml:308
+#: crates/tsuba-gui/qml/KeyNames.qml:319
+msgctxt "keyboard shortcut"
+msgid "Save"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:261 crates/tsuba-gui/qml/KeyNames.qml:307
+#: crates/tsuba-gui/qml/KeyNames.qml:319
+msgctxt "keyboard shortcut"
+msgid "Select all"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:262 crates/tsuba-gui/qml/KeyNames.qml:311
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Next tab"
+msgstr "次へ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:262 crates/tsuba-gui/qml/KeyNames.qml:312
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Previous tab"
+msgstr "前へ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:262 crates/tsuba-gui/qml/KeyNames.qml:311
+msgctxt "keyboard shortcut"
+msgid "Reopen closed tab"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:262 crates/tsuba-gui/qml/KeyNames.qml:299
+msgctxt "keyboard shortcut"
+msgid "Switch window (Alt+Tab)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:263 crates/tsuba-gui/qml/KeyNames.qml:300
+msgctxt "keyboard shortcut"
+msgid "Application launcher (Meta)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:263 crates/tsuba-gui/qml/KeyNames.qml:299
+msgctxt "keyboard shortcut"
+msgid "Close window (Alt+F4)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:263 crates/tsuba-gui/qml/KeyNames.qml:299
+msgctxt "keyboard shortcut"
+msgid "Show desktop (Meta+D)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:264 crates/tsuba-gui/qml/KeyNames.qml:300
+msgctxt "keyboard shortcut"
+msgid "Lock screen (Meta+L)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:264 crates/tsuba-gui/qml/KeyNames.qml:301
+msgctxt "keyboard shortcut"
+msgid "Screenshot (Print)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:264 crates/tsuba-gui/qml/KeyNames.qml:301
+msgctxt "keyboard shortcut"
+msgid "Task manager (Ctrl+Esc)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:265
+msgctxt "keyboard shortcut"
+msgid "Fullscreen (F11)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:265
+msgctxt "keyboard shortcut"
+msgid "Refresh (F5)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:265 crates/tsuba-gui/qml/KeyNames.qml:314
+#: crates/tsuba-gui/qml/KeyNames.qml:323
+msgctxt "keyboard shortcut"
+msgid "Zoom in"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:265 crates/tsuba-gui/qml/KeyNames.qml:314
+#: crates/tsuba-gui/qml/KeyNames.qml:323
+msgctxt "keyboard shortcut"
+msgid "Zoom out"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:277
+msgctxt "key group"
+msgid "Letters"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:278
+msgctxt "key group"
+msgid "Numbers"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:279
+msgctxt "key group"
+msgid "Function keys"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:280
+#, fuzzy
+msgctxt "key group"
+msgid "Navigation"
+msgstr "通知"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:281
+msgctxt "key group"
+msgid "Editing and spacing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:282
+#, fuzzy
+msgctxt "key group"
+msgid "Punctuation"
+msgstr "ドキュメント"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:283
+msgctxt "key group"
+msgid "Numpad"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:284
+msgctxt "key group"
+msgid "Modifiers"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:298
+#, fuzzy
+msgctxt "shortcut category"
+msgid "System"
+msgstr "システム"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:300
+msgctxt "keyboard shortcut"
+msgid "Overview (Meta+W)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:301
+msgctxt "keyboard shortcut"
+msgid "Run command (Alt+Space)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:302
+msgctxt "keyboard shortcut"
+msgid "Emoji picker (Meta+.)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:302
+msgctxt "keyboard shortcut"
+msgid "Maximise window (Meta+Up)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:302
+msgctxt "keyboard shortcut"
+msgid "Minimise window (Meta+Down)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:303
+msgctxt "keyboard shortcut"
+msgid "Clipboard history (Meta+V)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:303
+msgctxt "keyboard shortcut"
+msgid "Next desktop (Ctrl+Meta+Right)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:303
+msgctxt "keyboard shortcut"
+msgid "Previous desktop (Ctrl+Meta+Left)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:305
+msgctxt "shortcut category"
+msgid "Editing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:306
+msgctxt "keyboard shortcut"
+msgid "Paste without formatting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:307
+msgctxt "keyboard shortcut"
+msgid "Replace"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:308
+msgctxt "keyboard shortcut"
+msgid "New"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:308
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Open"
+msgstr "開く"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:308 crates/tsuba-gui/qml/KeyNames.qml:319
+msgctxt "keyboard shortcut"
+msgid "Print"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:308
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Save as"
+msgstr "診断情報を保存"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:310
+msgctxt "shortcut category"
+msgid "Browser"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:312
+msgctxt "keyboard shortcut"
+msgid "Address bar"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:312
+msgctxt "keyboard shortcut"
+msgid "Refresh"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:312
+msgctxt "keyboard shortcut"
+msgid "Refresh without cache"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:313
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Back"
+msgstr "戻る"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:313
+msgctxt "keyboard shortcut"
+msgid "Bookmark page"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:313
+msgctxt "keyboard shortcut"
+msgid "Forward"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:313
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Home page"
+msgstr "プロジェクトのページ"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:314
+msgctxt "keyboard shortcut"
+msgid "Developer tools"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:314
+msgctxt "keyboard shortcut"
+msgid "Full screen"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:314
+msgctxt "keyboard shortcut"
+msgid "Reset zoom"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:316
+msgctxt "shortcut category"
+msgid "Office"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:317
+msgctxt "keyboard shortcut"
+msgid "Align centre"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:317
+msgctxt "keyboard shortcut"
+msgid "Align left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:317
+msgctxt "keyboard shortcut"
+msgid "Bold"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:317
+msgctxt "keyboard shortcut"
+msgid "Italic"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:317
+msgctxt "keyboard shortcut"
+msgid "Underline"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:318
+msgctxt "keyboard shortcut"
+msgid "Align right"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:318
+msgctxt "keyboard shortcut"
+msgid "Find and replace"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:318
+msgctxt "keyboard shortcut"
+msgid "Go to line / page"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:318
+msgctxt "keyboard shortcut"
+msgid "Insert link"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:319
+msgctxt "keyboard shortcut"
+msgid "Spell check"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:321
+msgctxt "shortcut category"
+msgid "Creative apps"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:322
+msgctxt "keyboard shortcut"
+msgid "Brush bigger (])"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:322
+msgctxt "keyboard shortcut"
+msgid "Brush smaller ([)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:323
+msgctxt "keyboard shortcut"
+msgid "Brush (B)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:323
+msgctxt "keyboard shortcut"
+msgid "Eraser (E)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:323
+msgctxt "keyboard shortcut"
+msgid "Fit on screen"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:324
+msgctxt "keyboard shortcut"
+msgid "Deselect"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:324
+msgctxt "keyboard shortcut"
+msgid "Eyedropper (I)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:324
+msgctxt "keyboard shortcut"
+msgid "Invert selection"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:324
+msgctxt "keyboard shortcut"
+msgid "Move (V)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:325
+msgctxt "keyboard shortcut"
+msgid "Free transform"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:325
+msgctxt "keyboard shortcut"
+msgid "Merge layer down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:325
+msgctxt "keyboard shortcut"
+msgid "New layer"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:327
+msgctxt "shortcut category"
+msgid "Video"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:328
+msgctxt "keyboard shortcut"
+msgid "Back 10 seconds (J)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:328
+msgctxt "keyboard shortcut"
+msgid "Back 5 seconds"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:328
+msgctxt "keyboard shortcut"
+msgid "Forward 5 seconds"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:328
+#, fuzzy
+msgctxt "keyboard shortcut"
+msgid "Play / pause (Space)"
+msgstr "再生 / 一時停止"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:329
+msgctxt "keyboard shortcut"
+msgid "Forward 10 seconds (L)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:329
+msgctxt "keyboard shortcut"
+msgid "Next frame (.)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:329
+msgctxt "keyboard shortcut"
+msgid "Pause (K)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:329
+msgctxt "keyboard shortcut"
+msgid "Previous frame (,)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:330
+msgctxt "keyboard shortcut"
+msgid "Full screen (F)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:330
+msgctxt "keyboard shortcut"
+msgid "Mark in (I)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:330
+msgctxt "keyboard shortcut"
+msgid "Mark out (O)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:330
+msgctxt "keyboard shortcut"
+msgid "Mute (M)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:330
+msgctxt "keyboard shortcut"
+msgid "Split clip (S)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:332
+#, fuzzy
+msgctxt "shortcut category"
+msgid "Meetings"
+msgstr "設定"
+
+#: crates/tsuba-gui/qml/KeyNames.qml:333
+msgctxt "keyboard shortcut"
+msgid "Camera on / off (Zoom)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:333
+msgctxt "keyboard shortcut"
+msgid "Mute / unmute (Zoom)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:333
+msgctxt "keyboard shortcut"
+msgid "Raise hand (Zoom)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:333
+msgctxt "keyboard shortcut"
+msgid "Share screen (Zoom)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:334
+msgctxt "keyboard shortcut"
+msgid "Camera on / off (Meet)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:334
+msgctxt "keyboard shortcut"
+msgid "Mute / unmute (Meet)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:334
+msgctxt "keyboard shortcut"
+msgid "Mute / unmute (Teams)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:335
+msgctxt "keyboard shortcut"
+msgid "Camera on / off (Teams)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:335
+msgctxt "keyboard shortcut"
+msgid "Leave meeting (Teams)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:335
+msgctxt "keyboard shortcut"
+msgid "Raise hand (Teams)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:336
+msgctxt "keyboard shortcut"
+msgid "Deafen (Discord)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:336
+msgctxt "keyboard shortcut"
+msgid "Mute microphone (Discord)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/KeyNames.qml:457
+msgid "Factory default not known for this key yet"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:44
+#: crates/tsuba-gui/qml/LaunchEditor.qml:80
+#: crates/tsuba-gui/qml/LaunchEditor.qml:132
+msgid "Launch %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:52
+#, fuzzy
+msgid "Open %1"
+msgstr "開く"
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:58
+msgid "Program"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:58
+msgid "Website"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:68
+msgid "READY-MADE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:76
+msgid "%1  (not installed)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:76
+msgctxt "preset name and its command"
+msgid "%1  ·  %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:84
+msgid "INSTALLED APPLICATIONS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:89
+msgid "Search applications"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:117
+msgid "%1  (terminal)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:140
+msgid "No applications found"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:140
+msgid "Nothing matches"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:146
+msgid "OR TYPE A COMMAND"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:151
+msgid "Command, e.g. firefox or steam"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:165
+msgid "https://…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LaunchEditor.qml:171
+#, fuzzy
+msgid "Runs on your PC while Tsuba's service is running."
+msgstr "Tsuba サービスが動いていません"
+
+#: crates/tsuba-gui/qml/LedEditor.qml:25
+msgctxt "keyboard key group"
+msgid "All"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:27
+msgctxt "keyboard key group"
+msgid "Arrows"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:28
+msgctxt "keyboard key group"
+msgid "Letters"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:29
+msgctxt "keyboard key group"
+msgid "Number row"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:30
+msgctxt "keyboard key group"
+msgid "F-keys"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:31
+msgctxt "keyboard key group"
+msgid "Numpad"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:32
+#, fuzzy
+msgctxt "keyboard key group"
+msgid "Macro"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/LedEditor.qml:33
+msgctxt "keyboard key group"
+msgid "Media"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:34
+msgctxt "keyboard key group"
+msgid "Underglow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:94
+msgid "Brush colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:135
+msgctxt "verb: select keys by group"
+msgid "Select"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:173
+#: crates/tsuba-gui/qml/StudioPage.qml:1473
+msgid "Clear selection"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:188
+#: crates/tsuba-gui/qml/LightingTab.qml:670
+#: crates/tsuba-gui/qml/StudioPage.qml:161
+#: crates/tsuba-gui/qml/StudioPage.qml:2058
+msgid "Colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:228
+msgctxt "button: apply the brush colour to the selected keys"
+msgid "Paint"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:234
+msgctxt "button: switch the selected keys' lights off"
+msgid "Turn off"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:242
+msgid "%1 key selected"
+msgid_plural "%1 keys selected"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:248
+#: crates/tsuba-gui/qml/MacroList.qml:550
+#: crates/tsuba-gui/qml/MacrosPage.qml:985
+#: crates/tsuba-gui/qml/StudioPage.qml:2479
+msgid "Save"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LedEditor.qml:248
+#: crates/tsuba-gui/qml/MacrosPage.qml:152
+#: crates/tsuba-gui/qml/StudioPage.qml:781
+#, fuzzy
+msgid "Saved"
+msgstr "%1 に保存しました"
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:17
+msgid "Game: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:17
+msgid "a game"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:20
+#, fuzzy
+msgid "Lighting Studio: %1"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:22
+#, fuzzy
+msgid "Device lighting"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:70
+msgid ""
+"A game is lighting this device through Tsuba's Chroma interface. Your own "
+"lighting comes back when it closes."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:71
+msgid "Linked game profile active: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:71
+msgid "The device is showing its own lighting effect."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingOwnerChip.qml:71
+msgid "Tsuba is running a Lighting Studio profile on this device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingPage.qml:37
+msgid "Per-LED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingPage.qml:37
+msgid "Per-key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingPage.qml:37
+msgid "Quick effects"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:89
+#: crates/tsuba-gui/qml/StudioPage.qml:147
+#, fuzzy
+msgid "Static"
+msgstr "自動"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:90
+#: crates/tsuba-gui/qml/StudioPage.qml:149
+msgid "Breathing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:93
+msgid "Reactive"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:95
+msgid "Ripple"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:96
+#: crates/tsuba-gui/qml/StudioPage.qml:155
+msgid "Fire"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:97
+#: crates/tsuba-gui/qml/StudioPage.qml:152
+msgid "Wheel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:98
+#: crates/tsuba-gui/qml/StudioPage.qml:156
+msgid "Audio Meter"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:99
+#: crates/tsuba-gui/qml/StudioPage.qml:157
+msgid "Ambient (screen)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:100
+#: crates/tsuba-gui/qml/StudioPage.qml:153
+msgid "Tidal"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:101
+#: crates/tsuba-gui/qml/StudioPage.qml:158
+#, fuzzy
+msgid "Battery level"
+msgstr "満充電"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:102
+#, fuzzy
+msgid "None (lighting off)"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:128
+msgid "Bottom half"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:128
+msgid "Full screen"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:128
+msgid "Top half"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:129
+msgctxt "screen area: the middle"
+msgid "Centre"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:129
+msgid "Left half"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:129
+msgid "Right half"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:236
+#: crates/tsuba-gui/qml/StudioPage.qml:190
+msgid "%1: %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:245
+msgid "Applied to every device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:307
+#, fuzzy
+msgid "Choose colour"
+msgstr "アクセントカラー"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:343
+msgid ""
+"Overall brightness of this device's lighting. Dragging to 0 turns the "
+"lighting off. Brightness is stored with the on-board profile."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:381
+#, fuzzy
+msgid "Same brightness on every device"
+msgstr "ゲームがデバイスを光らせます"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:394
+msgid "Switch off lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:395
+msgid ""
+"Turns the lighting off after the screen has been off for the chosen time, "
+"and back on when you return. Match this to your desktop's own power settings "
+"so they work together."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:400
+msgid "When display is turned off, after"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:414
+msgid "min (match KDE's Power settings)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:424
+msgid "When idle for (minutes)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:439
+msgid "When the session is locked"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:445
+msgid ""
+"Lighting comes back with the next key press or mouse movement, or when you "
+"unlock."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:481
+msgid "Effects"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:482
+msgid ""
+"Quick Effects are built into the device and stay when Tsuba is closed. "
+"Advanced Effects come from a Lighting Studio profile and play on all your "
+"devices while Tsuba runs; they are not saved on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:486
+msgid "Advanced Effects"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:486
+msgid "Quick Effects"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:498
+msgid ""
+"Advanced effects come from a Lighting Studio profile (the counterpart of "
+"Chroma Studio effects in Razer's software) and play across all your devices; "
+"they are not saved to the device profile."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:505
+#, fuzzy
+msgid "Lighting Studio profile"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:530
+#: crates/tsuba-gui/qml/StudioPage.qml:1020
+msgid "Applied %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:542
+msgid "No profiles yet. Open Lighting Studio to create one."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:577
+#, fuzzy
+msgid "Open Lighting Studio"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:601
+msgid "Quick effects are applied to this device and restored when you log in."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:611
+msgid "Zone"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:617
+msgid "All zones"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:627
+#: crates/tsuba-gui/qml/StudioPage.qml:2015
+msgid "Effect"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:649
+#: crates/tsuba-gui/qml/StudioPage.qml:2058
+#: crates/tsuba-gui/qml/StudioPage.qml:2065
+msgid "Colours"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:649
+#: crates/tsuba-gui/qml/StudioPage.qml:2198
+msgid "Direction"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:653
+msgctxt "two colours"
+msgid "Dual"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:653
+#: crates/tsuba-gui/qml/StudioPage.qml:148
+msgid "Gradient"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:653
+#: crates/tsuba-gui/qml/StudioPage.qml:2065
+msgid "Random"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:653
+msgctxt "one colour"
+msgid "Single"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:152
+msgid "Clockwise"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:152
+msgid "Counter-clockwise"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:153
+msgid "Inward"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:151
+msgid "Left to right"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:153
+msgid "Outward"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:659
+#: crates/tsuba-gui/qml/StudioPage.qml:151
+msgid "Right to left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:721
+#: crates/tsuba-gui/qml/StudioPage.qml:2185
+#, fuzzy
+msgid "Duration"
+msgstr "ドキュメント"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:721
+#: crates/tsuba-gui/qml/StudioPage.qml:1961
+msgid "Speed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:731
+#: crates/tsuba-gui/qml/StudioPage.qml:2191
+msgid "Long"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:731
+#: crates/tsuba-gui/qml/StudioPage.qml:2191
+msgid "Medium"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:731
+#: crates/tsuba-gui/qml/StudioPage.qml:2191
+msgid "Short"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:731
+msgid "Slow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:752
+#: crates/tsuba-gui/qml/StudioPage.qml:2355
+msgid "Colour boost"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:763
+#: crates/tsuba-gui/qml/StudioPage.qml:2371
+msgid "Flow (colours move across the bars)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:774
+#: crates/tsuba-gui/qml/StudioPage.qml:2381
+msgid "Screen area"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:799
+#: crates/tsuba-gui/qml/StudioPage.qml:2393
+msgid "Vividness"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:812
+msgid "Choose a different screen"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:822
+msgid "KDE remembers the screen you pick."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:842
+#, fuzzy
+msgid "Every device"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/LightingTab.qml:849
+msgid "Applies to every device that has this effect"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LightingTab.qml:849
+msgid "Applies to: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:41
+msgid "%1  (slot %2)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:101
+msgid "New link"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:163
+msgid ""
+"Link a game or app to device profiles and a Lighting Studio profile. While "
+"it runs, your devices switch to those; when it closes they switch back. "
+"Games are found by matching their process name, command line or install "
+"folder (Steam and Proton games work too)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:170
+msgid "Scan for games"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:175
+msgctxt "button: add a new linked game"
+msgid "+ Add"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:186
+msgid "No linked game running"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:186
+msgid "Running now: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:230
+msgid "folder %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:230
+msgid "matches “%1”"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:230
+msgid "pick a program"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:239
+msgid "RUNNING"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:260
+msgid "When several linked games run, the one higher in this list wins."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:280
+msgid "LINKED GAMES"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:289
+msgid ""
+"Link a game or app to device profiles and a Lighting Studio profile. They "
+"switch on when it starts and switch back when it closes. Steam/Proton games "
+"work too."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:313
+msgid "Name (optional)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:318
+msgctxt "checkbox: this link is active"
+msgid "Enabled"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:328
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:347
+msgid "Remove"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:333
+msgid "Remove “%1”?"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:340
+msgid "Keep"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:355
+msgctxt "noun: the program to match"
+msgid "Program"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:361
+msgid "Pick a running program…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:373
+msgid "Refresh"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:381
+msgid "or match text"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:388
+msgid "e.g. cs2  or  eldenring.exe"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:395
+msgid ""
+"Matched against running process names and command lines (case doesn't "
+"matter). Start the game first to pick it from the list. Text starting with "
+"dir: followed by a folder matches any program running from inside that "
+"folder."
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:403
+msgid "While it runs"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:425
+msgid "Don't change profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:425
+#, fuzzy
+msgid "On-board slot %1"
+msgstr "オンボードプロファイル %1"
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:441
+#, fuzzy
+msgid "Studio lighting"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:450
+#, fuzzy
+msgid "Don't change lighting"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:467
+msgid "%1 polling rate"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:476
+msgid "%1 Hz"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:476
+msgid "Don't change polling rate"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:490
+msgid "When"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:494
+msgid "Only while the game's window has the focus"
+msgstr ""
+
+#: crates/tsuba-gui/qml/LinkedGamesPage.qml:500
+msgid ""
+"Alt+Tab to your browser and the devices switch back; return to the game and "
+"they switch again. Needs KDE Plasma: Tsuba loads a small window-focus helper "
+"into the desktop while this is on. On other desktops the link applies while "
+"the game runs."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:66
+msgid "Unfiled"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:133
+#: crates/tsuba-gui/qml/StudioPage.qml:386
+#: crates/tsuba-gui/qml/StudioPage.qml:1081
+msgid "%1 copy"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:144
+msgctxt "where a macro is used: profile name and key number"
+msgid "%1 (key %2)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:152
+msgid "Search macros"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:161
+msgid "Not in use (%1)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:183
+msgid ""
+"%1 key uses a macro that no longer exists, for example key %2 in “%3”. Bind "
+"it to another macro in the device's Customize tab."
+msgid_plural ""
+"%1 keys use a macro that no longer exists, for example key %2 in “%3”. Bind "
+"it to another macro in the device's Customize tab."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:262
+msgid "%1 event · on %2"
+msgid_plural "%1 events · on %2"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:263
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:668
+msgid "%1 event"
+msgid_plural "%1 events"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:288
+msgid "NOT IN USE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:340
+msgid "No macros yet. Click + New to record one."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:349
+msgid "No macro matches."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:357
+#, fuzzy
+msgid "On device only"
+msgstr "デバイスがまだ見つかりません。"
+
+#: crates/tsuba-gui/qml/MacroList.qml:393
+msgid "%2 · %1 event"
+msgid_plural "%2 · %1 events"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:402
+msgid "Import"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:429
+msgid "Rename"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:435
+#: crates/tsuba-gui/qml/StudioPage.qml:1078
+msgid "Duplicate"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:441
+msgid "Move to folder…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:447
+#: crates/tsuba-gui/qml/MacroList.qml:550
+msgid "Delete"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:473
+msgid "Delete “%1”?"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:473
+msgid "Folder"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:473
+msgid "Rename macro"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:485
+msgid "Folder name (empty = none)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:485
+#: crates/tsuba-gui/qml/MacrosPage.qml:791
+#, fuzzy
+msgid "Macro name"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/MacroList.qml:520
+msgid ""
+"It is used by %1. Those keys lose it. This also removes it from your devices."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacroList.qml:522
+msgid "This removes it from the library and from your devices."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:73
+msgid "Button 4"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:73
+msgid "Button 5"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:73
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Left click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:73
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+msgid "Middle click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:73
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Right click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:133
+#, fuzzy
+msgid "Macro %1"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:173
+msgid "Import failed: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:173
+msgid "the daemon returned no macro"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:181
+msgid "Imported “%1” to the library"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:183
+msgid "Imported “%1”, but it isn't in the library list yet"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:215
+msgid "Button %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:217
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:93
+#, fuzzy
+msgid "Scroll down"
+msgstr "音量を下げる"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:217
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:93
+msgid "Scroll up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:221
+msgid "Move cursor to %1, %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:223
+msgid "Media key 0x%1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:225
+#, fuzzy
+msgid "System key %1"
+msgstr "システム"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:227
+msgid "Run command (not set)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:227
+msgid "Run: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:229
+msgid "Event 0x%1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:255
+msgctxt "duration in milliseconds"
+msgid "%1 ms"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:255
+msgctxt "duration in seconds"
+msgid "%1 s"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:555 crates/tsuba-gui/qml/Main.qml:134
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:650
+msgid "Macros"
+msgstr "マクロ"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:560
+msgid ""
+"Macros are recorded key, click and scroll sequences with delays. Press "
+"Record, then type or click in this window; edit or reorder events afterwards "
+"and click Save. Bind a macro to a key from a device's Customize tab. Macros "
+"are stored on this PC and copied to the device when bound."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:567
+msgctxt "button: import macros"
+msgid "Import"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:571
+#: crates/tsuba-gui/qml/StudioPage.qml:1098
+msgid "Import from Synapse…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:574
+msgctxt "button: create a new macro"
+msgid "+ New"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:636
+msgid "%1: %2 on board · %3 KB free"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:657
+msgid "MACROS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:667
+msgid ""
+"Record keystrokes, mouse clicks and delays, then bind a macro to any key or "
+"button from a device's CUSTOMIZE tab."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:675
+msgid "+ New macro"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:695
+msgctxt "heading of the list of items that can be added to a macro"
+msgid "Add"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:700
+msgctxt "macro event"
+msgid "Delay"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:701
+msgid "Keyboard key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:702
+msgid "Mouse button"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:704
+msgid "Media key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:705
+#, fuzzy
+msgid "System key"
+msgstr "システム"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:706
+msgid "Cursor move"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:707
+#, fuzzy
+msgid "Run command"
+msgstr "コマンドをコピー"
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:744
+msgid "New items go after the selected row, or at the end."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:781
+msgid "ON DEVICE ONLY · READ-ONLY"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:801
+msgid "UNSAVED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:812
+msgctxt "button: delete the macro"
+msgid "Delete"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:819
+msgid "Import to library"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:851
+msgid "Total  %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:858
+msgid "%1 selected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:865
+msgid "Remove selected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:873
+msgid "Undo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:879
+msgid "Redo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:889
+msgctxt "button: start recording"
+msgid "Record"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:889
+msgctxt "button: stop recording"
+msgid "Stop"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:924
+msgid "RECORD OPTIONS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:931
+msgid "Delays between events"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:938
+msgctxt "delay mode: fixed delay"
+msgid "Fixed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:938
+msgctxt "delay mode: no delays"
+msgid "None"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:938
+msgctxt "delay mode: use the recorded timing"
+msgid "Recorded"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:943
+msgid "What to record"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:951
+msgid "Keys + mouse"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:951
+msgid "Keys only"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:951
+msgid "Mouse only"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:957
+msgid "Record pointer movement"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:966
+msgid "Fixed delay (ms)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1020
+msgid ""
+"%1 event, %2 in total. Import it to keep a copy in the library, where you "
+"can edit it."
+msgid_plural ""
+"%1 events, %2 in total. Import it to keep a copy in the library, where you "
+"can edit it."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1030
+msgid ""
+"This event list may be incomplete: the device returns long keyboard macros "
+"cut short, so the end may be missing. Importing saves only what was read."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1039
+msgid "Recorded events are added after the selected row (or at the end)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1039
+msgid ""
+"Recording: type, click and scroll anywhere in this window. Click Stop when "
+"done."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1116
+msgid "Press Record, or add items from the list on the left."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1133
+msgid "Event %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1133
+msgid "Selected event"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1138
+msgid "Select an event in the list to edit, move or delete it."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1167
+msgctxt "button: remove the selected event"
+msgid "Remove"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1177
+msgid "Bind it to a key from a device's CUSTOMIZE tab → Macro."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1177
+msgid "On board: %1. Saving updates those copies."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1177
+msgid ""
+"This macro is only on %1. Importing copies it to this PC; the device keeps "
+"its copy."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1244
+msgid "Delay (ms)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1272
+msgid "%1  (click to change)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1272
+msgid "Press the new key…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1291
+#: crates/tsuba-gui/qml/MacrosPage.qml:1310
+#: crates/tsuba-gui/qml/MacrosPage.qml:1341
+#: crates/tsuba-gui/qml/MacrosPage.qml:1370
+msgctxt "key or button action"
+msgid "Press"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1291
+#: crates/tsuba-gui/qml/MacrosPage.qml:1310
+#: crates/tsuba-gui/qml/MacrosPage.qml:1341
+#: crates/tsuba-gui/qml/MacrosPage.qml:1370
+msgctxt "key or button action"
+msgid "Release"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1321
+msgctxt "scroll direction"
+msgid "Down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1321
+msgctxt "scroll direction"
+msgid "Up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1347
+msgid ""
+"Plays as a media key press through the device. Check that it does what you "
+"expect on your hardware."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1376
+msgid "Power and Sleep act on the whole computer when the macro plays."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1422
+msgid ""
+"Screen position in pixels from the top left. Where the pointer ends up also "
+"depends on the device's pointer settings."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1439
+msgid "Command, e.g. konsole or xdg-open https://…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MacrosPage.qml:1444
+msgid ""
+"The macro presses a key combination reserved for this command (F14–F24 with "
+"modifiers) and Tsuba's service runs it, so it only works while the service "
+"is running. Each different command uses one of the 46 reserved combinations."
+msgstr ""
 
 #: crates/tsuba-gui/qml/Main.qml:57
 msgid "mute"
@@ -371,16 +4180,12 @@ msgid "%1: scroll wheel tactile"
 msgstr "%1: スクロールホイール クリック感あり"
 
 #: crates/tsuba-gui/qml/Main.qml:83 crates/tsuba-gui/qml/Main.qml:247
-#: crates/tsuba-gui/qml/Main.qml:464
+#: crates/tsuba-gui/qml/Main.qml:471
 msgid "Tsuba"
 msgstr "Tsuba"
 
-#: crates/tsuba-gui/qml/Main.qml:134
-msgid "Macros"
-msgstr "マクロ"
-
 #: crates/tsuba-gui/qml/Main.qml:138 crates/tsuba-gui/qml/Main.qml:247
-#: crates/tsuba-gui/qml/Main.qml:700
+#: crates/tsuba-gui/qml/Main.qml:707
 msgid "Settings"
 msgstr "設定"
 
@@ -436,43 +4241,43 @@ msgstr "プロファイル"
 msgid "Quit"
 msgstr "終了"
 
-#: crates/tsuba-gui/qml/Main.qml:581
+#: crates/tsuba-gui/qml/Main.qml:588
 msgid "tsubad connected"
 msgstr "tsubad 接続済み"
 
-#: crates/tsuba-gui/qml/Main.qml:581
+#: crates/tsuba-gui/qml/Main.qml:588
 msgid "tsubad not running"
 msgstr "tsubad 停止中"
 
-#: crates/tsuba-gui/qml/Main.qml:581
+#: crates/tsuba-gui/qml/Main.qml:588
 msgid "tsubad · read-only"
 msgstr "tsubad · 読み取り専用"
 
-#: crates/tsuba-gui/qml/Main.qml:610
+#: crates/tsuba-gui/qml/Main.qml:617
 msgid "Help"
 msgstr "ヘルプ"
 
-#: crates/tsuba-gui/qml/Main.qml:629
+#: crates/tsuba-gui/qml/Main.qml:636
 msgid "Show the welcome"
 msgstr "ようこそ画面を表示"
 
-#: crates/tsuba-gui/qml/Main.qml:631 crates/tsuba-gui/qml/SettingsPage.qml:469
+#: crates/tsuba-gui/qml/Main.qml:638 crates/tsuba-gui/qml/SettingsPage.qml:471
 msgid "About Tsuba"
 msgstr "Tsuba について"
 
-#: crates/tsuba-gui/qml/Main.qml:724
+#: crates/tsuba-gui/qml/Main.qml:731
 msgid ""
 "The Tsuba service is running read-only: nothing you change is sent to your "
 "devices."
 msgstr ""
 "Tsuba サービスは読み取り専用で動作しています。変更はデバイスに送られません。"
 
-#: crates/tsuba-gui/qml/Main.qml:731
+#: crates/tsuba-gui/qml/Main.qml:738
 #, javascript-format
 msgid "Battery at %1%. Plug in the cable to charge."
 msgstr "バッテリー残量 %1%。ケーブルをつないで充電してください。"
 
-#: crates/tsuba-gui/qml/Main.qml:737
+#: crates/tsuba-gui/qml/Main.qml:744
 msgid ""
 "This device isn't answering. A wireless device may be asleep: move it or "
 "press a button."
@@ -480,37 +4285,361 @@ msgstr ""
 "このデバイスから応答がありません。ワイヤレスデバイスがスリープしているかもし"
 "れません。動かすかボタンを押してください。"
 
-#: crates/tsuba-gui/qml/Main.qml:738
+#: crates/tsuba-gui/qml/Main.qml:745
 msgid "Try again"
 msgstr "再試行"
 
-#: crates/tsuba-gui/qml/Main.qml:810
+#: crates/tsuba-gui/qml/Main.qml:820
 msgid "Ready"
 msgstr "準備完了"
 
-#: crates/tsuba-gui/qml/Main.qml:810
+#: crates/tsuba-gui/qml/Main.qml:820
 msgid "Tsuba was updated: close and reopen it to use the new version."
 msgstr ""
 "Tsuba が更新されました。新しいバージョンを使うには、閉じてもう一度開いてくだ"
 "さい。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:56
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Mouse button 4"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:18
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Mouse button 5"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:79
+msgid "BUTTONS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:81
+msgid "Scroll click"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:91
+msgid "SCROLLING"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:93
+msgid "Scroll left"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:93
+msgid "Scroll right"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:100
+msgid "%1 (repeating)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:134
+msgid "Pick a button or scroll direction after choosing the repeat rate."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:142
+msgid "CLICK WITH KEYS HELD"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:145
+msgid ""
+"For Ctrl+click, Shift+click and the like. Saved as a small macro that "
+"presses the keys, clicks and lets go."
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:180
+msgid "and hold %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:180
+msgid "and hold a key (optional)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/MouseEditor.qml:187
+msgid "Clear"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:108
+msgid "Game Mode on"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:108
+msgid "Game Mode settings saved"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:272
+msgid ""
+"Sensitivity (DPI) is how far the pointer moves for each centimetre you move "
+"the mouse. Set up to five stages and switch between them with the "
+"sensitivity buttons; the highlighted stage is the one in use. Very high "
+"values can feel jittery on some surfaces."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:273
+msgid ""
+"The number of dots-per-inch (DPI) of mouse movement. Click a stage's number "
+"to make it the active one; the stage buttons on the mouse cycle through them."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:279
+#, fuzzy
+msgid "Sensitivity stages"
+msgstr "感度（DPI）ステージの変更"
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:304
+msgid "Separate X / Y sensitivity"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:383
+msgid "Move this stage down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:383
+msgid "Move this stage up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:441
+#, fuzzy
+msgid "Current sensitivity: %1 / %2 DPI"
+msgstr "%1: 感度 %2 DPI"
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:441
+#, fuzzy
+msgid "Current sensitivity: %1 DPI"
+msgstr "%1: 感度 %2 DPI"
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:461
+msgid "Wireless power saving"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:462
+msgid ""
+"When the device is idle on battery it goes to sleep to save power. A short "
+"timeout saves more battery but the first movement afterwards wakes it with a "
+"brief delay. Does not apply when the cable is plugged in."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:463
+#, fuzzy, javascript-format
+msgid "Battery %1%"
+msgstr "満充電"
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:463
+#, javascript-format
+msgid "Battery %1% · charging"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:463
+msgid "Put the device to sleep after it has been idle on battery."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:466
+msgid "Sleep after being idle for (minutes)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:484
+msgid ""
+"Caps the lighting brightness while the device runs on battery so it lasts "
+"longer. Set it to 0% to turn the lighting off on battery; it returns to "
+"normal when plugged in."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:485
+msgid "Lighting brightness is capped at this level while running on battery."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:505
+#, fuzzy
+msgid "Device"
+msgstr "デバイス"
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:506
+msgid ""
+"Firmware version, operating mode and serial number as reported by the "
+"device. Tsuba only reads these; it never updates firmware."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:511
+msgid "Firmware %1   ·   Mode: %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:511
+msgid "driver (software control)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:519
+msgid "Connection: wired"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:519
+msgid "Connection: wireless (HyperSpeed receiver)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:519
+msgid "Link quality %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:519
+msgid "Model: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:525
+msgid "Serial number  %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:528
+msgctxt "button: copy the serial number"
+msgid "Copy"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:537
+msgid ""
+"Firmware updates are published by Razer for Windows only; Tsuba never "
+"updates firmware."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:545
+msgid "Check for updates"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:567
+msgid "Polling rate"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:567
+msgid "Wired polling rate"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:568
+msgid ""
+"How many times per second the device reports to the computer. Higher rates "
+"feel smoother and reduce input delay but use a little more CPU and, "
+"wirelessly, more battery. 1000 Hz is a good default."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:569
+msgid ""
+"The frequency (Hz) of data updates in a second. Higher rates lower latency "
+"but use more CPU, which can affect frame rates."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:583
+msgid "Scrolling"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:584
+msgid ""
+"Tactile gives the wheel distinct notches; Free-spin lets it turn without "
+"resistance. Auto free-spin switches between the two based on how fast you "
+"scroll, and scroll acceleration scrolls further the faster you spin."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:590
+msgid "Scrolling mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:594
+msgid "Free-spin"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:594
+msgid "Tactile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:601
+msgid "Auto free-spin"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:602
+msgid ""
+"Switches to free-spin automatically when you scroll fast, and back to "
+"tactile when you slow down (called Smart-Reel on Razer mice)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:608
+msgid "Scroll acceleration"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:609
+msgid "Scrolls further the faster you spin the wheel."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:616
+msgid "Scroll acceleration level"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:617
+msgid "Auto free-spin speed threshold"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:662
+#: crates/tsuba-gui/qml/PerformanceTab.qml:667
+msgid "Game Mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:663
+msgid ""
+"While on, Game Mode stops accidental key presses from leaving your game: you "
+"can disable the Meta (Windows) and Menu keys and pause desktop shortcuts "
+"like Alt+Tab. Fn+F10 toggles it on the keyboard. Turn it off to get "
+"everything back."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:664
+msgid ""
+"Stops keys and shortcuts that pull you out of a game. Fn+F10 on the keyboard "
+"turns it on and off too."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:672
+msgid "Disable the Windows (Meta) key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:677
+msgid "Disable the Menu key"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:682
+msgid "Block desktop shortcuts"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:683
+msgid ""
+"Alt+Tab, Alt+F4, Meta shortcuts and other KDE global shortcuts (including "
+"Tsuba's own) are paused while Game Mode is on."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:704
+msgid "Low power mode"
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:705
+msgid ""
+"The device switches to its low power mode when the battery falls below this "
+"level, to keep working a bit longer. Raise it to get the warning earlier."
+msgstr ""
+
+#: crates/tsuba-gui/qml/PerformanceTab.qml:706
+msgid "Switch to low power mode when the battery drops below this level."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:58
 msgid "Could not save: %1"
 msgstr "保存できませんでした: %1"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:56
+#: crates/tsuba-gui/qml/SettingsPage.qml:58
 msgid "Saved to %1"
 msgstr "%1 に保存しました"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:117
+#: crates/tsuba-gui/qml/SettingsPage.qml:119
 msgid "General"
 msgstr "一般"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:119
+#: crates/tsuba-gui/qml/SettingsPage.qml:121
 msgid "Launch Tsuba at login"
 msgstr "ログイン時に Tsuba を起動"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:120
+#: crates/tsuba-gui/qml/SettingsPage.qml:122
 msgid ""
 "Starts minimised in the system tray, so notifications and the tray menu are "
 "ready."
@@ -518,11 +4647,11 @@ msgstr ""
 "システムトレイに最小化された状態で起動するので、通知とトレイメニューがすぐ使"
 "えます。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:131
+#: crates/tsuba-gui/qml/SettingsPage.qml:133
 msgid "Start the background service at login"
 msgstr "ログイン時にバックグラウンドサービスを開始"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:132
+#: crates/tsuba-gui/qml/SettingsPage.qml:134
 msgid ""
 "The Tsuba service (tsubad) applies your settings to your devices. Keep this "
 "on."
@@ -530,87 +4659,87 @@ msgstr ""
 "Tsuba サービス（tsubad）が設定をデバイスに反映します。オンのままにしてくださ"
 "い。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:143
+#: crates/tsuba-gui/qml/SettingsPage.qml:145
 msgid "When Tsuba opens, show"
 msgstr "起動時に表示するページ"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:146
+#: crates/tsuba-gui/qml/SettingsPage.qml:148
 msgid "Home"
 msgstr "ホーム"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:146
+#: crates/tsuba-gui/qml/SettingsPage.qml:148
 msgid "Last page"
 msgstr "前回のページ"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:152
+#: crates/tsuba-gui/qml/SettingsPage.qml:154
 msgid "Closing the window keeps Tsuba in the tray"
 msgstr "ウィンドウを閉じても Tsuba をトレイに残す"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:153
+#: crates/tsuba-gui/qml/SettingsPage.qml:155
 msgid ""
 "No system tray found on this desktop, so closing the window quits Tsuba."
 msgstr ""
 "このデスクトップにはシステムトレイがないため、ウィンドウを閉じると Tsuba は終"
 "了します。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:153
+#: crates/tsuba-gui/qml/SettingsPage.qml:155
 msgid "Quit from the tray icon's menu."
 msgstr "終了はトレイアイコンのメニューから行います。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:162
+#: crates/tsuba-gui/qml/SettingsPage.qml:164
 msgid "Show tips on the Home page"
 msgstr "ホームにヒントを表示"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:169
+#: crates/tsuba-gui/qml/SettingsPage.qml:171
 msgid "Show the welcome again"
 msgstr "ようこそ画面をもう一度表示"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:179
+#: crates/tsuba-gui/qml/SettingsPage.qml:181
 msgid "Appearance"
 msgstr "外観"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:182
+#: crates/tsuba-gui/qml/SettingsPage.qml:184
 msgid "Automatic follows your desktop's light or dark setting."
 msgstr "「自動」はデスクトップのライト／ダーク設定に従います。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:191
-#: crates/tsuba-gui/qml/SettingsPage.qml:282
+#: crates/tsuba-gui/qml/SettingsPage.qml:193
+#: crates/tsuba-gui/qml/SettingsPage.qml:284
 msgid "Accent colour"
 msgstr "アクセントカラー"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:235
+#: crates/tsuba-gui/qml/SettingsPage.qml:237
 msgid "Reset to Tsuba default"
 msgstr "Tsuba の既定に戻す"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:244
+#: crates/tsuba-gui/qml/SettingsPage.qml:246
 msgid "Device pictures"
 msgstr "デバイスの画像"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:250
+#: crates/tsuba-gui/qml/SettingsPage.qml:252
 msgid "My picture pack"
 msgstr "自分の画像パック"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:250
+#: crates/tsuba-gui/qml/SettingsPage.qml:252
 msgid "Tsuba drawings"
 msgstr "Tsuba のイラスト"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:257
+#: crates/tsuba-gui/qml/SettingsPage.qml:259
 msgid "Takes effect when you reopen a device tab."
 msgstr "デバイスのタブを開き直すと反映されます。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:265
+#: crates/tsuba-gui/qml/SettingsPage.qml:267
 msgid "My own pictures"
 msgstr "自分の画像"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:296
+#: crates/tsuba-gui/qml/SettingsPage.qml:298
 msgid "System default"
 msgstr "システムの既定"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:301
+#: crates/tsuba-gui/qml/SettingsPage.qml:303
 msgid "Language of the app"
 msgstr "アプリの言語"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:302
+#: crates/tsuba-gui/qml/SettingsPage.qml:304
 msgid ""
 "Only the app's own text changes. Messages from the Tsuba service and the "
 "command-line tool stay in English."
@@ -618,19 +4747,19 @@ msgstr ""
 "変わるのはアプリ自体の文言だけです。Tsuba サービスとコマンドラインツールの"
 "メッセージは英語のままです。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:321
+#: crates/tsuba-gui/qml/SettingsPage.qml:323
 msgid "Restart Tsuba to use the new language."
 msgstr "新しい言語を使うには Tsuba を再起動してください。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:330
+#: crates/tsuba-gui/qml/SettingsPage.qml:332
 msgid "Restart now"
 msgstr "今すぐ再起動"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:345
+#: crates/tsuba-gui/qml/SettingsPage.qml:347
 msgid "Notifications"
 msgstr "通知"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:346
+#: crates/tsuba-gui/qml/SettingsPage.qml:348
 msgid ""
 "Short pop-ups when something changes on a device. They come from the Tsuba "
 "service, so they also appear when this window is closed."
@@ -638,63 +4767,63 @@ msgstr ""
 "デバイスで何かが変わったときに短いポップアップを表示します。Tsuba サービスか"
 "ら出るため、このウィンドウを閉じていても表示されます。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:346
+#: crates/tsuba-gui/qml/SettingsPage.qml:348
 msgid "Start the Tsuba service to change these."
 msgstr "これらを変更するには Tsuba サービスを開始してください。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:359
+#: crates/tsuba-gui/qml/SettingsPage.qml:361
 msgid "Sensitivity (DPI) stage changes"
 msgstr "感度（DPI）ステージの変更"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:364
+#: crates/tsuba-gui/qml/SettingsPage.qml:366
 msgid "Profile changes from the device's profile button"
 msgstr "デバイスのプロファイルボタンによる切り替え"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:369
+#: crates/tsuba-gui/qml/SettingsPage.qml:371
 msgid "Dial changes"
 msgstr "ダイヤルの変更"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:374
+#: crates/tsuba-gui/qml/SettingsPage.qml:376
 msgid "Scroll wheel mode (free-spin or tactile)"
 msgstr "スクロールホイールのモード（フリースピン／クリック感あり）"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:379
+#: crates/tsuba-gui/qml/SettingsPage.qml:381
 msgid "A device connects or disconnects"
 msgstr "デバイスの接続・切断"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:385
+#: crates/tsuba-gui/qml/SettingsPage.qml:387
 msgid "Low battery"
 msgstr "バッテリー残量が少ないとき"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:395
+#: crates/tsuba-gui/qml/SettingsPage.qml:397
 msgid "Warn at"
 msgstr "警告する残量"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:413
+#: crates/tsuba-gui/qml/SettingsPage.qml:415
 msgid "Battery full"
 msgstr "満充電"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:419
+#: crates/tsuba-gui/qml/SettingsPage.qml:421
 msgid "Show routine messages as an on-screen display (KDE Plasma)"
 msgstr "通常のメッセージを通知ではなくオンスクリーン表示で出す（KDE Plasma）"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:424
+#: crates/tsuba-gui/qml/SettingsPage.qml:426
 msgid "Play the desktop's notification sound"
 msgstr "デスクトップの通知音を鳴らす"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:434
+#: crates/tsuba-gui/qml/SettingsPage.qml:436
 msgid "Send a test notification"
 msgstr "テスト通知を送信"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:435
+#: crates/tsuba-gui/qml/SettingsPage.qml:437
 msgid "The service didn't answer."
 msgstr "サービスから応答がありません。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:452
+#: crates/tsuba-gui/qml/SettingsPage.qml:454
 msgid "Help and diagnostics"
 msgstr "ヘルプと診断情報"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:453
+#: crates/tsuba-gui/qml/SettingsPage.qml:455
 msgid ""
 "If something doesn't work, export diagnostics and attach the file to an "
 "issue. It lists the Razer devices the system sees, your Linux and desktop "
@@ -708,27 +4837,27 @@ msgstr ""
 "キー割り当て、マクロの内容、シリアル番号、ユーザー名、ファイルのパスは含まれ"
 "ません。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:458
+#: crates/tsuba-gui/qml/SettingsPage.qml:460
 msgid "Export diagnostics…"
 msgstr "診断情報をエクスポート…"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:484
+#: crates/tsuba-gui/qml/SettingsPage.qml:486
 msgid "Opens the issue page in your browser."
 msgstr "ブラウザーで Issue のページを開きます。"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:486
+#: crates/tsuba-gui/qml/SettingsPage.qml:488
 msgid "Open"
 msgstr "開く"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:502
+#: crates/tsuba-gui/qml/SettingsPage.qml:504
 msgid "Save diagnostics"
 msgstr "診断情報を保存"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:503
+#: crates/tsuba-gui/qml/SettingsPage.qml:505
 msgid "Zip archive (*.zip)"
 msgstr "Zip アーカイブ (*.zip)"
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:506
+#: crates/tsuba-gui/qml/SettingsPage.qml:508
 msgid "Writing…"
 msgstr "書き込み中…"
 
@@ -871,3 +5000,1072 @@ msgid "Still stuck? The troubleshooting page lists the usual causes."
 msgstr ""
 "解決しませんか? トラブルシューティングのページに、よくある原因をまとめていま"
 "す。"
+
+#: crates/tsuba-gui/qml/ShortcutCatalogue.qml:45
+msgid "Suggested for %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ShortcutCatalogue.qml:55
+msgid "%1  (suggested)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ShortcutCatalogue.qml:78
+msgid "YOUR OWN SHORTCUT"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:22
+msgid "Lift-off distance"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:23
+msgid ""
+"How high you can lift the mouse before it stops tracking. Lower distances "
+"stop the pointer from drifting when you reposition the mouse. Asymmetric "
+"sets separate distances for lifting off and landing again. The mouse adjusts "
+"to your surface by itself (Smart Tracking)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:24
+msgid "The height at which the sensor stops tracking when you lift the mouse."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:29
+msgid "Asymmetric"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:29
+msgid "Symmetric"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:37
+msgid "Lift-off and landing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:47
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:66
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:81
+msgctxt "distance in millimetres"
+msgid "%1 mm"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:56
+msgid "Lift-off"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:71
+msgid "Landing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:87
+msgid "Failed: landing must be lower than lift-off"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:94
+msgid ""
+"Not set from Tsuba yet — the mouse keeps its own setting until you pick one."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SmartTrackingCard.qml:94
+msgid ""
+"The mouse can't report this setting back; Tsuba shows the value it last sent."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:18
+msgid "Keyboard"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:20
+msgid "Mouse"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:42
+#: crates/tsuba-gui/qml/StudioPage.qml:57
+msgid "Logo"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:42
+#: crates/tsuba-gui/qml/StudioPage.qml:176
+msgid "Underglow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:56
+#: crates/tsuba-gui/qml/StudioPage.qml:167
+msgid "All"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:59
+msgid "All underglow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:60
+msgid "Left side"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:62
+msgid "Right side"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:63
+msgid "Logo + wheel"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:67
+#: crates/tsuba-gui/qml/StudioPage.qml:920
+#: crates/tsuba-gui/qml/StudioPage.qml:1113
+#, fuzzy
+msgid "My Lighting"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:150
+msgid "Spectrum Cycling"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:151
+msgid "Bottom to top"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:151
+msgid "Top to bottom"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:159
+msgid "Image"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:161
+msgid "Live"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:161
+msgid "Motion"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:168
+msgid "WASD"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:169
+msgid "Arrows"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:170
+msgid "Letters"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:171
+msgid "Number row"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:172
+msgid "F-keys"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:173
+msgid "Numpad"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:175
+msgid "Media"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:189
+msgid "%1: all"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:487
+#, fuzzy
+msgid "no device"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:489
+msgid "%1 LED"
+msgid_plural "%1 LEDs"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:489
+msgid "all LEDs"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:781
+msgid "Saved and applied"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:802
+#, fuzzy
+msgid "Exported to %1"
+msgstr "%1 に保存しました"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:816
+msgid "Imported as %1 (not saved yet)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1002
+msgid "LIGHTING STUDIO"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1032
+#, fuzzy
+msgid "Profile name"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1062
+#, fuzzy
+msgid "New profile"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1064
+#, fuzzy
+msgid "Profile"
+msgstr "プロファイル"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1088
+#, fuzzy
+msgid "Export to file…"
+msgstr "診断情報をエクスポート…"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1093
+msgid "Import from file…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1104
+msgid "Delete profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1127
+msgid "LIVE ON DEVICE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1127
+msgid "read-only daemon"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1134
+msgid "Save & apply"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1163
+msgid "EFFECT LAYERS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1172
+msgid ""
+"A Lighting Studio profile is a stack of effect layers drawn on your devices' "
+"LEDs, top layer first. Add layers with +, choose which LEDs each one covers, "
+"and use Blend to decide how it mixes with the layers below. Profiles play on "
+"all devices while Tsuba runs."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1262
+msgid "%1 · %2"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1306
+msgid ""
+"Canvas layers span devices: one effect laid out over the keyboard and mouse "
+"placed together. They draw above each device's own layers."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1316
+msgid "%1 canvas layer also lights this device (see All devices)."
+msgid_plural "%1 canvas layers also light this device (see All devices)."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1325
+msgid "Add a layer to start. Upper layers draw over lower ones."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1333
+msgid "ADD EFFECT"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1447
+msgid "Quick select"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1458
+msgid "Choose group…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1467
+msgid "Select all LEDs"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1483
+#, fuzzy
+msgid "Arrange devices"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1483
+msgid "Done"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1492
+msgid "Undo (Ctrl+Z)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1499
+msgid "Redo (Ctrl+Shift+Z)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1510
+msgid "Drag a device to move it."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1529
+msgid "Smaller"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1535
+msgid "Larger"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1542
+msgid "Reset layout"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1709
+msgid "Add or pick a layer, then choose its LEDs here."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1709
+msgid ""
+"Canvas layer: click LEDs on either device or drag a box around them. Shift "
+"or Ctrl adds to the selection."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1709
+msgid ""
+"Click LEDs or drag a box around them to choose where this layer lights. "
+"Shift or Ctrl adds to the selection."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1723
+msgid "Layer LEDs"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1762
+#, fuzzy
+msgid "Layer devices"
+msgstr "お使いのデバイス"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1848
+msgid "Layer name"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1859
+msgid "Copy"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1864
+msgid "Duplicate this layer"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1873
+msgid "Put this effect's options back to their defaults"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1885
+msgid "This layer lights the %1 only."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1885
+msgid "This layer spans: %1."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1894
+#, fuzzy
+msgid "Span across devices"
+msgstr "対応デバイス"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1899
+msgid ""
+"Move this layer onto the shared canvas so one effect runs across the "
+"keyboard and the mouse"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1904
+msgid "Move to the device's layers"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1911
+msgid "Layer brightness"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1936
+msgid "Opacity"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1989
+msgid "Blend"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1997
+msgid "Add"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1997
+msgid "Cover"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:1997
+#, fuzzy
+msgid "Lighten"
+msgstr "ライト"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2003
+msgid ""
+"Blend controls how this layer mixes with the layers below it. Cover replaces "
+"them on its LEDs, Add stacks the light, Lighten keeps whichever colour is "
+"brighter. Opacity fades the whole layer into what is below."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2008
+msgid ""
+"Cover hides the layers below on this layer's LEDs; Add mixes its light on "
+"top; Lighten keeps the brighter colour."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2049
+msgid ""
+"Reactive and Ripple run in the keyboard itself: pick them on the device's "
+"LIGHTING tab."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2065
+#: crates/tsuba-gui/qml/StudioPage.qml:2114
+msgid "Rainbow"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2114
+msgid "Random colours"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2124
+#, fuzzy
+msgid "Add a colour"
+msgstr "アクセントカラー"
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2132
+msgid "Remove the selected colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2146
+msgid "Angle"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2175
+msgid "Scroll the gradient"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2237
+msgid "Rotation centre"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2245
+msgid "Bottom edge"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2245
+msgid "Left edge"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2245
+msgid "Middle of the device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2245
+msgid "Right edge"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2245
+msgid "Top edge"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2257
+msgid "Colour spread"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2276
+msgid "Density"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2293
+msgid "Audio source"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2301
+msgid "What the PC is playing"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2318
+msgid "Display"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2325
+msgid "Bands"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2325
+msgid "Level"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2332
+msgid "Hold peaks"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2410
+msgid "Picture"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2425
+msgid "Choose a picture…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2425
+msgid "Choose another picture…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2433
+msgid "A %1×%2 copy of the picture is kept in the profile."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2433
+msgid ""
+"The picture is shrunk to at most 64 pixels a side and stored in the profile, "
+"so exported profiles are self-contained."
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2440
+#: crates/tsuba-gui/qml/StudioPage.qml:2447
+msgid "Fit"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2447
+msgid "Fill"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2447
+msgid "Stretch"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2452
+msgid "Scroll"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2459
+msgid "None"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2539
+msgid "Choose a picture"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2541
+msgid "Pictures (*.png *.jpg *.jpeg *.bmp *.gif *.webp)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2548
+msgid "Export lighting profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2550
+#: crates/tsuba-gui/qml/StudioPage.qml:2559
+msgid "Tsuba lighting profile (*.json)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/StudioPage.qml:2557
+msgid "Import lighting profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:147
+#, fuzzy
+msgid "%1 profile"
+msgid_plural "%1 profiles"
+msgstr[0] "プロファイル"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:148
+#, fuzzy
+msgid "%1 macro"
+msgid_plural "%1 macros"
+msgstr[0] "マクロ"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:149
+msgid "%1 effect"
+msgid_plural "%1 effects"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:151
+msgid "device-wide settings for %1 device"
+msgid_plural "device-wide settings for %1 devices"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:152
+msgctxt "%1 is a list such as “2 profiles, 1 macro”"
+msgid "%1 selected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:152
+msgid ""
+"Pick what to bring over. Profiles go into each device's profile library (as "
+"many as you like); macros and effects are saved on this PC."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:229
+msgid "Choose the Windows drive or user folder"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:377
+msgid "◇  %1  (device-wide)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:417
+msgid "IMPORT FROM SYNAPSE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:424
+msgid ""
+"Profiles, macros and Lighting Studio effects from Synapse 4 on a Windows "
+"install. Its files are only read."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:438
+msgid "Synapse data"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:456
+msgid ""
+"No mounted Windows drive with Synapse data was found. Mount the drive in "
+"your file manager, or choose its folder."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:463
+msgid "Choose folder…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:492
+msgid "Choose where the Synapse data is."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:492
+msgid "Reading the Synapse data…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:517
+#, fuzzy
+msgid "Device profiles"
+msgstr "デバイスの画像"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:521
+msgid "Synapse has no device profiles here."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:554
+msgid "%1 PICKED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:561
+msgid "Tsuba isn't running, so nothing can be imported."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:564
+msgid "%1 profile in Synapse → profile library"
+msgid_plural "%1 profiles in Synapse → profile library"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:565
+msgid "%1 profile in Synapse → profile library (not connected)"
+msgid_plural "%1 profiles in Synapse → profile library (not connected)"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:579
+msgid ""
+"Also write the picked profiles into the device's free on-board slots, so its "
+"profile button reaches them without Tsuba."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:583
+msgid "Pinning needs write access"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:584
+msgid "Also pin to device (%2 of %1 free slot)"
+msgid_plural "Also pin to device (%2 of %1 free slots)"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:585
+msgid "No free on-board slot to pin to"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:592
+msgid "Device-wide settings"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:601
+msgid "From “%1”"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:601
+#, fuzzy
+msgid "Keep Tsuba's"
+msgstr "Tsuba を開く"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:616
+msgid ""
+"Polling rate, lighting and the command dial are one setting per device in "
+"Tsuba; pick the profile to take them from."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:626
+msgid "ACTIVE IN SYNAPSE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:626
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:665
+msgid "IN LIBRARY"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:631
+msgid "%1 setting + %2 device-wide · updates the library copy"
+msgid_plural "%1 settings + %2 device-wide · updates the library copy"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:632
+msgid "%1 setting + %2 device-wide"
+msgid_plural "%1 settings + %2 device-wide"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:635
+msgid "%1 setting · updates the library copy"
+msgid_plural "%1 settings · updates the library copy"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:636
+#, fuzzy
+msgid "%1 setting"
+msgid_plural "%1 settings"
+msgstr[0] "設定"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:654
+msgid "Synapse has no macros here."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:667
+msgid "%1 event · replaces the library copy"
+msgid_plural "%1 events · replaces the library copy"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:671
+msgid "Imported with a selected profile that uses it"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:678
+#, fuzzy
+msgid "Lighting Studio effects"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:682
+msgid "Synapse has no Chroma Studio effects here."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:693
+msgid "NAME IN USE"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:694
+msgid "Nothing in it maps to a Tsuba device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:695
+msgid "%1 layer on %2 · saved under a new name"
+msgid_plural "%1 layers on %2 · saved under a new name"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:696
+msgid "%1 layer on %2"
+msgid_plural "%1 layers on %2"
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:705
+msgid "%1 Synapse record couldn't be read and was left out."
+msgid_plural "%1 Synapse records couldn't be read and were left out."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:728
+msgid "Import finished"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:728
+#, fuzzy
+msgid "Importing…"
+msgstr "書き込み中…"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:733
+#, fuzzy
+msgid "Starting…"
+msgstr "書き込み中…"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:773
+msgid "%1 item didn't import; see above."
+msgid_plural "%1 items didn't import; see above."
+msgstr[0] ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:773
+msgid "Everything was imported."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:774
+#, fuzzy
+msgid "Tsuba is running read-only, so nothing can be imported."
+msgstr ""
+"Tsuba サービスは読み取り専用で動作しています。変更はデバイスに送られません。"
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:783
+msgctxt "button: finish"
+msgid "Done"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SynapseImportDialog.qml:791
+msgid "Import selected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:47
+msgid "US (built in)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:57
+msgid "Type “%1”"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:60
+#, fuzzy
+msgid "Text: %1"
+msgstr "ヒント: %1"
+
+#: crates/tsuba-gui/qml/TextEditor.qml:68
+msgid "Text to type"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:77
+msgid "Delay between characters (ms)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:98
+msgid "Keyboard layout"
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:119
+msgid ""
+"“%1” can't be typed with keys on the %2 layout, so Tsuba types this text "
+"itself while its service runs (needs wtype, ydotool or xdotool)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/TextEditor.qml:120
+msgid ""
+"Typed as an on-board macro using the %1 layout; it works without Tsuba "
+"running."
+msgstr ""
+
+#: crates/tsuba-gui/qml/WirelessDimCard.qml:16
+#, fuzzy
+msgid "Lighting dimming"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/qml/WirelessDimCard.qml:17
+msgid ""
+"Saves battery by dimming the lighting. Smart dimming is the device's own "
+"automatic dimming; Dim when idle lowers the lighting after the device has "
+"not been used for a while. Both are stored on the device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/WirelessDimCard.qml:25
+msgid "Smart dimming"
+msgstr ""
+
+#: crates/tsuba-gui/qml/WirelessDimCard.qml:43
+msgid "Dim when idle"
+msgstr ""
+
+#: crates/tsuba-gui/qml/WirelessDimCard.qml:57
+msgid "Dim after being idle for (minutes)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ZoomCanvas.qml:159
+msgid "Zoom out"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ZoomCanvas.qml:176
+msgid "Zoom in"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ZoomCanvas.qml:181
+msgctxt "zoom bar button: fit the whole picture in view"
+msgid "Fit"
+msgstr ""
+
+#: crates/tsuba-gui/qml/ZoomCanvas.qml:182
+msgid "Reset zoom and position"
+msgstr ""
+
+#: crates/tsuba-gui/src/app_backend.rs:253
+#, fuzzy
+msgid "Could not run tsubad: %1"
+msgstr "保存できませんでした: %1"
+
+#: crates/tsuba-gui/src/app_backend.rs:380
+#, fuzzy
+msgid "Started"
+msgstr "はじめる"
+
+#: crates/tsuba-gui/src/app_backend.rs:391
+msgid "Started without the systemd service"
+msgstr ""
+
+#: crates/tsuba-gui/src/app_backend.rs:393
+#, fuzzy
+msgid "Could not start tsubad: %1"
+msgstr "保存できませんでした: %1"
+
+#: crates/tsuba-gui/src/backend.rs:499
+msgid "tsubad isn't running — start it with: systemctl --user start tsubad"
+msgstr ""
+
+#: crates/tsuba-gui/src/backend.rs:1013
+#, fuzzy
+msgid "Device picture: %1"
+msgstr "デバイスの画像"
+
+#: crates/tsuba-gui/src/backend.rs:1124
+msgid "That folder isn't a Wine prefix (it has no drive_c/windows/system32)."
+msgstr ""
+
+#: crates/tsuba-gui/src/backend.rs:1133
+#, fuzzy
+msgid "Couldn't save the setting: %1"
+msgstr "保存できませんでした: %1"
+
+#: crates/tsuba-gui/src/backend.rs:1260
+msgid "Installed in %1 of %2 selected."
+msgstr ""
+
+#: crates/tsuba-gui/src/backend.rs:1262
+msgid "Removed from %1 of %2 selected."
+msgstr ""
+
+#: crates/tsuba-gui/src/studio_api.rs:116
+msgid "Demo device: nothing is written in this mode"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:91
+msgid ""
+"No Synapse data was found there. Pick the Windows drive, its Users folder or "
+"a user folder."
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:95 crates/tsuba-gui/src/synapse.rs:206
+msgid "Couldn't read the Synapse data: %1"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:200
+msgid "Bad selection: %1"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:202
+msgid "The Synapse data is no longer there"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:210
+msgid "D-Bus: %1"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:221
+msgid "Saving macro “%1”…"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:223
+msgid "Macro “%1” saved to the library"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:224
+msgid "Macro “%1”: %2"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:238
+msgid "Saving Lighting Studio effect “%1”…"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:241
+msgid "Lighting Studio effect “%1” saved"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:244
+#, fuzzy
+msgid "Lighting Studio effect “%1”: %2"
+msgstr "Lighting Studio"
+
+#: crates/tsuba-gui/src/synapse.rs:259
+msgid "%1: not available"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:264
+msgid "Adding “%1” to the %2 profile library…"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:269
+msgid "%1 “%2”: %3"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:275
+msgid "%1: “%2” updated in the profile library (%3 settings)"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:277
+msgid "%1: “%2” added to the profile library (%3 settings)"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:283
+msgid ", pinned to on-board slot %1"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:285
+msgid "%1 “%2”: pinning: %3"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:294
+msgid "%1: device-wide settings need the device connected"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:298
+msgid "Applying device-wide settings of “%1” to %2…"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:300
+msgid "%1: %2 (from “%3”)"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:301
+msgid "%1: %2: %3"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:305
+msgid "polling rate %1 Hz"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:311
+#, fuzzy
+msgid "lighting %1"
+msgstr "ゲームライティング"
+
+#: crates/tsuba-gui/src/synapse.rs:313
+msgid "brightness %1%"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:316
+msgid "command dial modes"
+msgstr ""
+
+#: crates/tsuba-gui/src/synapse.rs:320
+msgid "Nothing was selected"
+msgstr ""
+
+#~ msgid "Other"
+#~ msgstr "その他"

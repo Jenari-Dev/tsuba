@@ -17,7 +17,7 @@ Rectangle {
     property real imgH: 0
     property var rect: [0, 0, 1, 1]  // x, y, w, h in drawing space
     property bool placed: false
-    property string title: "Line up your picture"
+    property string title: i18n("Line up your picture")
     signal accepted(real x, real y, real w, real h)
     signal cancelled()
 
@@ -114,7 +114,7 @@ Rectangle {
                 Layout.fillWidth: true
             }
             Text {
-                text: "Drag to move · mouse wheel to resize"
+                text: i18n("Drag to move · mouse wheel to resize")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -198,7 +198,7 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 12
             Text {
-                text: "Size"
+                text: i18nc("picture size slider", "Size")
                 color: Theme.text
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -223,17 +223,17 @@ Rectangle {
             }
             SynButton {
                 objectName: "fitButton"
-                text: "Fit"
+                text: i18nc("button: fit picture", "Fit")
                 onClicked: root.fit()
             }
             SynButton {
                 objectName: "cancelButton"
-                text: "Cancel"
+                text: i18nc("@action:button", "Cancel")
                 onClicked: root.cancelled()
             }
             SynButton {
                 objectName: "saveButton"
-                text: "Save"
+                text: i18nc("@action:button", "Save")
                 primary: true
                 enabled: root.placed
                 onClicked: root.accepted(root.rect[0], root.rect[1], root.rect[2], root.rect[3])

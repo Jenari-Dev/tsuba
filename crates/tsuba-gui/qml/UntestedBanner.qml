@@ -15,6 +15,7 @@ Rectangle {
     property var responded: []
     property bool confirming: false
     property string note: ""
+    property bool noteFailed: false
     signal updated(var support)
 
     readonly property bool untested: support.tested === false && support.supported !== false
@@ -28,6 +29,8 @@ Rectangle {
     function reportText() {
         const f = support.features || {};
         const feats = Object.keys(f).filter(k => f[k]).join(", ");
+        // The report is for the maintainers' issue tracker: always English, never translated.
+        // i18n-ok-begin
         return [
             "Tsuba device report",
             "Name: " + deviceName,
@@ -41,13 +44,16 @@ Rectangle {
             "Settings that answered: " + (responded.length ? responded.join(", ") : "none"),
             "What worked / what didn't: "
         ].join("\n");
+        // i18n-ok-end
     }
     function copyReport() {
         backend.copy_text(reportText());
-        note = "Report copied to the clipboard. Paste it in a GitHub issue.";
+        noteFailed = false;
+        note = i18n("Report copied to the clipboard. Paste it in a GitHub issue.");
     }
     // The toggle: switching on asks first; switching off needs no question.
     function toggle(on) {
+        noteFailed = false;
         note = "";
         if (on) {
             confirming = true;
@@ -59,7 +65,8 @@ Rectangle {
     function apply(allow) {
         const r = backend.set_allow_untested_writes(pid, allow);
         if (r === "") {
-            note = "Failed: " + backend.status;
+            noteFailed = true;
+            note = i18n("Failed: %1", backend.status);
             return;
         }
         confirming = false;
@@ -109,7 +116,7 @@ Rectangle {
             Text {
                 objectName: "bannerText"
                 Layout.fillWidth: true
-                text: bar.allowed ? "Changes allowed — please report how it works." : bar.deviceName + " hasn't been tested with Tsuba yet. Settings are shown read-only."
+                text: bar.allowed ? i18n("Changes allowed — please report how it works.") : i18n("%1 hasn't been tested with Tsuba yet. Settings are shown read-only.", bar.deviceName)
                 color: Theme.text
                 font.family: Theme.font
                 font.pixelSize: bar.allowed ? Theme.small : Theme.fontSize
@@ -118,12 +125,12 @@ Rectangle {
             SynButton {
                 objectName: "reportButton"
                 visible: bar.allowed
-                text: "Report this device"
-                implicitWidth: 150
+                text: i18n("Report this device")
+                minWidth: 150
                 onClicked: bar.copyReport()
             }
             Text {
-                text: "Allow changes"
+                text: i18nc("toggle label", "Allow changes")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -151,7 +158,9 @@ Rectangle {
                 width: parent.width - 28
                 spacing: 10
                 Text {
-                    text: "Allow changes on " + bar.deviceName + "?"
+                    text: i18n("Allow changes on %1?", bar.deviceName)
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
                     color: Theme.textBright
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -159,7 +168,7 @@ Rectangle {
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: "Tsuba's information about this model comes from community sources and hasn't been checked on real hardware. Most settings use the same commands as on tested devices, but a wrong value could leave the device set up oddly until you reset it. Nothing permanent, such as firmware, is ever changed."
+                    text: i18n("Tsuba's information about this model comes from community sources and hasn't been checked on real hardware. Most settings use the same commands as on tested devices, but a wrong value could leave the device set up oddly until you reset it. Nothing permanent, such as firmware, is ever changed.")
                     color: Theme.text
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -169,14 +178,14 @@ Rectangle {
                     spacing: 10
                     SynButton {
                         objectName: "confirmCancel"
-                        text: "Cancel"
+                        text: i18nc("button", "Cancel")
                         onClicked: bar.confirming = false
                     }
                     SynButton {
                         objectName: "confirmAllow"
-                        text: "Allow changes"
+                        text: i18nc("button", "Allow changes")
                         primary: true
-                        implicitWidth: 140
+                        minWidth: 140
                         onClicked: bar.apply(true)
                     }
                 }
@@ -188,7 +197,7 @@ Rectangle {
             visible: bar.note !== ""
             Layout.fillWidth: true
             text: bar.note
-            color: bar.note.indexOf("Failed") === 0 ? Theme.warn : Theme.accent
+            color: bar.noteFailed ? Theme.warn : Theme.accent
             font.family: Theme.font
             font.pixelSize: Theme.small
             wrapMode: Text.WordWrap
@@ -196,7 +205,7 @@ Rectangle {
         Text {
             visible: bar.allowed && bar.note === ""
             Layout.fillWidth: true
-            text: "The report goes to the clipboard — paste it in a GitHub issue."
+            text: i18n("The report goes to the clipboard — paste it in a GitHub issue.")
             color: Theme.textMuted
             font.family: Theme.font
             font.pixelSize: 11

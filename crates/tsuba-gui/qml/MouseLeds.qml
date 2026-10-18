@@ -58,17 +58,17 @@ Item {
             const l = view && view.leds ? view.leds.find(e => e.name === n) : null;
             return l ? l.anchor : (n === "logo" ? [328, 670] : [339, 216]);
         };
-        const logo = at("logo"), wheel = at("scroll wheel");
-        const p = [{ c: 0, x: logo[0] / w, y: logo[1] / h, d: 64, name: "Logo" }, { c: 1, x: wheel[0] / w, y: wheel[1] / h, d: 44, name: "Scroll wheel" }];
+        const logo = at("logo"), wheel = at("scroll wheel"); // i18n-ok: LED anchor name in the pack
+        const p = [{ c: 0, x: logo[0] / w, y: logo[1] / h, d: 64, name: i18nc("mouse LED zone", "Logo") }, { c: 1, x: wheel[0] / w, y: wheel[1] / h, d: 44, name: i18nc("mouse LED zone", "Scroll wheel") }];
         for (let i = 0; i < 11; i++) {
             // Tsuba's line-art pack names each underglow LED; otherwise spread them round the render.
-            const u = at("underglow " + (i + 1));
+            const u = at("underglow " + (i + 1)); // i18n-ok
             if (view && view.leds && view.leds.some(e => e.name === "underglow " + (i + 1))) {
-                p.push({ c: 2 + i, x: u[0] / w, y: u[1] / h, name: "Underglow " + (i + 1) });
+                p.push({ c: 2 + i, x: u[0] / w, y: u[1] / h, name: i18nc("mouse LED zone, %1 is a number", "Underglow %1", i + 1) });
                 continue;
             }
             const a = Math.PI - 0.5 + (i / 10) * (Math.PI + 1.0);
-            p.push({ c: 2 + i, x: 0.5 + 0.46 * Math.cos(a), y: 0.55 - 0.42 * Math.sin(a), name: "Underglow " + (i + 1) });
+            p.push({ c: 2 + i, x: 0.5 + 0.46 * Math.cos(a), y: 0.55 - 0.42 * Math.sin(a), name: i18nc("mouse LED zone, %1 is a number", "Underglow %1", i + 1) });
         }
         return p;
     }

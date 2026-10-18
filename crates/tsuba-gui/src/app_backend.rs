@@ -91,6 +91,7 @@ pub mod qobject {
     impl cxx_qt::Threading for AppBackend {}
 }
 
+use crate::i18n::{tr, trf};
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
@@ -249,7 +250,7 @@ impl qobject::AppBackend {
             let (ok, msg) = match r {
                 Ok(o) if o.status.success() => (true, path.clone()),
                 Ok(o) => (false, String::from_utf8_lossy(&o.stderr).trim().to_string()),
-                Err(e) => (false, format!("could not run tsubad: {e}")),
+                Err(e) => (false, trf("Could not run tsubad: %1", &[&e])),
             };
             let _ = qt.queue(move |mut o| o.as_mut().diagnostics_exported(ok, q(&msg)));
         });
@@ -376,7 +377,7 @@ impl qobject::AppBackend {
 fn start_daemon() -> (bool, String) {
     if let Ok(o) = systemctl(&["start", "tsubad"]) {
         if o.status.success() {
-            return (true, "started".into());
+            return (true, tr("Started"));
         }
     }
     match std::process::Command::new(tsubad_binary())
@@ -387,9 +388,9 @@ fn start_daemon() -> (bool, String) {
     {
         Ok(mut c) => {
             std::thread::spawn(move || c.wait());
-            (true, "started without the systemd service".into())
+            (true, tr("Started without the systemd service"))
         }
-        Err(e) => (false, format!("could not start tsubad: {e}")),
+        Err(e) => (false, trf("Could not start tsubad: %1", &[&e])),
     }
 }
 

@@ -2,6 +2,7 @@
 //! invokable (arguments and results are JSON strings): canvas expansion, profile files,
 //! and the lighting-related daemon calls on the `…Tsuba1.Lighting` D-Bus interface.
 
+use crate::i18n::tr;
 use serde_json::{json, Value};
 use tsuba_core::chroma_profiles::{self as cp, ChromaProfile};
 
@@ -112,9 +113,9 @@ where
     B: serde::Serialize + zbus::zvariant::DynamicType,
 {
     if demo() {
-        return failure("Demo device: nothing is written in this mode");
+        return failure(&tr("Demo device: nothing is written in this mode"));
     }
-    let Some(conn) = connection() else { return failure("tsubad isn't running") };
+    let Some(conn) = connection() else { return failure(&tr("tsubad isn't running")) };
     match conn.call_method(Some(BUS), PATH, Some(IFACE), method, body) {
         Ok(_) => json!({ "ok": true }),
         Err(zbus::Error::MethodError(_, Some(msg), _)) => failure(&msg),

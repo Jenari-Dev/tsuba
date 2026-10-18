@@ -6,6 +6,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
+
+use crate::i18n::{tr, trf};
 use serde_json::{json, Value};
 use tsuba_core::synapse_import::{self as si, Plan};
 use zbus::blocking::Connection;
@@ -86,11 +88,11 @@ fn targets(conn: Option<&Connection>, plan: &Plan) -> BTreeMap<String, Target> {
 pub fn scan_json(path: &str) -> String {
     let t0 = std::time::Instant::now();
     let Some(store) = resolve(path) else {
-        return json!({ "error": "No Synapse data was found there. Pick the Windows drive, its Users folder or a user folder." }).to_string();
+        return json!({ "error": tr("No Synapse data was found there. Pick the Windows drive, its Users folder or a user folder.") }).to_string();
     };
     let plan = match si::scan(&store) {
         Ok(p) => p,
-        Err(e) => return json!({ "error": format!("Couldn't read the Synapse data: {e:#}") }).to_string(),
+        Err(e) => return json!({ "error": trf("Couldn't read the Synapse data: %1", &[&format!("{e:#}")]) }).to_string(),
     };
     let conn = Connection::session().ok();
     let tg = targets(conn.as_ref(), &plan);
@@ -195,17 +197,17 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
     let finish = |done: Vec<String>, failed: Vec<String>| json!({ "done": done, "failed": failed }).to_string();
     let sel: Selection = match serde_json::from_str(selection) {
         Ok(s) => s,
-        Err(e) => return finish(done, vec![format!("Bad selection: {e}")]),
+        Err(e) => return finish(done, vec![trf("Bad selection: %1", &[&e])]),
     };
-    let Some(store) = resolve(path) else { return finish(done, vec!["The Synapse data is no longer there".into()]) };
-    progress("Reading the Synapse data…".into());
+    let Some(store) = resolve(path) else { return finish(done, vec![tr("The Synapse data is no longer there")]) };
+    progress(tr("Reading the Synapse data…"));
     let plan = match si::scan(&store) {
         Ok(p) => p,
-        Err(e) => return finish(done, vec![format!("Couldn't read the Synapse data: {e:#}")]),
+        Err(e) => return finish(done, vec![trf("Couldn't read the Synapse data: %1", &[&format!("{e:#}")])]),
     };
     let conn = match Connection::session() {
         Ok(c) => c,
-        Err(e) => return finish(done, vec![format!("D-Bus: {e}")]),
+        Err(e) => return finish(done, vec![trf("D-Bus: %1", &[&e])]),
     };
     let tg = targets(Some(&conn), &plan);
 
@@ -216,10 +218,10 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
         d.profiles.iter().filter(|p| chosen.contains(&p.guid)).for_each(|p| want.extend(p.macros.iter().cloned()));
     }
     for m in plan.macros.iter().filter(|m| want.contains(&m.guid)) {
-        progress(format!("Saving macro “{}”…", m.name));
+        progress(trf("Saving macro “%1”…", &[&m.name]));
         match call::<_, String>(&conn, "SaveMacro", &(serde_json::to_string(&m.mac).unwrap_or_default(),)) {
-            Ok(_) => done.push(format!("Macro “{}” saved to the library", m.name)),
-            Err(e) => failed.push(format!("Macro “{}”: {e}", m.name)),
+            Ok(_) => done.push(trf("Macro “%1” saved to the library", &[&m.name])),
+            Err(e) => failed.push(trf("Macro “%1”: %2", &[&m.name, &e])),
         }
     }
 
@@ -233,13 +235,13 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
         for l in plan.lighting.iter().filter(|l| sel.lighting.contains(&l.id) && l.importable) {
             let mut prof = l.profile.clone();
             prof.name = unique_name(&l.name, &taken);
-            progress(format!("Saving Lighting Studio effect “{}”…", prof.name));
+            progress(trf("Saving Lighting Studio effect “%1”…", &[&prof.name]));
             match call::<_, Vec<String>>(&conn, "SaveChromaProfile", &(serde_json::to_string(&prof).unwrap_or_default(), false)) {
                 Ok(_) => {
-                    done.push(format!("Lighting Studio effect “{}” saved", prof.name));
+                    done.push(trf("Lighting Studio effect “%1” saved", &[&prof.name]));
                     taken.insert(prof.name);
                 }
-                Err(e) => failed.push(format!("Lighting Studio effect “{}”: {e}", l.name)),
+                Err(e) => failed.push(trf("Lighting Studio effect “%1”: %2", &[&l.name, &e])),
             }
         }
     }
@@ -254,30 +256,33 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
         }
         let dname = d.name.trim_start_matches("Razer ");
         let Some(t) = tg.get(pid) else {
-            failed.push(format!("{dname}: not available"));
+            failed.push(trf("%1: not available", &[&dname]));
             continue;
         };
         let mut pins = if sel.pin.get(pid).copied().unwrap_or(false) { t.free_pins } else { 0 };
         for p in d.profiles.iter().filter(|p| chosen.contains(&p.guid)) {
-            progress(format!("Adding “{}” to the {dname} profile library…", p.name));
+            progress(trf("Adding “%1” to the %2 profile library…", &[&p.name, &dname]));
             let prof = tsuba_core::library::LibraryProfile::from_synapse(&t.pid, p);
             let id: String = match call(&conn, "SaveLibraryProfile", &(t.pid.clone(), serde_json::to_string(&prof).unwrap_or_default())) {
                 Ok(id) => id,
                 Err(e) => {
-                    failed.push(format!("{dname} “{}”: {e}", p.name));
+                    failed.push(trf("%1 “%2”: %3", &[&dname, &p.name, &e]));
                     continue;
                 }
             };
             let n = prof.assignments.len() + prof.macros.len() + prof.actions.len() + usize::from(prof.performance.is_some());
-            let verb = if t.in_library.contains(&p.guid) { "updated in" } else { "added to" };
-            let mut line = format!("{dname}: “{}” {verb} the profile library ({n} setting(s))", p.name);
+            let mut line = if t.in_library.contains(&p.guid) {
+                trf("%1: “%2” updated in the profile library (%3 settings)", &[&dname, &p.name, &n])
+            } else {
+                trf("%1: “%2” added to the profile library (%3 settings)", &[&dname, &p.name, &n])
+            };
             if pins > 0 {
                 match call::<_, u8>(&conn, "PinLibraryProfile", &(t.pid.clone(), id.clone(), 0u8)) {
                     Ok(slot) => {
                         pins -= 1;
-                        line.push_str(&format!(", pinned to on-board slot {slot}"));
+                        line.push_str(&trf(", pinned to on-board slot %1", &[&slot]));
                     }
-                    Err(e) => failed.push(format!("{dname} “{}”: pinning: {e}", p.name)),
+                    Err(e) => failed.push(trf("%1 “%2”: pinning: %3", &[&dname, &p.name, &e])),
                 }
             }
             done.push(line);
@@ -286,33 +291,33 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
         // Device-wide settings from one profile (written to the attached device).
         let Some(p) = settings_from.and_then(|g| d.profiles.iter().find(|p| &p.guid == g)) else { continue };
         if !t.attached {
-            failed.push(format!("{dname}: device-wide settings need the device connected"));
+            failed.push(trf("%1: device-wide settings need the device connected", &[&dname]));
             continue;
         }
         let dw = &p.device_wide;
-        progress(format!("Applying device-wide settings of “{}” to {dname}…", p.name));
+        progress(trf("Applying device-wide settings of “%1” to %2…", &[&p.name, &dname]));
         let mut step = |what: &str, r: Result<(), String>| match r {
-            Ok(()) => done.push(format!("{dname}: {what} (from “{}”)", p.name)),
-            Err(e) => failed.push(format!("{dname}: {what}: {e}")),
+            Ok(()) => done.push(trf("%1: %2 (from “%3”)", &[&dname, &what, &p.name])),
+            Err(e) => failed.push(trf("%1: %2: %3", &[&dname, &what, &e])),
         };
         if let Some(hz) = dw.polling_hz {
             let j = json!({ "polling_hz": hz });
-            step(&format!("polling rate {hz} Hz"), call::<_, Vec<String>>(&conn, "SetPerformance", &(t.pid.clone(), j.to_string())).map(|_| ()));
+            step(&trf("polling rate %1 Hz", &[&hz])), call::<_, Vec<String>>(&conn, "SetPerformance", &(t.pid.clone(), j.to_string())).map(|_| ()));
         }
         let b = dw.brightness.unwrap_or(255);
         if let Some(e) = &dw.effect {
             let ej = serde_json::to_string(e).unwrap_or_default();
             let r = call::<_, Vec<String>>(&conn, "SetEffect", &(t.pid.clone(), ej.clone(), b)).and_then(|_| call::<_, ()>(&conn, "SaveLighting", &(t.pid.clone(), ej, b)));
-            step(&format!("lighting {}", tsuba_core::config::effect_name(e)), r);
+            step(&trf("lighting %1", &[&tsuba_core::config::effect_name(e)]), r);
         } else if let Some(pc) = dw.brightness {
-            step(&format!("brightness {pc}%"), call::<_, ()>(&conn, "SetBrightness", &(t.pid.clone(), pc)));
+            step(&trf("brightness %1%", &[&pc])), call::<_, ()>(&conn, "SetBrightness", &(t.pid.clone(), pc)));
         }
         if let Some(slots) = &dw.dial {
-            step("command dial modes", call::<_, Vec<String>>(&conn, "SetDial", &(t.pid.clone(), serde_json::to_string(slots).unwrap_or_default())).map(|_| ()));
+            step(&tr("command dial modes"), call::<_, Vec<String>>(&conn, "SetDial", &(t.pid.clone(), serde_json::to_string(slots).unwrap_or_default())).map(|_| ()));
         }
     }
     if done.is_empty() && failed.is_empty() {
-        failed.push("Nothing was selected".into());
+        failed.push(tr("Nothing was selected"));
     }
     finish(done, failed)
 }

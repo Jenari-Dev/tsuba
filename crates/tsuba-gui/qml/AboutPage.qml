@@ -23,12 +23,12 @@ Rectangle {
     function detailLines() {
         const d = details;
         const lines = [
-            "Tsuba " + (d.app || "?"),
-            "Service: " + (d.daemon ? d.daemon + (d.daemon_read_only ? " (read-only)" : "") : "not running"),
-            "System: " + (d.system || "?"),
-            "Kernel: " + (d.kernel || "?"),
-            "Desktop: " + (d.desktop || "?") + (d.session ? " / " + d.session : ""),
-            "Architecture: " + (d.arch || "?")
+            i18n("Tsuba %1", d.app || "?"),
+            d.daemon ? (d.daemon_read_only ? i18n("Service: %1 (read-only)", d.daemon) : i18n("Service: %1", d.daemon)) : i18n("Service: not running"),
+            i18n("System: %1", d.system || "?"),
+            i18n("Kernel: %1", d.kernel || "?"),
+            d.session ? i18n("Desktop: %1 / %2", d.desktop || "?", d.session) : i18n("Desktop: %1", d.desktop || "?"),
+            i18n("Architecture: %1", d.arch || "?")
         ];
         return lines;
     }
@@ -71,7 +71,7 @@ Rectangle {
                 ColumnLayout {
                     spacing: 4
                     Text {
-                        text: "Tsuba"
+                        text: "Tsuba" // i18n-ok: product name
                         color: Theme.textBright
                         font.family: Theme.titleFont
                         font.pixelSize: 30

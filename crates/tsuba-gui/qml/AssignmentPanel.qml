@@ -40,6 +40,11 @@ Rectangle {
     property string open: ""          // expanded category
     property var captured: null       // keyboard function [modifier, usage]
     property string result: ""
+    property bool resultFailed: false
+    function setResult(text, failed) {
+        resultFailed = !!failed;
+        result = text;
+    }
     property var macroLib: []          // library macros, loaded when the Macro category opens
     property int macroIdx: 0
     property int playback: 0           // once, times, while_held, toggle, sequence
@@ -81,7 +86,7 @@ Rectangle {
         const j = JSON.parse(s);
         macroLib = j.library;
         if (macroLib.length === 0 && backend.env_var("TSUBA_DEMO") === "1") {   // headless UI check
-            macroLib = [{ guid: "d1", name: "Demo: copy line" }, { guid: "d2", name: "Demo: sign-off" }, { guid: "d3", name: "Demo: open terminal" }];
+            macroLib = [{ guid: "d1", name: "Demo: copy line" }, { guid: "d2", name: "Demo: sign-off" }, { guid: "d3", name: "Demo: open terminal" }];   // i18n-ok: demo data
         }
         const names = {};
         for (const p in j.devices) {
@@ -134,7 +139,7 @@ Rectangle {
     // Software actions: the key sends a shortcut-slot key combination that tsubad acts on.
     function assignAction(action) {
         const r = backend.assign_action(pid, JSON.stringify({ profile: profile, key: target, layer: keyLayer, action: action }));
-        result = r === "" ? "Failed: " + backend.status : "Saved: " + r;
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : i18n("Saved: %1", r), r === "");
         if (r !== "") {
             afterSave(true);
             return true;
@@ -151,7 +156,7 @@ Rectangle {
 
     // A library macro for `events`, reusing an identical one; "" on failure.
     function ensureMacro(name, events) {
-        const lib = JSON.parse(backend.macros() || "{\"library\": []}").library;
+        const lib = JSON.parse(backend.macros() || "{\"library\": []}").library;   // i18n-ok
         const same = lib.find(m => JSON.stringify(m.events) === JSON.stringify(events));
         if (same) {
             return same.guid;
@@ -162,11 +167,11 @@ Rectangle {
     function assignEventsMacro(name, events) {
         const guid = ensureMacro(name, events);
         if (guid === "") {
-            result = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
             return false;
         }
         const r = backend.assign_macro(pid, JSON.stringify({ profile: profile, key: target, layer: keyLayer, guid: guid, playback: "once", count: 1 }));
-        result = r === "" ? "Failed: " + backend.status : "Saved: " + name;
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : i18n("Saved: %1", name), r === "");
         if (r !== "") {
             afterSave(true);
             return true;
@@ -182,8 +187,8 @@ Rectangle {
             return false;
         }
         const r = backend.assign_macro(pid, JSON.stringify({ profile: profile, key: target, layer: keyLayer, guid: m.guid, playback: playbackIds[playback], count: repeatCount }));
-        result = r === "" ? "Failed: " + backend.status : "Saved: " + r;
-        console.log("assign macro", pid, target, keyLayer, m.name, "->", result);
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : i18n("Saved: %1", r), r === "");
+        console.log("assign macro", pid, target, keyLayer, m.name, "->", result);   // i18n-ok
         if (r !== "") {
             afterSave(true);
             return true;
@@ -229,12 +234,12 @@ Rectangle {
             const cur = allAssignments[target];
             const isLeft = a => a && a.function === 1 && a.data[0] === 1;
             if (isLeft(cur) && !Object.keys(allAssignments).some(k => +k !== target && isLeft(allAssignments[k]))) {
-                result = "Failed: left click has to stay on at least one button";
+                setResult(i18n("Failed: left click has to stay on at least one button"), true);
                 return false;
             }
         }
         const r = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: target, layer: keyLayer, function: fn, data: data }));
-        result = r === "" ? "Failed: " + backend.status : "Saved: " + r;
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : i18n("Saved: %1", r), r === "");
         console.log("assignment", pid, target, keyLayer, fn, JSON.stringify(data), "->", result);
         if (r !== "") {
             const d = defaultFor(target);
@@ -346,9 +351,13 @@ Rectangle {
                 width: 130
                 height: 34
                 radius: 3
-                color: cancelHover.hovered ? "#707070" : "#5d5d5d"
+                color: cancelHover.hovered ? Theme.pressedFill : Theme.controlFill
+                border.color: Theme.controlBorder
                 Text {
                     anchors.centerIn: parent
+                    width: parent.width - 12
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     text: i18n("CANCEL")
                     color: Theme.textBright
                     font.family: Theme.font
@@ -371,6 +380,9 @@ Rectangle {
                 color: saveHover.hovered ? Theme.accentHover : Theme.accent
                 Text {
                     anchors.centerIn: parent
+                    width: parent.width - 12
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     text: i18n("SAVE")
                     color: Theme.accentText
                     font.family: Theme.font
@@ -451,7 +463,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 38
                 visible: root.targetName !== "" && !root.locked
-                color: typeHover.hovered ? "#2d2d2d" : "transparent"
+                color: typeHover.hovered ? Theme.hoverFill : "transparent"
                 Text {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
@@ -498,7 +510,7 @@ Rectangle {
                     visible: !modelData.mouseOnly || root.isMouse
                     Layout.fillWidth: true
                     Layout.preferredHeight: visible ? 32 : 0
-                    color: ch.hovered ? "#2d2d2d" : "transparent"
+                    color: ch.hovered ? Theme.hoverFill : "transparent"
                     opacity: root.target < 0 ? 0.4 : 1
                     Text {
                         anchors.left: parent.left
@@ -659,7 +671,7 @@ Rectangle {
                             label: modelData[0]
                             on: root.assignment && root.assignment.function === 6 && root.assignment.data[0] === modelData[1]
                             chosen: root.stagedId === "dpi:" + modelData[1]
-                            onPicked: root.stage("dpi:" + modelData[1], modelData[0], () => root.save(6, [modelData[1]]))
+                            onPicked: root.stage("dpi:" + modelData[1], modelData[0], () => root.save(6, [modelData[1]]))   // i18n-ok
                         }
                     }
                     RowLayout {
@@ -680,8 +692,8 @@ Rectangle {
                         }
                         SynButton {
                             text: i18n("Select")
-                            implicitWidth: 72
-                            onClicked: root.stage("dpi:clutch", i18n("Sensitivity clutch %1 DPI", clutchDpi.value), () => root.save(6, [5, clutchDpi.value >> 8, clutchDpi.value & 255, clutchDpi.value >> 8, clutchDpi.value & 255]))
+                            minWidth: 72
+                            onClicked: root.stage("dpi:clutch", i18n("Sensitivity clutch %1 DPI", clutchDpi.value), () => root.save(6, [5, clutchDpi.value >> 8, clutchDpi.value & 255, clutchDpi.value >> 8, clutchDpi.value & 255]))   // i18n-ok
                         }
                     }
                     RowLayout {
@@ -700,8 +712,8 @@ Rectangle {
                         }
                         SynButton {
                             text: i18n("Select")
-                            implicitWidth: 72
-                            onClicked: root.stage("dpi:jump", i18n("Jump to stage %1", jumpStage.value), () => root.save(6, [3, jumpStage.value]))
+                            minWidth: 72
+                            onClicked: root.stage("dpi:jump", i18n("Jump to stage %1", jumpStage.value), () => root.save(6, [3, jumpStage.value]))   // i18n-ok
                         }
                     }
                 }
@@ -798,7 +810,7 @@ Rectangle {
                             label: modelData[0]
                             on: root.assignment && root.assignment.function === 10 && root.assignment.data[1] === modelData[1]
                             chosen: root.stagedId === "media:" + modelData[1]
-                            onPicked: root.stage("media:" + modelData[1], modelData[0], () => root.save(10, [0, modelData[1]]))
+                            onPicked: root.stage("media:" + modelData[1], modelData[0], () => root.save(10, [0, modelData[1]]))   // i18n-ok
                         }
                     }
                 }
@@ -825,7 +837,7 @@ Rectangle {
                             label: modelData[0]
                             on: !!root.assignment && root.assignment.function === 7 && root.assignment.data[0] === modelData[1]
                             chosen: root.stagedId === "profile:" + modelData[1]
-                            onPicked: root.stage("profile:" + modelData[1], modelData[0], () => root.save(7, [modelData[1]]))
+                            onPicked: root.stage("profile:" + modelData[1], modelData[0], () => root.save(7, [modelData[1]]))   // i18n-ok
                         }
                     }
                     RowLayout {
@@ -844,8 +856,8 @@ Rectangle {
                         }
                         SynButton {
                             text: i18n("Select")
-                            implicitWidth: 72
-                            onClicked: root.stage("profile:slot", i18n("Switch to slot %1", profileTarget.value), () => root.save(7, [3, profileTarget.value]))
+                            minWidth: 72
+                            onClicked: root.stage("profile:slot", i18n("Switch to slot %1", profileTarget.value), () => root.save(7, [3, profileTarget.value]))   // i18n-ok
                         }
                     }
                 }
@@ -883,7 +895,7 @@ Rectangle {
                             label: modelData[0]
                             on: !!root.assignment && root.assignment.function === 9 && root.assignment.data[0] === modelData[1]
                             chosen: root.stagedId === "system:" + modelData[1]
-                            onPicked: root.stage("system:" + modelData[1], modelData[0], () => root.save(9, [modelData[1]]))
+                            onPicked: root.stage("system:" + modelData[1], modelData[0], () => root.save(9, [modelData[1]]))   // i18n-ok
                         }
                     }
                 }
@@ -900,7 +912,7 @@ Rectangle {
                             label: modelData[0]
                             on: !!root.assignment && root.assignment.function === 18 && root.assignment.data[0] === modelData[1]
                             chosen: root.stagedId === "scroll:" + modelData[1]
-                            onPicked: root.stage("scroll:" + modelData[1], modelData[0], () => root.save(18, [modelData[1]]))
+                            onPicked: root.stage("scroll:" + modelData[1], modelData[0], () => root.save(18, [modelData[1]]))   // i18n-ok
                         }
                     }
                 }
@@ -947,10 +959,11 @@ Rectangle {
                         delegate: OptionRow {
                             required property var modelData
                             label: modelData[0]
-                            chosen: root.stagedId === "inter:" + modelData[0]
+                            readonly property string stageKey: "inter:" + (modelData[1] ? modelData[1].op : "dpi_clutch")   // i18n-ok
+                            chosen: root.stagedId === stageKey
                             onPicked: {
                                 const op = modelData[1] || { op: "dpi_clutch", dpi: interClutch.value };
-                                root.stage("inter:" + modelData[0], modelData[0], () => root.assignAction({ type: "device", target: root.otherDevices[root.interTarget].pid, op: op }));
+                                root.stage(stageKey, modelData[0], () => root.assignAction({ type: "device", target: root.otherDevices[root.interTarget].pid, op: op }));
                             }
                         }
                     }
@@ -1016,10 +1029,11 @@ Rectangle {
                             required property var modelData
                             objectName: "light_" + modelData[1].op
                             label: modelData[0]
-                            chosen: root.stagedId === "light:" + lightingEd.targetIdx + ":" + modelData[0]
+                            readonly property string stageKey: "light:" + lightingEd.targetIdx + ":" + modelData[1].op + (modelData[1].effect ? ":" + modelData[1].effect.type : "")   // i18n-ok
+                            chosen: root.stagedId === stageKey
                             onPicked: {
                                 const tgt = lightingEd.targets[lightingEd.targetIdx].pid;
-                                root.stage("light:" + lightingEd.targetIdx + ":" + modelData[0], modelData[0], () => root.assignAction({ type: "device", target: tgt, op: modelData[1] }));
+                                root.stage(stageKey, modelData[0], () => root.assignAction({ type: "device", target: tgt, op: modelData[1] }));
                             }
                         }
                     }
@@ -1032,8 +1046,9 @@ Rectangle {
                             required property var modelData
                             objectName: "studio_" + (modelData[1].name || modelData[1].op)
                             label: modelData[0]
-                            chosen: root.stagedId === "studio:" + modelData[0]
-                            onPicked: root.stage("studio:" + modelData[0], modelData[0], () => root.assignAction({ type: "device", target: "all", op: modelData[1] }))
+                            readonly property string stageKey: "studio:" + modelData[1].op + ":" + (modelData[1].name || "")   // i18n-ok
+                            chosen: root.stagedId === stageKey
+                            onPicked: root.stage(stageKey, modelData[0], () => root.assignAction({ type: "device", target: "all", op: modelData[1] }))
                         }
                     }
                 }
@@ -1080,7 +1095,7 @@ Rectangle {
                 Layout.fillWidth: true
                 visible: root.result !== ""
                 text: root.result
-                color: root.result.startsWith("Saved") ? Theme.accent : Theme.warn
+                color: root.resultFailed ? Theme.warn : Theme.accent
                 font.family: Theme.font
                 font.pixelSize: Theme.small
                 wrapMode: Text.Wrap
@@ -1098,7 +1113,7 @@ Rectangle {
         visible: root.noticeOpen
         anchors.fill: parent
         z: 20
-        color: "#e61a1a1a"
+        color: Theme.overlayPanel
         MouseArea {
             anchors.fill: parent
         }

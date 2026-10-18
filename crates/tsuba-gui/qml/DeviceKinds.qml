@@ -107,7 +107,7 @@ QtObject {
     // Tab ids for the device page, from the support JSON; `hasPower` is whether the device
     // answered a power query. Without support information (old daemon) the classic three tabs.
     function tabsFor(sup, hasPower) {
-        const classic = hasPower ? ["Customize", "Performance", "Lighting", "Power"] : ["Customize", "Performance", "Lighting"];
+        const classic = hasPower ? ["Customize", "Performance", "Lighting", "Power"] : ["Customize", "Performance", "Lighting"]; // i18n-ok: tab id
         if (!sup || !sup.kind) {
             return classic;
         }
@@ -119,16 +119,16 @@ QtObject {
         }
         const t = [];
         if (remaps(sup)) {
-            t.push("Customize");
+            t.push("Customize"); // i18n-ok: tab id
         }
         if (hasPerformance(sup)) {
-            t.push("Performance");
+            t.push("Performance"); // i18n-ok: tab id
         }
         if (hasLighting(sup)) {
-            t.push("Lighting");
+            t.push("Lighting"); // i18n-ok: tab id
         }
         if (hasPower || feat(sup, "battery")) {
-            t.push("Power");
+            t.push("Power"); // i18n-ok: tab id
         }
         return t.length ? t : ["Info"];
     }

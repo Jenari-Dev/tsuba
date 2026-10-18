@@ -121,10 +121,11 @@ Item {
             height: r.height
             readonly property bool strip: modelData.group === "underglow"
             radius: round ? width / 2 : (strip ? 2 : 4)
-            color: hex === "000000" ? "transparent" : "#" + hex
+            color: hex === "000000" ? "transparent" : "#" + hex   // LED colour: intentional
             opacity: hex === "000000" ? 1 : 0.72
             border.width: sel ? 2 : 1
-            border.color: sel ? "#ffffff" : (hex === "000000" ? "#55cccccc" : "#" + hex)
+            border.color: sel ? "#ffffff" : (hex === "000000" ? "#55cccccc" : "#" + hex)   // device drawing: intentional
+
             Rectangle {
                 visible: parent.sel
                 anchors.fill: parent

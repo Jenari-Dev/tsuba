@@ -54,7 +54,10 @@ Rectangle {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             text: chip.caption
+            width: Math.min(implicitWidth, 280)
+            elide: Text.ElideRight
             color: Theme.text
+
             font.family: Theme.font
             font.pixelSize: Theme.small
         }

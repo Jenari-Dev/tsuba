@@ -19,6 +19,12 @@ Rectangle {
     // Bumped when the tabs must re-read the slot (another profile was written into it).
     property int libRev: 0
     property string profileStatus: ""
+    // The status text is an error (set together with the text; never inferred from it).
+    property bool profileFailed: false
+    function setStatus(text, failed) {
+        profileFailed = !!failed;
+        profileStatus = text;
+    }
     // Library profile being activated ("" when idle).
     property string switching: ""
     // Profile to delete once the switch away from it finished.
@@ -65,19 +71,26 @@ Rectangle {
                 failed.push(path.split("/").pop() + ": " + lp.error);
             }
         });
-        profileStatus = (ok > 0 ? i18np("Imported %1 profile", "Imported %1 profiles", ok) : "") + (failed.length ? (ok > 0 ? "; " : "Failed: ") + failed.join("; ") : "");
+        if (failed.length === 0) {
+            setStatus(ok > 0 ? i18np("Imported %1 profile", "Imported %1 profiles", ok) : "", false);
+        } else if (ok > 0) {
+            setStatus(i18np("Imported %1 profile; %2", "Imported %1 profiles; %2", ok, failed.join("; ")), false);
+        } else {
+            setStatus(i18n("Failed: %1", failed.join("; ")), true);
+        }
         loadProfiles();
         Theme.profilesRev++;
     }
     function exportOne(url) {
         const p = current;
         const path = lp.pathOfUrl(url);
-        profileStatus = lp.call("Tsuba1.ExportLibraryProfile", [pid, p.id, path]) !== null ? i18n("Exported “%1”", p.name) : "Failed: " + lp.error;
+        const ok = lp.call("Tsuba1.ExportLibraryProfile", [pid, p.id, path]) !== null;
+        setStatus(ok ? i18n("Exported “%1”", p.name) : i18n("Failed: %1", lp.error), !ok);
     }
     function exportMany(url) {
         const ids = Object.keys(exportSel).filter(k => exportSel[k]);
         const r = lp.json("ExportLibraryProfiles", [pid, JSON.stringify(ids), lp.pathOfUrl(url)], null);
-        profileStatus = r ? i18np("Exported %1 profile", "Exported %1 profiles", r.length) : "Failed: " + lp.error;
+        setStatus(r ? i18np("Exported %1 profile", "Exported %1 profiles", r.length) : i18n("Failed: %1", lp.error), !r);
     }
     // Profiles ticked in the "Export…" list.
     property var exportSel: ({})
@@ -96,7 +109,7 @@ Rectangle {
         const ok = lp.call("SetProfileLighting", [pid, p.id, on ? "current" : "off"]) !== null;
         profileAction(ok, on ? i18n("“%1” now keeps its own lighting", p.name) : i18n("“%1” no longer changes the lighting", p.name));
         if (!ok) {
-            profileStatus = "Failed: " + lp.error;
+            setStatus(i18n("Failed: %1", lp.error), true);
         }
     }
 
@@ -126,7 +139,7 @@ Rectangle {
             return current.name;
         }
         const s = (lib.slots || []).find(x => x.slot === lib.active_slot);
-        return s ? (s.name !== "" ? s.name : "On-board profile " + s.slot) : "";
+        return s ? (s.name !== "" ? s.name : i18n("On-board profile %1", s.slot)) : "";
     }
 
     // Re-read the library; returns true when the active profile changed.
@@ -150,12 +163,12 @@ Rectangle {
             return;
         }
         switching = id;
-        profileStatus = "";
+        setStatus("", false);
         backend.activate_library_profile(pid, id);
     }
 
     function profileAction(ok, done) {
-        profileStatus = ok ? done : "Failed: " + backend.status;
+        setStatus(ok ? done : i18n("Failed: %1", backend.status), !ok);
         loadProfiles();
         Theme.profilesRev++;
     }
@@ -180,7 +193,7 @@ Rectangle {
             activate(to.id);
             return;
         }
-        profileAction(backend.delete_library_profile(pid, id), "Deleted “" + p.name + "”");
+        profileAction(backend.delete_library_profile(pid, id), i18n("Deleted “%1”", p.name));
     }
 
     // What the database says about this model, and whether the daemon lets it be changed.
@@ -203,15 +216,17 @@ Rectangle {
         const s = backend.power(pid);
         return s !== "" && JSON.parse(s).sleep_seconds !== undefined;
     }
+    // i18n-ok-begin: the keys are tab ids
     readonly property var tabHelp: ({
-        "Info": "What Tsuba knows about this model.",
-        "Customize": "Click a key or button to see what it does and change it. Changes are saved in the active profile and written to the device's on-board memory, so they keep working without Tsuba. Remapped keys are shown in the accent colour.",
-        "Performance": "Settings that change how the device behaves: sensitivity, polling rate, scrolling, Game Mode and similar. Most are stored on the device's current profile.",
-        "Lighting": "Pick a colour and effect for this device, set its brightness, or play a Lighting Studio profile across all your devices.",
-        "Power": "Battery level, charging state and power-saving options for this wireless device."
+        "Info": i18n("What Tsuba knows about this model."),
+        "Customize": i18n("Click a key or button to see what it does and change it. Changes are saved in the active profile and written to the device's on-board memory, so they keep working without Tsuba. Remapped keys are shown in the accent colour."),
+        "Performance": i18n("Settings that change how the device behaves: sensitivity, polling rate, scrolling, Game Mode and similar. Most are stored on the device's current profile."),
+        "Lighting": i18n("Pick a colour and effect for this device, set its brightness, or play a Lighting Studio profile across all your devices."),
+        "Power": i18n("Battery level, charging state and power-saving options for this wireless device.")
     })
+    // i18n-ok-end
     readonly property var tabs: DeviceKinds.tabsFor(sup, hasPower)
-    readonly property var stackOrder: ["Customize", "Performance", "Lighting", "Power", "Info"]
+    readonly property var stackOrder: ["Customize", "Performance", "Lighting", "Power", "Info"]   // i18n-ok: tab ids
     function tabActive(name) {
         return tabs.indexOf(name) >= 0;
     }
@@ -228,7 +243,7 @@ Rectangle {
         Text {
             id: sbt
             anchors.centerIn: parent
-            text: "SLOT " + parent.slot
+            text: i18n("SLOT %1", parent.slot)
             color: parent.held ? Theme.textDim : Theme.borderSoft
             font.family: Theme.font
             font.pixelSize: 9
@@ -298,6 +313,7 @@ Rectangle {
     // Which settings groups the device answers (for the "Report this device" text).
     function probe() {
         const out = [];
+        // i18n-ok-begin: names of settings groups for the English-only device report
         [["profiles", "profiles"], ["performance", "performance"], ["power", "power"], ["game_mode", "game mode"], ["lighting_power", "lighting power"]].forEach(p => {
             const r = p[0] === "performance" ? backend.performance(pid, 1) : backend[p[0]](pid);
             if (r !== "" && r !== undefined) {
@@ -307,6 +323,7 @@ Rectangle {
         if (st.lighting && st.lighting.length) {
             out.push("lighting");
         }
+        // i18n-ok-end
         responded = out;
     }
 
@@ -323,7 +340,7 @@ Rectangle {
             moreMenu.open();
         }
         if (backend.env_var("TSUBA_SYNAPSE") !== "") {   // headless UI check
-            synapseDlg.open("device:" + pid);
+            synapseDlg.open("device:" + pid);   // i18n-ok
         }
     }
 
@@ -361,15 +378,17 @@ Rectangle {
                 return;
             }
             const p = page.profileById(page.switching);
-            const name = p ? p.name : "The profile";
+            const name = p ? p.name : i18n("The profile");
             page.switching = "";
             if (ok) {
                 const r = JSON.parse(result);
                 const n = r.writes || 0;
-                page.profileStatus = name + " is active" + (n > 0 ? " (" + n + (n === 1 ? " change" : " changes") + " written)" : "")
-                    + (r.warnings && r.warnings.length ? "; " + r.warnings.length + " setting(s) couldn't be written: " + r.warnings[0] : "");
+                const head = n > 0 ? i18np("%2 is active (%1 change written)", "%2 is active (%1 changes written)", n, name) : i18n("%1 is active", name);
+                const nw = r.warnings ? r.warnings.length : 0;
+                const warn = nw > 0 ? i18np("%1 setting couldn't be written: %2", "%1 settings couldn't be written: %2", nw, r.warnings[0]) : "";
+                page.setStatus(warn !== "" ? i18nc("profile is active; followed by a warning", "%1; %2", head, warn) : head, false);
             } else {
-                page.profileStatus = "Failed: " + result;
+                page.setStatus(i18n("Failed: %1", result), true);
             }
             page.loadProfiles();
             page.libRev++;
@@ -387,7 +406,7 @@ Rectangle {
         interval: 300
         onTriggered: {
             if (page.loadProfiles()) {
-                page.profileStatus = page.currentName() + " is active";
+                page.setStatus(i18n("%1 is active", page.currentName()), false);
                 page.libRev++;
             }
         }
@@ -454,7 +473,7 @@ Rectangle {
                         anchors.right: badges.left
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
-                        text: page.switching !== "" ? "Switching to " + (page.profileById(page.switching) || { name: "…" }).name + "…" : page.currentName()
+                        text: page.switching !== "" ? i18n("Switching to %1…", (page.profileById(page.switching) || { name: "…" }).name) : page.currentName()
                         color: page.switching !== "" ? Theme.textDim : Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
@@ -473,7 +492,7 @@ Rectangle {
                         }
                         Text {
                             visible: page.switching === "" && !page.current && page.lib.active_slot > 0
-                            text: "ON-BOARD"
+                            text: i18n("ON-BOARD")
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: 10
@@ -496,7 +515,7 @@ Rectangle {
                     TapHandler {
                         onTapped: {
                             page.loadProfiles();
-                            page.profileStatus = "";
+                            page.setStatus("", false);
                             profileMenu.open();
                         }
                     }
@@ -528,7 +547,7 @@ Rectangle {
                                     readonly property bool isActive: modelData.id === page.lib.active
                                     width: ListView.view.width
                                     height: 36
-                                    color: rh.hovered ? "#2d2d2d" : "transparent"
+                                    color: rh.hovered ? Theme.hoverFill : "transparent"
                                     RowLayout {
                                         anchors.fill: parent
                                         anchors.leftMargin: 12
@@ -559,7 +578,7 @@ Rectangle {
                                         }
                                         Text {
                                             visible: isActive
-                                            text: "ACTIVE"
+                                            text: i18n("ACTIVE")
                                             color: Theme.accent
                                             font.family: Theme.font
                                             font.pixelSize: 10
@@ -583,7 +602,7 @@ Rectangle {
                                 visible: !page.current && page.lib.active_slot > 0
                                 Layout.fillWidth: true
                                 Layout.margins: 10
-                                text: "The device runs on-board profile " + page.lib.active_slot + ", which isn't in the library. Pick a profile to switch."
+                                text: i18n("The device runs on-board profile %1, which isn't in the library. Pick a profile to switch.", page.lib.active_slot)
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
@@ -593,7 +612,7 @@ Rectangle {
                                 visible: page.writesBlocked
                                 Layout.fillWidth: true
                                 Layout.margins: 10
-                                text: "Tsuba may not change this device, so profiles can't be switched here."
+                                text: i18n("Tsuba may not change this device, so profiles can't be switched here.")
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
@@ -609,7 +628,7 @@ Rectangle {
                     Layout.preferredWidth: 34
                     Layout.preferredHeight: 34
                     radius: 2
-                    color: mh.hovered || moreMenu.opened ? "#2d2d2d" : "transparent"
+                    color: mh.hovered || moreMenu.opened ? Theme.hoverFill : "transparent"
                     border.color: moreMenu.opened ? Theme.accent : "transparent"
                     Text {
                         anchors.centerIn: parent
@@ -624,7 +643,7 @@ Rectangle {
                     TapHandler {
                         onTapped: {
                             page.loadProfiles();
-                            page.profileStatus = "";
+                            page.setStatus("", false);
                             page.nameMode = "";
                             moreMenu.open();
                         }
@@ -649,7 +668,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: 36
                                 visible: page.nameMode === ""
-                                color: mrh.hovered && enabled ? "#2d2d2d" : "transparent"
+                                color: mrh.hovered && enabled ? Theme.hoverFill : "transparent"
                                 opacity: enabled ? 1 : 0.4
                                 Text {
                                     anchors.left: parent.left
@@ -674,10 +693,10 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuAdd"
-                                caption: "Add"
+                                caption: i18nc("menu item", "Add")
                                 enabled: !page.writesBlocked && page.switching === ""
                                 onPicked: {
-                                    nameField.text = "Profile " + ((page.lib.profiles || []).length + 1);
+                                    nameField.text = i18n("Profile %1", (page.lib.profiles || []).length + 1);
                                     page.nameMode = "new";
                                     nameField.forceActiveFocus();
                                 }
@@ -687,13 +706,13 @@ Rectangle {
                                 caption: i18n("New from factory defaults")
                                 enabled: !page.writesBlocked && page.switching === ""
                                 onPicked: {
-                                    nameField.text = "Factory defaults";
+                                    nameField.text = i18n("Factory defaults");
                                     page.nameMode = "factory";
                                     nameField.forceActiveFocus();
                                 }
                             }
                             MenuRow {
-                                caption: "Rename"
+                                caption: i18nc("menu item", "Rename")
                                 enabled: !!page.current
                                 onPicked: {
                                     nameField.text = page.current.name;
@@ -702,17 +721,17 @@ Rectangle {
                                 }
                             }
                             MenuRow {
-                                caption: "Duplicate"
+                                caption: i18nc("menu item", "Duplicate")
                                 enabled: !!page.current && !page.writesBlocked && page.switching === ""
                                 onPicked: {
-                                    nameField.text = page.current.name + " copy";
+                                    nameField.text = i18n("%1 copy", page.current.name);
                                     page.nameMode = "duplicate";
                                     nameField.forceActiveFocus();
                                 }
                             }
                             MenuRow {
                                 objectName: "menuDelete"
-                                caption: "Delete"
+                                caption: i18nc("menu item", "Delete")
                                 enabled: !!page.current && !page.writesBlocked && page.switching === "" && !!page.fallbackFor(page.current.id)
                                 onPicked: page.nameMode = "delete"
                             }
@@ -720,17 +739,17 @@ Rectangle {
                                 objectName: "menuPin"
                                 readonly property bool pinned: !!page.current && page.current.pinned_slot !== null && page.current.pinned_slot !== undefined
                                 readonly property var free: page.lib.free_slots || []
-                                caption: pinned ? "Unpin from slot " + page.current.pinned_slot
-                                    : free.length > 0 ? "Pin to device (slot " + free[0] + ")" : "Pin to device (no free slot)"
+                                caption: pinned ? i18n("Unpin from slot %1", page.current.pinned_slot)
+                                    : free.length > 0 ? i18n("Pin to device (slot %1)", free[0]) : i18n("Pin to device (no free slot)")
                                 enabled: !!page.current && !page.writesBlocked && page.switching === "" && (pinned || free.length > 0)
                                 onPicked: {
                                     const p = page.current;
                                     if (pinned) {
-                                        page.profileAction(page.backend.unpin_library_profile(page.pid, p.id), "“" + p.name + "” is no longer pinned");
+                                        page.profileAction(page.backend.unpin_library_profile(page.pid, p.id), i18n("“%1” is no longer pinned", p.name));
                                     } else {
-                                        page.profileStatus = "Writing “" + p.name + "” to the device…";
+                                        page.setStatus(i18n("Writing “%1” to the device…", p.name), false);
                                         const s = page.backend.pin_library_profile(page.pid, p.id, 0);
-                                        page.profileAction(s > 0, "“" + p.name + "” pinned to on-board slot " + s + ": the profile button reaches it without Tsuba");
+                                        page.profileAction(s > 0, i18n("“%1” pinned to on-board slot %2: the profile button reaches it without Tsuba", p.name, s));
                                         page.libRev++;
                                     }
                                 }
@@ -786,7 +805,7 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuLinkedGames"
-                                caption: "Linked games"
+                                caption: i18n("Linked games")
                                 onPicked: {
                                     moreMenu.close();
                                     page.openLinks();
@@ -794,10 +813,10 @@ Rectangle {
                             }
                             MenuRow {
                                 objectName: "menuSynapseImport"
-                                caption: "Import from Synapse…"
+                                caption: i18n("Import from Synapse…")
                                 onPicked: {
                                     moreMenu.close();
-                                    synapseDlg.open("device:" + page.pid);
+                                    synapseDlg.open("device:" + page.pid);   // i18n-ok
                                 }
                             }
                             // Export several profiles: tick them, then choose a folder.
@@ -836,15 +855,15 @@ Rectangle {
                                 RowLayout {
                                     spacing: 8
                                     SynButton {
-                                        text: "Cancel"
-                                        implicitWidth: 80
+                                        text: i18nc("button", "Cancel")
+                                        minWidth: 80
                                         onClicked: page.nameMode = ""
                                     }
                                     SynButton {
                                         objectName: "exportChosen"
-                                        text: "Export…"
+                                        text: i18n("Export…")
                                         primary: true
-                                        implicitWidth: 90
+                                        minWidth: 90
                                         enabled: page.exportCount > 0
                                         onClicked: {
                                             page.nameMode = "";
@@ -863,8 +882,21 @@ Rectangle {
                                 spacing: 8
                                 Text {
                                     Layout.fillWidth: true
-                                    text: page.current ? "Delete “" + page.current.name + "”?" + (page.fallbackFor(page.current.id) ? " Tsuba switches to “" + page.fallbackFor(page.current.id).name + "” first." : "")
-                                        + (page.current.pinned_slot ? " Its on-board slot is freed." : "") : ""
+                                    text: {
+                                        if (!page.current) {
+                                            return "";
+                                        }
+                                        // Whole sentences, joined.
+                                        const parts = [i18n("Delete “%1”?", page.current.name)];
+                                        const fb = page.fallbackFor(page.current.id);
+                                        if (fb) {
+                                            parts.push(i18n("Tsuba switches to “%1” first.", fb.name));
+                                        }
+                                        if (page.current.pinned_slot) {
+                                            parts.push(i18n("Its on-board slot is freed."));
+                                        }
+                                        return parts.join(i18nc("space between two sentences", " "));
+                                    }
                                     color: Theme.text
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
@@ -873,15 +905,15 @@ Rectangle {
                                 RowLayout {
                                     spacing: 8
                                     SynButton {
-                                        text: "Cancel"
-                                        implicitWidth: 80
+                                        text: i18nc("button", "Cancel")
+                                        minWidth: 80
                                         onClicked: page.nameMode = ""
                                     }
                                     SynButton {
                                         objectName: "confirmDelete"
-                                        text: "Delete"
+                                        text: i18nc("button", "Delete")
                                         primary: true
-                                        implicitWidth: 80
+                                        minWidth: 80
                                         onClicked: {
                                             page.nameMode = "";
                                             page.deleteProfile(page.current.id);
@@ -896,7 +928,7 @@ Rectangle {
                                 Layout.margins: 12
                                 spacing: 8
                                 Text {
-                                    text: page.nameMode === "rename" ? "Rename profile" : (page.nameMode === "duplicate" ? "Duplicate as" : (page.nameMode === "factory" ? i18n("New profile with factory settings") : "New profile"))
+                                    text: page.nameMode === "rename" ? i18n("Rename profile") : (page.nameMode === "duplicate" ? i18n("Duplicate as") : (page.nameMode === "factory" ? i18n("New profile with factory settings") : i18n("New profile")))
                                     color: Theme.textDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
@@ -910,32 +942,32 @@ Rectangle {
                                 RowLayout {
                                     spacing: 8
                                     SynButton {
-                                        text: "Cancel"
-                                        implicitWidth: 80
+                                        text: i18nc("button", "Cancel")
+                                        minWidth: 80
                                         onClicked: page.nameMode = ""
                                     }
                                     SynButton {
                                         id: okButton
                                         objectName: "profileNameSave"
-                                        text: "Save"
+                                        text: i18nc("button", "Save")
                                         primary: true
-                                        implicitWidth: 72
+                                        minWidth: 72
                                         enabled: nameField.text.trim() !== ""
                                         onClicked: {
                                             const n = nameField.text.trim();
                                             if (page.nameMode === "rename") {
-                                                page.profileAction(page.backend.rename_library_profile(page.pid, page.current.id, n), "Renamed");
+                                                page.profileAction(page.backend.rename_library_profile(page.pid, page.current.id, n), i18n("Renamed"));
                                             } else if (page.nameMode === "factory") {
                                                 const id = page.lp.call("CreateFactoryProfile", [page.pid, n]);
                                                 page.profileAction(id !== null, i18n("Created “%1” with factory settings", n));
                                                 if (id !== null) {
                                                     page.activate(id);
                                                 } else {
-                                                    page.profileStatus = "Failed: " + page.lp.error;
+                                                    page.setStatus(i18n("Failed: %1", page.lp.error), true);
                                                 }
                                             } else {
                                                 const id = page.nameMode === "duplicate" ? page.backend.duplicate_library_profile(page.pid, page.current.id, n) : page.backend.create_library_profile(page.pid, n, "");
-                                                page.profileAction(id !== "", "Created “" + n + "”");
+                                                page.profileAction(id !== "", i18n("Created “%1”", n));
                                                 if (id !== "") {
                                                     // Like Synapse: the new profile becomes the active one.
                                                     page.activate(id);
@@ -952,7 +984,7 @@ Rectangle {
                                 Layout.margins: 10
                                 Layout.topMargin: 4
                                 text: page.profileStatus
-                                color: page.profileStatus.startsWith("Failed") ? Theme.warn : Theme.accent
+                                color: page.profileFailed ? Theme.warn : Theme.accent
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
                                 wrapMode: Text.Wrap
@@ -967,7 +999,7 @@ Rectangle {
                     visible: page.profileStatus !== "" && !moreMenu.opened
                     Layout.maximumWidth: 360
                     text: page.profileStatus
-                    color: page.profileStatus.startsWith("Failed") ? Theme.warn : Theme.textDim
+                    color: page.profileFailed ? Theme.warn : Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
                     elide: Text.ElideRight
@@ -989,7 +1021,7 @@ Rectangle {
                 outlined: false
                 upper: true
                 fontSize: 14
-                model: page.tabs
+                model: page.tabs.map(t => DeviceKinds.tabTitle(t))
                 currentIndex: page.tabIndex
                 onActivated: i => page.tabIndex = i
             }
@@ -1017,7 +1049,7 @@ Rectangle {
             currentIndex: Math.max(0, page.stackOrder.indexOf(page.tabs[page.tabIndex]))
 
             Loader {
-                active: page.tabActive("Customize")
+                active: page.tabActive("Customize")   // i18n-ok
                 sourceComponent: CustomizeTab {
                     backend: page.backend
                     pid: page.pid
@@ -1031,7 +1063,7 @@ Rectangle {
                 }
             }
             Loader {
-                active: page.tabActive("Performance")
+                active: page.tabActive("Performance")   // i18n-ok
                 sourceComponent: PerformanceTab {
                     backend: page.backend
                     pid: page.pid
@@ -1044,7 +1076,7 @@ Rectangle {
                 }
             }
             Loader {
-                active: page.tabActive("Lighting")
+                active: page.tabActive("Lighting")   // i18n-ok
                 sourceComponent: LightingPage {
                     backend: page.backend
                     pid: page.pid
@@ -1057,7 +1089,7 @@ Rectangle {
                 }
             }
             Loader {
-                active: page.tabActive("Power")
+                active: page.tabActive("Power")   // i18n-ok
                 sourceComponent: PerformanceTab {
                     mode: "power"
                     backend: page.backend
@@ -1070,7 +1102,7 @@ Rectangle {
                 }
             }
             Loader {
-                active: page.tabActive("Info")
+                active: page.tabActive("Info")   // i18n-ok
                 sourceComponent: DeviceInfoPage {
                     support: page.sup
                 }

@@ -18,6 +18,7 @@ ColumnLayout {
     property real val: 1
     property bool internal: false
 
+    // colour picker: intentional (preset swatches)
     readonly property var presets: ["ff2020", "ff8a00", "ffd200", "44d62c", "1fc9a7", "0080ff", "7a3cff", "ff3cc8", "ffffff", "808080"]
     property var custom: []
 
@@ -83,14 +84,14 @@ ColumnLayout {
         border.color: Theme.borderSoft
         gradient: Gradient {
             orientation: Gradient.Horizontal
-            GradientStop { position: 0; color: "#ffffff" }
+            GradientStop { position: 0; color: "#ffffff" }   // colour picker: intentional
             GradientStop { position: 1; color: Qt.hsva(panel.hue, 1, 1, 1) }
         }
         Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0; color: "#00000000" }
-                GradientStop { position: 1; color: "#ff000000" }
+                GradientStop { position: 0; color: "#00000000" }   // colour picker: intentional
+                GradientStop { position: 1; color: "#ff000000" }   // colour picker: intentional
             }
         }
         Rectangle {
@@ -100,14 +101,14 @@ ColumnLayout {
             height: 14
             radius: 7
             color: "transparent"
-            border.color: "#ffffff"
+            border.color: "#ffffff"   // colour picker: intentional
             border.width: 2
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: -1
                 radius: width / 2
                 color: "transparent"
-                border.color: "#80000000"
+                border.color: "#80000000"   // colour picker: intentional
                 border.width: 1
                 z: -1
             }
@@ -131,6 +132,7 @@ ColumnLayout {
         border.color: Theme.borderSoft
         gradient: Gradient {
             orientation: Gradient.Horizontal
+            // colour picker: intentional (hue strip)
             GradientStop { position: 0.0; color: "#ff0000" }
             GradientStop { position: 0.1667; color: "#ffff00" }
             GradientStop { position: 0.3333; color: "#00ff00" }
@@ -145,7 +147,7 @@ ColumnLayout {
             width: 8
             height: strip.height + 4
             color: "transparent"
-            border.color: "#ffffff"
+            border.color: "#ffffff"   // colour picker: intentional
             border.width: 2
         }
         MouseArea {

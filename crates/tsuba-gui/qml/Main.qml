@@ -7,7 +7,7 @@ import io.github.jenaridev.tsuba
 QQC2.ApplicationWindow {
     id: root
 
-    title: "Tsuba"
+    title: "Tsuba"   // i18n-ok: product name
     // Shown by Component.onCompleted (stays hidden when started with --minimized from autostart).
     visible: false
     width: 1440
@@ -901,7 +901,7 @@ QQC2.ApplicationWindow {
                 Qt.quit();
             });
             if (!ok) {
-                console.warn("screenshot: grabToImage failed");
+                console.warn("screenshot: grabToImage failed");   // i18n-ok
                 Qt.quit();
             }
         }

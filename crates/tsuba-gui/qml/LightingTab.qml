@@ -24,6 +24,7 @@ QQC2.ScrollView {
     property var studioProfiles: []
     property int profileIdx: 0
     property string studioStatus: ""
+    property bool studioFailed: false
     function loadStudioProfiles() {
         if (typeof backend.chroma_profiles !== "function") {
             return;
@@ -56,9 +57,11 @@ QQC2.ScrollView {
     property string result: ""
     property var devb: null
     property var feat: ({})
-    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
-    function tr(translated, plain) {
-        return typeof i18n === "function" ? translated() : plain;
+    // Whether `result` reports a failure (set together with the text, never inferred from it).
+    property bool resultFailed: false
+    function setResult(text, failed) {
+        resultFailed = failed;
+        result = text;
     }
     function loadFeatures() {
         if (!devb) {
@@ -69,7 +72,7 @@ QQC2.ScrollView {
     }
     function setFeat(change) {
         const r = devb.set_features(pid, JSON.stringify(Object.assign({ profile: profile }, change)));
-        result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : r.split("\n").join(" · ");
+        setResult(r === "" ? i18n("Failed: %1", devb.status) : r.split("\n").join(" · "), r === "");
         loadFeatures();
     }
     function makeDevb() {
@@ -79,22 +82,26 @@ QQC2.ScrollView {
             return null;
         }
     }
+    // `en` is the English name stored in saved Lighting Studio layers and `fw` the firmware effect id;
+    // only `label` is shown.
+    // i18n-ok-begin
     readonly property var effectTypes: [
-        { type: "static", label: "Static", fw: "Static", colours: 1 },
-        { type: "breathing", label: "Breathing", fw: "Breathing", colours: 2 },
-        { type: "spectrum", label: "Spectrum cycling", fw: "Spectrum", colours: 0 },
-        { type: "wave", label: "Wave", fw: "Wave", colours: 0 },
-        { type: "reactive", label: "Reactive", fw: "Reactive", colours: 1 },
-        { type: "starlight", label: "Starlight", fw: "Starlight", colours: 2 },
-        { type: "ripple", label: "Ripple", fw: "Ripple", colours: 1 },
-        { type: "fire", label: "Fire", soft: true, colours: 0 },
-        { type: "wheel", label: "Wheel", soft: true, colours: 0 },
-        { type: "audio_meter", label: "Audio Meter", soft: true, colours: 0 },
-        { type: "ambient", label: "Ambient (screen)", soft: true, colours: 0 },
-        { type: "tidal", label: "Tidal", soft: true, colours: 0 },
-        { type: "battery", label: "Battery level", soft: true, colours: 0, mouseOnly: true },
-        { type: "off", label: "None (lighting off)", fw: "Off", colours: 0 }
+        { type: "static", en: "Static", label: i18n("Static"), fw: "Static", colours: 1 },
+        { type: "breathing", en: "Breathing", label: i18n("Breathing"), fw: "Breathing", colours: 2 },
+        { type: "spectrum", en: "Spectrum cycling", label: i18n("Spectrum cycling"), fw: "Spectrum", colours: 0 },
+        { type: "wave", en: "Wave", label: i18n("Wave"), fw: "Wave", colours: 0 },
+        { type: "reactive", en: "Reactive", label: i18n("Reactive"), fw: "Reactive", colours: 1 },
+        { type: "starlight", en: "Starlight", label: i18n("Starlight"), fw: "Starlight", colours: 2 },
+        { type: "ripple", en: "Ripple", label: i18n("Ripple"), fw: "Ripple", colours: 1 },
+        { type: "fire", en: "Fire", label: i18n("Fire"), soft: true, colours: 0 },
+        { type: "wheel", en: "Wheel", label: i18n("Wheel"), soft: true, colours: 0 },
+        { type: "audio_meter", en: "Audio Meter", label: i18n("Audio Meter"), soft: true, colours: 0 },
+        { type: "ambient", en: "Ambient (screen)", label: i18n("Ambient (screen)"), soft: true, colours: 0 },
+        { type: "tidal", en: "Tidal", label: i18n("Tidal"), soft: true, colours: 0 },
+        { type: "battery", en: "Battery level", label: i18n("Battery level"), soft: true, colours: 0, mouseOnly: true },
+        { type: "off", en: "None (lighting off)", label: i18n("None (lighting off)"), fw: "Off", colours: 0 }
     ]
+    // i18n-ok-end
     // Effects the firmware lacks (Fire, Wheel; Wave/Starlight on the mouse) are drawn by tsubad.
     readonly property bool isMouse: st.kind === "mouse"
     function softOnHere(e) {
@@ -118,8 +125,8 @@ QQC2.ScrollView {
     property var ambientArea: [0, 0, 1, 1]
     property real ambientBoost: 1.3
     readonly property var areaPresets: [
-        ["Full screen", [0, 0, 1, 1]], ["Top half", [0, 0, 1, 0.5]], ["Bottom half", [0, 0.5, 1, 1]],
-        ["Left half", [0, 0, 0.5, 1]], ["Right half", [0.5, 0, 1, 1]], ["Centre", [0.25, 0.25, 0.75, 0.75]]
+        [i18n("Full screen"), [0, 0, 1, 1]], [i18n("Top half"), [0, 0, 1, 0.5]], [i18n("Bottom half"), [0, 0.5, 1, 1]],
+        [i18n("Left half"), [0, 0, 0.5, 1]], [i18n("Right half"), [0.5, 0, 1, 1]], [i18nc("screen area: the middle", "Centre"), [0.25, 0.25, 0.75, 0.75]]
     ]
 
     contentWidth: availableWidth
@@ -193,7 +200,7 @@ QQC2.ScrollView {
         default:
             fx = { type: "starlight", colours: cs, duration: duration };
         }
-        return { type: "studio", studio: { layers: [{ name: effect.label, enabled: true, leds: [], effect: fx }] } };
+        return { type: "studio", studio: { layers: [{ name: effect.en, enabled: true, leds: [], effect: fx }] } };
     }
 
     // Lighting power options (idle / display off).
@@ -225,13 +232,17 @@ QQC2.ScrollView {
     function apply() {
         if (zone > 0 && devb && !softOnHere(effect)) {
             const ze = quickEffect();
-            result = devb.set_zone_effect(pid, region.id, JSON.stringify(ze), Math.round(brightness.value)) ? region.name + ": " + effect.label : tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status);
+            if (devb.set_zone_effect(pid, region.id, JSON.stringify(ze), Math.round(brightness.value))) {
+                setResult(i18n("%1: %2", region.name, effect.label), false);
+            } else {
+                setResult(i18n("Failed: %1", devb.status), true);
+            }
             changed();
             return;
         }
         if (allDevices && multiDevice && devb && !softOnHere(effect)) {
             const r = devb.set_effect_all(JSON.stringify(quickEffect()), Math.round(brightness.value));
-            result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : tr(() => i18n("Applied to every device"), "Applied to every device");
+            setResult(r === "" ? i18n("Failed: %1", devb.status) : i18n("Applied to every device"), r === "");
             changed();
             return;
         }
@@ -293,7 +304,7 @@ QQC2.ScrollView {
 
     ColorDialog {
         id: picker
-        title: "Choose colour"
+        title: i18n("Choose colour")
         onAccepted: {
             const c = tab.colours.slice();
             c[tab.editing] = selectedColor.toString().replace("#", "").slice(-6);
@@ -302,6 +313,8 @@ QQC2.ScrollView {
     }
 
     component Label14: Text {
+        Layout.maximumWidth: 480
+        elide: Text.ElideRight
         color: Theme.text
         font.family: Theme.font
         font.pixelSize: Theme.fontSize
@@ -326,8 +339,8 @@ QQC2.ScrollView {
                 spacing: 24
 
                 SynCard {
-                    title: "Brightness"
-                    help: "Overall brightness of this device's lighting. Dragging to 0 turns the lighting off. Brightness is stored with the on-board profile."
+                    title: i18n("Brightness")
+                    help: i18n("Overall brightness of this device's lighting. Dragging to 0 turns the lighting off. Brightness is stored with the on-board profile.")
                     headerContent: SynToggle {
                         objectName: "brightnessToggle"
                         checked: brightness.value > 0
@@ -378,13 +391,13 @@ QQC2.ScrollView {
 
                 SynCard {
                     visible: tab.power !== null
-                    title: "Switch off lighting"
-                    help: "Turns the lighting off after the screen has been off for the chosen time, and back on when you return. Match this to your desktop's own power settings so they work together."
+                    title: i18n("Switch off lighting")
+                    help: i18n("Turns the lighting off after the screen has been off for the chosen time, and back on when you return. Match this to your desktop's own power settings so they work together.")
 
                     RowLayout {
                         spacing: 12
                         SynCheckBox {
-                            text: "When display is turned off, after"
+                            text: i18n("When display is turned off, after")
                             checked: !!tab.power && tab.power.display_off
                             onToggled: tab.setPower({ display_off: checked })
                         }
@@ -396,7 +409,9 @@ QQC2.ScrollView {
                             onValueModified: tab.setPower({ display_off_minutes: value })
                         }
                         Text {
-                            text: "min (match KDE's Power settings)"
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
+                            text: i18n("min (match KDE's Power settings)")
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -406,7 +421,7 @@ QQC2.ScrollView {
                         spacing: 12
                         SynCheckBox {
                             id: idleBox
-                            text: "When idle for (minutes)"
+                            text: i18n("When idle for (minutes)")
                             checked: !!tab.power && tab.power.idle_minutes > 0
                             onToggled: tab.setPower({ idle_minutes: checked ? idleMins.value : 0 })
                         }
@@ -448,7 +463,7 @@ QQC2.ScrollView {
                     visible: tab.result !== ""
                     Layout.fillWidth: true
                     text: tab.result
-                    color: tab.result.startsWith(tab.tr(() => i18n("Failed"), "Failed")) ? Theme.warn : Theme.accent
+                    color: tab.resultFailed ? Theme.warn : Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.small
                     wrapMode: Text.Wrap
@@ -463,12 +478,12 @@ QQC2.ScrollView {
                 spacing: 24
 
                 SynCard {
-                    title: "Effects"
-                    help: "Quick Effects are built into the device and stay when Tsuba is closed. Advanced Effects come from a Lighting Studio profile and play on all your devices while Tsuba runs; they are not saved on the device."
+                    title: i18n("Effects")
+                    help: i18n("Quick Effects are built into the device and stay when Tsuba is closed. Advanced Effects come from a Lighting Studio profile and play on all your devices while Tsuba runs; they are not saved on the device.")
 
                     SynPillTabs {
                         visible: tab.studioAvailable
-                        model: ["Quick Effects", "Advanced Effects"]
+                        model: [i18n("Quick Effects"), i18n("Advanced Effects")]
                         currentIndex: tab.advanced ? 1 : 0
                         onActivated: i => tab.advanced = i === 1
                     }
@@ -480,14 +495,14 @@ QQC2.ScrollView {
                         spacing: 14
                         Text {
                             Layout.fillWidth: true
-                            text: "Advanced effects come from a Lighting Studio profile (the counterpart of Chroma Studio effects in Razer's software) and play across all your devices; they are not saved to the device profile."
+                            text: i18n("Advanced effects come from a Lighting Studio profile (the counterpart of Chroma Studio effects in Razer's software) and play across all your devices; they are not saved to the device profile.")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
                             wrapMode: Text.Wrap
                         }
                         Label14 {
-                            text: "Lighting Studio profile"
+                            text: i18n("Lighting Studio profile")
                         }
                         RowLayout {
                             spacing: 12
@@ -505,35 +520,38 @@ QQC2.ScrollView {
                             }
                             SynButton {
                                 objectName: "studioApply"
-                                text: "Apply"
+                                text: i18n("Apply")
                                 primary: true
                                 enabled: !tab.readOnly && tab.studioProfiles.length > 0
                                 onClicked: {
                                     const n = tab.studioProfiles[tab.profileIdx];
-                                    tab.studioStatus = tab.backend.apply_chroma_profile(n) ? "Applied " + n : "Failed: " + tab.backend.status;
+                                    const ok = tab.backend.apply_chroma_profile(n);
+                                    tab.studioFailed = !ok;
+                                    tab.studioStatus = ok ? i18n("Applied %1", n) : i18n("Failed: %1", tab.backend.status);
                                 }
                             }
                             Text {
                                 text: tab.studioStatus
-                                color: tab.studioStatus.startsWith("Failed") ? Theme.warn : Theme.accent
+                                color: tab.studioFailed ? Theme.warn : Theme.accent
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
                             }
                         }
                         Text {
                             visible: tab.studioProfiles.length === 0
-                            text: "No profiles yet. Open Lighting Studio to create one."
+                            text: i18n("No profiles yet. Open Lighting Studio to create one.")
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
                         }
                         Rectangle {
-                            Layout.preferredWidth: 270
+                            Layout.preferredWidth: Math.max(270, launchRow.implicitWidth + 40)
                             Layout.preferredHeight: 52
-                            color: launchHover.hovered ? "#2d2d2d" : "transparent"
-                            border.color: "#d3d3d3"
+                            color: launchHover.hovered ? Theme.hoverFill : "transparent"
+                            border.color: Theme.border
                             border.width: 1
                             Row {
+                                id: launchRow
                                 anchors.centerIn: parent
                                 spacing: 12
                                 Rectangle {
@@ -551,12 +569,12 @@ QQC2.ScrollView {
                                         radius: 10
                                         color: "transparent"
                                         border.width: 3
-                                        border.color: "#2c8fd6"
+                                        border.color: "#2c8fd6"   // device drawing: intentional (Lighting Studio logo ring)
                                     }
                                 }
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "OPEN LIGHTING STUDIO"
+                                    text: i18n("Open Lighting Studio").toUpperCase()
                                     color: Theme.textBright
                                     font.family: Theme.font
                                     font.pixelSize: Theme.fontSize
@@ -580,7 +598,7 @@ QQC2.ScrollView {
 
                         Text {
                             Layout.fillWidth: true
-                            text: "Quick effects are applied to this device and restored when you log in."
+                            text: i18n("Quick effects are applied to this device and restored when you log in.")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
@@ -606,7 +624,7 @@ QQC2.ScrollView {
                             }
                         }
                         Label14 {
-                            text: "Effect"
+                            text: i18n("Effect")
                         }
                         SynDropdown {
                             id: effectBox
@@ -628,17 +646,17 @@ QQC2.ScrollView {
                             visible: !!tab.effect && (tab.effect.colours === 2 || tab.effect.type === "ripple" || tab.effect.type === "audio_meter" || ["wave", "wheel", "tidal"].indexOf(tab.effect.type) >= 0)
                             spacing: 8
                             Label14 {
-                                text: tab.effect && ["wave", "wheel", "tidal"].indexOf(tab.effect.type) >= 0 ? "Direction" : "Colours"
+                                text: tab.effect && ["wave", "wheel", "tidal"].indexOf(tab.effect.type) >= 0 ? i18n("Direction") : i18n("Colours")
                             }
                             SynPillTabs {
                                 visible: !!tab.effect && (tab.effect.colours === 2 || tab.effect.type === "ripple" || tab.effect.type === "audio_meter")
-                                model: tab.effect && tab.effect.type === "audio_meter" ? ["Gradient", "Single"] : (tab.effect && tab.effect.type === "ripple" ? ["Random", "Single"] : ["Random", "Single", "Dual"])
+                                model: tab.effect && tab.effect.type === "audio_meter" ? [i18n("Gradient"), i18nc("one colour", "Single")] : (tab.effect && tab.effect.type === "ripple" ? [i18n("Random"), i18nc("one colour", "Single")] : [i18n("Random"), i18nc("one colour", "Single"), i18nc("two colours", "Dual")])
                                 currentIndex: tab.colourCount
                                 onActivated: index => tab.colourCount = index
                             }
                             SynPillTabs {
                                 visible: !!tab.effect && ["wave", "wheel", "tidal"].indexOf(tab.effect.type) >= 0
-                                model: !tab.effect ? [] : tab.effect.type === "wheel" ? ["Clockwise", "Counter-clockwise"] : (tab.effect.type === "tidal" ? ["Outward", "Inward"] : ["Left to right", "Right to left"])
+                                model: !tab.effect ? [] : tab.effect.type === "wheel" ? [i18n("Clockwise"), i18n("Counter-clockwise")] : (tab.effect.type === "tidal" ? [i18n("Outward"), i18n("Inward")] : [i18n("Left to right"), i18n("Right to left")])
                                 currentIndex: tab.direction - 1
                                 onActivated: index => tab.direction = index + 1
                             }
@@ -649,7 +667,7 @@ QQC2.ScrollView {
                             visible: !!tab.effect && (tab.effect.colours > 0 || tab.effect.type === "audio_meter")
                             spacing: 8
                             Label14 {
-                                text: "Colour"
+                                text: i18n("Colour")
                             }
                             Row {
                                 spacing: 12
@@ -661,14 +679,14 @@ QQC2.ScrollView {
                                         height: 34
                                         radius: 2
                                         color: Theme.card
-                                        border.color: sw.hovered ? "#8a8a8a" : Theme.border
+                                        border.color: sw.hovered ? Theme.controlBorderHover : Theme.border
                                         Rectangle {
                                             x: 6
                                             y: 6
                                             width: 56
                                             height: 22
                                             radius: 2
-                                            color: "#" + tab.colours[index]
+                                            color: "#" + tab.colours[index]   // LED colour: intentional
                                         }
                                         Text {
                                             anchors.right: parent.right
@@ -700,7 +718,7 @@ QQC2.ScrollView {
                             Layout.fillWidth: true
                             spacing: 4
                             Label14 {
-                                text: tab.effect && tab.effect.type === "wave" ? "Speed" : "Duration"
+                                text: tab.effect && tab.effect.type === "wave" ? i18n("Speed") : i18n("Duration")
                             }
                             SynSlider {
                                 Layout.fillWidth: true
@@ -710,7 +728,7 @@ QQC2.ScrollView {
                                 stepSize: 1
                                 snapMode: QQC2.Slider.SnapAlways
                                 value: tab.speedIdx
-                                ticks: tab.effect && tab.effect.type === "wave" ? ["SLOW", "MEDIUM", "FAST"] : ["SHORT", "MEDIUM", "LONG"]
+                                ticks: tab.effect && tab.effect.type === "wave" ? [i18n("Slow"), i18n("Medium"), i18n("Fast")].map(t => t.toUpperCase()) : [i18n("Short"), i18n("Medium"), i18n("Long")].map(t => t.toUpperCase())
                                 onMoved: tab.speedIdx = Math.round(value)
                             }
                         }
@@ -721,7 +739,7 @@ QQC2.ScrollView {
                             columns: 3
                             columnSpacing: 12
                             rowSpacing: 6
-                            Text { text: "Sensitivity"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
+                            Text { text: i18n("Sensitivity"); color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
                             SynSlider {
                                 id: gainSlider
                                 Layout.preferredWidth: 260
@@ -731,7 +749,7 @@ QQC2.ScrollView {
                                 onMoved: tab.meterGain = value
                             }
                             Text { text: tab.meterGain.toFixed(1) + "×"; color: Theme.textDim; font.family: Theme.font; font.pixelSize: Theme.small }
-                            Text { text: "Colour boost"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
+                            Text { text: i18n("Colour boost"); color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
                             SynSlider {
                                 Layout.preferredWidth: 260
                                 from: 0.4
@@ -742,7 +760,7 @@ QQC2.ScrollView {
                             Text { text: Math.round(tab.meterBoost * 100) + "%"; color: Theme.textDim; font.family: Theme.font; font.pixelSize: Theme.small }
                             SynCheckBox {
                                 Layout.columnSpan: 3
-                                text: "Flow (colours move across the bars)"
+                                text: i18n("Flow (colours move across the bars)")
                                 checked: tab.meterFlow
                                 onToggled: tab.meterFlow = checked
                             }
@@ -753,7 +771,7 @@ QQC2.ScrollView {
                             visible: !!tab.effect && tab.effect.type === "ambient"
                             spacing: 10
                             Label14 {
-                                text: "Screen area"
+                                text: i18n("Screen area")
                             }
                             Flow {
                                 Layout.fillWidth: true
@@ -778,7 +796,7 @@ QQC2.ScrollView {
                             }
                             RowLayout {
                                 spacing: 10
-                                Text { text: "Vividness"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
+                                Text { text: i18n("Vividness"); color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.small }
                                 SynSlider {
                                     Layout.preferredWidth: 260
                                     from: 0.6
@@ -791,7 +809,7 @@ QQC2.ScrollView {
                             RowLayout {
                                 spacing: 10
                                 SynButton {
-                                    text: "Choose a different screen"
+                                    text: i18n("Choose a different screen")
                                     enabled: !tab.readOnly
                                     onClicked: {
                                         tab.backend.reset_ambient_screen();
@@ -799,7 +817,9 @@ QQC2.ScrollView {
                                     }
                                 }
                                 Text {
-                                    text: "KDE remembers the screen you pick."
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                    text: i18n("KDE remembers the screen you pick.")
                                     color: Theme.textMuted
                                     font.family: Theme.font
                                     font.pixelSize: 11
@@ -811,7 +831,7 @@ QQC2.ScrollView {
                             Layout.topMargin: 4
                             spacing: 12
                             SynButton {
-                                text: "Apply"
+                                text: i18n("Apply")
                                 primary: true
                                 enabled: !tab.readOnly && tab.effect !== null
                                 onClicked: tab.apply()
@@ -824,7 +844,9 @@ QQC2.ScrollView {
                                 onToggled: tab.allDevices = checked
                             }
                             Text {
-                                text: !tab.region ? "" : (tab.zone > 0 ? i18n("Applies to: %1", tab.region.name) : (tab.allDevices && tab.multiDevice && tab.devb !== null && !!tab.effect && !tab.softOnHere(tab.effect) ? i18n("Applies to every device that has this effect") : "Applies to: " + tab.st.lighting.map(r => r.name).join(", ")))
+                                Layout.fillWidth: true
+                                wrapMode: Text.Wrap
+                                text: !tab.region ? "" : (tab.zone > 0 ? i18n("Applies to: %1", tab.region.name) : (tab.allDevices && tab.multiDevice && tab.devb !== null && !!tab.effect && !tab.softOnHere(tab.effect) ? i18n("Applies to every device that has this effect") : i18n("Applies to: %1", tab.st.lighting.map(r => r.name).join(", "))))
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small

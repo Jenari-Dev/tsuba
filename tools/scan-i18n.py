@@ -2,7 +2,8 @@
 """List QML string literals that are not wrapped in i18n()/i18nc()/i18np() and look user-visible.
 
 Usage: tools/scan-i18n.py [--all] [files...]   (default: crates/tsuba-gui/qml/*.qml)
-Exit status 1 when a suspicious literal is found. Exceptions live in tools/i18n-allow.txt as
+A line with `// i18n-ok` (or a block between `// i18n-ok-begin` and `// i18n-ok-end`) is skipped: key caps,
+internal ids, protocol names. Exit status 1 when a suspicious literal is found. Exceptions live in tools/i18n-allow.txt as
 `File.qml: literal` lines (or `*: literal` for any file). A literal is suspicious when it contains a
 letter-run of 2+ characters, a space or sentence punctuation, is not an identifier-like token, and is
 not in an obviously technical position (property key, id, import, enum compare, colour...).
@@ -54,8 +55,16 @@ def wrapped(src, start):
     return bool(m)
 
 
-TECH = re.compile(r"^(#[0-9a-fA-F]{3,8}|[a-z][a-zA-Z0-9_]*|[A-Z_]+|[\w./:+\-]*\.(qml|svg|png|json|toml|ini)|qrc:.*|file:.*|image://.*|[\W\d_]*)$")
+TECH = re.compile(r"^(/[\w/.\-]*|#[0-9a-fA-F]{3,8}|[a-z][a-zA-Z0-9_]*|[A-Z_]+|[\w./:+\-]*\.(qml|svg|png|json|toml|ini)|qrc:.*|file:.*|image://.*|[\W\d_]*)$")
 UI_KEY = re.compile(r"(text|title|label|placeholderText|toolTip|tip|name|description|subtitle|hint|heading|message|caption|summary|status|result|error|detail|body|note|header|display)\w*\s*:\s*$", re.I)
+
+
+# Positions where a literal is a value being compared / looked up / logged, not text shown to the user.
+TECH_BEFORE = re.compile(
+    r"(===?|!==?|indexOf\(|replace\(|docsUrl\(|console\.\w+\(|startsWith\(|endsWith\(|\.json\(|\.call\(|case|"
+    r"\b(?:id|code|pid|kind|type|key|op|mode|source|style|fontFamily|objectName|category|effect|target|method|icon\w*|"
+    r"state|role|name_id|action)\s*:|\[)\s*$"
+)
 
 
 def allow():
@@ -68,14 +77,28 @@ def allow():
     return a
 
 
+def ignored_lines(lines):
+    """Lines carrying `// i18n-ok`, or between `// i18n-ok-begin` and `// i18n-ok-end` (key caps, ids...)."""
+    out, on = set(), False
+    for n, l in enumerate(lines, 1):
+        if "i18n-ok-begin" in l:
+            on = True
+        if on or "i18n-ok" in l:
+            out.add(n)
+        if "i18n-ok-end" in l:
+            on = False
+    return out
+
+
 def scan(files, show_all=False):
     al = allow(); bad = []
     for f in files:
         src = open(f, encoding="utf-8").read()
         lines = src.split("\n")
+        skip = ignored_lines(lines)
         base = os.path.basename(f)
         for kind, text, line, s, e in tokens(src):
-            if wrapped(src, s):
+            if wrapped(src, s) or line in skip:
                 continue
             if kind == "`":
                 lit = re.sub(r"\$\{[^}]*\}", "", text)
@@ -84,6 +107,9 @@ def scan(files, show_all=False):
             if not re.search(r"[A-Za-z぀-ヿ一-鿿]{2}", lit):
                 continue
             if f"{base}: {text}" in al or f"*: {text}" in al:
+                continue
+            before = src[max(0, s - 40):s]
+            if TECH_BEFORE.search(before) and not show_all and not re.search(r"\s", text.strip()):
                 continue
             ctx = lines[line - 1].strip()
             if TECH.match(text) and not show_all:

@@ -173,6 +173,10 @@ fn macros_are_renamed_duplicated_and_filed() {
     assert_eq!(mgr.library().unwrap().get(&copy).unwrap().group, "Work");
     mgr.set_macro_group(&copy, "").unwrap();
     assert_eq!(mgr.library().unwrap().get(&copy).unwrap().group, "");
+    // Saving the macro again without naming a folder keeps its folder.
+    mgr.set_macro_group(&guid, "Keep").unwrap();
+    mgr.save_macro(Macro { guid: guid.clone(), name: "Second".into(), events: ev.clone(), ..Default::default() }).unwrap();
+    assert_eq!(mgr.library().unwrap().get(&guid).unwrap().group, "Keep");
     // A re-import from the device keeps the folder.
     mgr.set_macro_group(&guid, "Keep").unwrap();
     let id = mgr.with_device("00aa", |dev, _| macros::ids(dev)).unwrap()[0];

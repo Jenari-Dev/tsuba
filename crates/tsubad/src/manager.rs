@@ -529,6 +529,12 @@ impl Manager {
             let path = tsuba_core::macros::library_path();
             let mut lib = tsuba_core::macros::Library::load(&path)?;
             let had_run = lib.get(&mac.guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, MacroEvent::Run { .. })));
+            // A save that doesn't name a folder keeps the one the macro is in (SetMacroGroup changes it).
+            if mac.group.is_empty() {
+                if let Some(old) = lib.get(&mac.guid) {
+                    mac.group = old.group.clone();
+                }
+            }
             let guid = lib.upsert(mac)?;
             lib.save(&path)?;
             let mac = lib.get(&guid).cloned().context("saved macro")?;

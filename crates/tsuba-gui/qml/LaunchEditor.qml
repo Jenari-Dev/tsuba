@@ -21,7 +21,16 @@ ColumnLayout {
         presets = panel.lp.launchPresets();
         apps = panel.lp.desktopApps();
     }
-    Component.onCompleted: load()
+    // Read the lists (applications, audio devices, layouts) only once the editor is shown.
+    property bool loaded: false
+    function ensureLoaded() {
+        if (!loaded) {
+            loaded = true;
+            load();
+        }
+    }
+    onVisibleChanged: if (visible) ensureLoaded()
+    Component.onCompleted: if (visible) ensureLoaded()
 
     function commandFor(app) {
         // Programs that need a terminal run in one.

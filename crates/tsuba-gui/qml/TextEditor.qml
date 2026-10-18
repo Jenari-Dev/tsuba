@@ -23,7 +23,16 @@ ColumnLayout {
         layouts = l.layouts;
         layoutIdx = 0;
     }
-    Component.onCompleted: load()
+    // Read the lists (applications, audio devices, layouts) only once the editor is shown.
+    property bool loaded: false
+    function ensureLoaded() {
+        if (!loaded) {
+            loaded = true;
+            load();
+        }
+    }
+    onVisibleChanged: if (visible) ensureLoaded()
+    Component.onCompleted: if (visible) ensureLoaded()
 
     function layoutName() {
         return layouts.length > 0 ? layouts[Math.min(layoutIdx, layouts.length - 1)] : "";

@@ -22,7 +22,16 @@ ColumnLayout {
         sinkIdx = Math.max(0, sinks.findIndex(s => s.default));
         sourceIdx = Math.max(0, sources.findIndex(s => s.default));
     }
-    Component.onCompleted: load()
+    // Read the lists (applications, audio devices, layouts) only once the editor is shown.
+    property bool loaded: false
+    function ensureLoaded() {
+        if (!loaded) {
+            loaded = true;
+            load();
+        }
+    }
+    onVisibleChanged: if (visible) ensureLoaded()
+    Component.onCompleted: if (visible) ensureLoaded()
 
     function stageOp(id, label, op) {
         panel.stage("audio:" + id, label, () => panel.assignAction({ type: "audio", op: op }));

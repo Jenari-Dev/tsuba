@@ -24,6 +24,8 @@ Rectangle {
     // The macro being edited.
     property string guid: ""
     property string macroName: ""
+    // The folder the macro is filed in (kept when saving; the list's menu changes it).
+    property string macroGroup: ""
     property var events: []
     property int sel: -1
     property bool dirty: false
@@ -93,6 +95,7 @@ Rectangle {
         devView = null;
         guid = m.guid;
         macroName = m.name;
+        macroGroup = m.group || "";
         events = m.events.slice();
         sel = -1;
         dirty = false;
@@ -107,6 +110,7 @@ Rectangle {
         devView = { pid: pid, id: m.id, name: m.name };
         guid = m.guid || "";
         macroName = m.name;
+        macroGroup = "";
         events = (m.events || []).slice();
         sel = -1;
         dirty = false;
@@ -120,6 +124,7 @@ Rectangle {
         devView = null;
         guid = "";
         macroName = "Macro " + (lib.length + 1);
+        macroGroup = "";
         events = [];
         sel = -1;
         dirty = true;
@@ -130,7 +135,7 @@ Rectangle {
 
     function save() {
         stopRecording();
-        const g = backend.save_macro(JSON.stringify({ guid: guid, name: macroName, events: events }));
+        const g = backend.save_macro(JSON.stringify({ guid: guid, name: macroName, group: macroGroup, events: events }));
         if (g === "") {
             result = "Failed: " + backend.status;
             return;

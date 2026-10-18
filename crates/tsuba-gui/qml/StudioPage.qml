@@ -1030,6 +1030,12 @@ Rectangle {
                         studio.dirty = true;
                     }
                 }
+                LightingOwnerChip {
+                    objectName: "ownerChip"
+                    backend: studio.backend
+                    pid: studio.editPid
+                    visible: !studio.backend.readonly
+                }
                 Text {
                     visible: studio.loadedName !== "" && studio.loadedName === studio.activeName
                     text: i18n("ACTIVE")

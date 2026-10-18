@@ -32,6 +32,21 @@ Item {
         function game_lighting_add_prefix(p) { return ""; }
         function set_game_lighting_auto(on) { auto = on; calls.push("auto " + on); return true; }
         function game_lighting_test() { calls.push("test"); }
+        property var apps: [{ key: "game.exe", name: "Some Game", exe: "game.exe", rule: "default", allowed: true, last_seen: 5, connected: true }]
+        property bool onlyAllowed: false
+        property string owner: "device"
+        function studio_call(m, a) {
+            if (m === "apps") { return JSON.stringify({ only_allowed: onlyAllowed, apps: apps }); }
+            if (m === "set_app") {
+                const r = JSON.parse(a);
+                calls.push("rule " + r.key + " " + r.rule);
+                apps = apps.map(x => x.key === r.key ? Object.assign({}, x, { rule: r.rule, allowed: r.rule !== "block" }) : x);
+                return JSON.stringify({ ok: true });
+            }
+            if (m === "only_allowed") { calls.push("only " + a); onlyAllowed = a === "true"; return JSON.stringify({ ok: true }); }
+            if (m === "owner") { return JSON.stringify(owner === "game" ? { owner: "game", name: "Some Game" } : { owner: "device" }); }
+            return "{}";
+        }
     }
     GameLightingPage {
         id: page
@@ -52,6 +67,35 @@ Item {
             compare(page.headline, "Menu is connected");
             fake.game_lighting_changed(JSON.stringify({ enabled: false, port: 54235, sessions: [] }));
             compare(page.headline, "Game lighting is off");
+        }
+
+        function test_1b_applications_can_be_blocked() {
+            fake.calls = [];
+            const row = find("appRow_game.exe");
+            verify(row !== null, "the connected program is listed");
+            const tabs = find("appRule_game.exe");
+            mouseClick(tabs.children[2], 10, 10);   // Block
+            wait(50);
+            verify(fake.calls.indexOf("rule game.exe block") >= 0, fake.calls.join());
+            compare(page.rules.apps[0].allowed, false);
+            const only = find("glOnlyAllowed");
+            only.toggled();
+            only.checked = true;
+            mouseClick(only, 5, 5);
+            wait(50);
+            verify(fake.calls.some(c => c.indexOf("only ") === 0), fake.calls.join());
+        }
+
+        function test_1c_owner_chip() {
+            fake.owner = "game";
+            const chip = find("ownerChip028d");
+            verify(chip !== null);
+            chip.refresh();
+            compare(chip.owner, "game");
+            verify(chip.caption.indexOf("Some Game") >= 0, chip.caption);
+            fake.owner = "device";
+            chip.refresh();
+            compare(chip.owner, "device");
         }
 
         function test_2_old_daemon() {

@@ -8,12 +8,15 @@ mod applinks;
 mod audio;
 mod cache;
 mod dbus;
+mod dbus_app;
+mod diag;
 mod game_http;
 mod game_lighting;
 mod gamemode;
 mod idle;
 mod library;
 mod manager;
+mod notify;
 mod shortcuts;
 mod studio_runner;
 
@@ -39,12 +42,26 @@ struct Args {
     /// Snapshot the attached devices into the config file and exit (read-only).
     #[arg(long)]
     import: bool,
+    /// Print the environment report (service, udev rule, device access, conflicts) as JSON and exit.
+    #[arg(long)]
+    check_env: bool,
+    /// Write a support bundle (zip) with no personal data to this file and exit.
+    #[arg(long, value_name = "FILE")]
+    diagnostics: Option<PathBuf>,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_target(false).init();
     let args = Args::parse();
+    if args.check_env {
+        println!("{}", diag::env_report());
+        return Ok(());
+    }
+    if let Some(path) = &args.diagnostics {
+        println!("{}", diag::export(path)?.display());
+        return Ok(());
+    }
     let config_path = args.config.unwrap_or_else(Config::default_path);
     let (tx, mut rx) = mpsc::unbounded_channel();
     let mgr = Arc::new(manager::Manager::new(args.read_only || args.import, config_path.clone(), tx)?);
@@ -71,9 +88,16 @@ async fn main() -> Result<()> {
     game.underglow.store(mgr.config.lock().unwrap().game_lighting_underglow_enabled(), std::sync::atomic::Ordering::Relaxed);
     game.web.store(mgr.config.lock().unwrap().game_lighting_web_enabled(), std::sync::atomic::Ordering::Relaxed);
 
+    // Desktop notifications (their own bus connection: the settings object below needs the notifier first).
+    let notifier = Arc::new(notify::Notifier::new(
+        notify::Settings::path(),
+        Box::new(notify::DBusSink::new(zbus::Connection::session().await.context("D-Bus session bus")?)),
+    ));
+
     let conn = zbus::connection::Builder::session()?
         .name(dbus::BUS_NAME)?
         .serve_at(dbus::PATH, dbus::Tsuba { mgr: mgr.clone(), game: game.clone() })?
+        .serve_at(dbus::PATH, dbus_app::App { notifier: notifier.clone(), read_only: mgr.read_only })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;
@@ -84,11 +108,16 @@ async fn main() -> Result<()> {
     let hot = {
         let mgr = mgr.clone();
         let iface = iface.clone();
+        let notifier = notifier.clone();
         tokio::spawn(async move {
             loop {
                 let m = mgr.clone();
                 let (added, removed) = tokio::task::spawn_blocking(move || m.refresh()).await.unwrap_or_default();
+                for pid in &removed {
+                    notifier.handle(&notify::Input::Detached { pid, name: &notify::device_name(pid) });
+                }
                 for pid in added {
+                    notifier.handle(&notify::Input::Attached { pid: &pid, name: &notify::device_name(&pid) });
                     mgr.request_warm(&pid);
                     // First start with the profile library: copy the on-board profiles into it.
                     let m = mgr.clone();
@@ -160,8 +189,27 @@ async fn main() -> Result<()> {
         let _ = tokio::task::spawn_blocking(move || m.restore_shortcut_block()).await;
     }
 
+    // Battery level for the low-battery notification (a Get on devices that have a battery).
+    let battery = {
+        let (mgr, notifier) = (mgr.clone(), notifier.clone());
+        tokio::spawn(async move {
+            tokio::time::sleep(Duration::from_secs(20)).await;
+            loop {
+                let (m, n) = (mgr.clone(), notifier.clone());
+                let _ = tokio::task::spawn_blocking(move || {
+                    for (pid, _, _) in m.list() {
+                        notify::check_battery(&m, &n, &pid);
+                    }
+                })
+                .await;
+                tokio::time::sleep(Duration::from_secs(300)).await;
+            }
+        })
+    };
+
     // Forward hardware events as D-Bus signals.
     let fwd_mgr = mgr.clone();
+    let notifier_fwd = notifier.clone();
     let fwd = tokio::spawn(async move {
         let mut held: std::collections::HashMap<String, Vec<u8>> = std::collections::HashMap::new();
         while let Some((pid, ev)) = rx.recv().await {
@@ -182,6 +230,10 @@ async fn main() -> Result<()> {
             if matches!(ev, tsuba_proto::events::Event::Notification { .. } | tsuba_proto::events::Event::Power(_)) {
                 let (m, p, e) = (fwd_mgr.clone(), pid.clone(), ev.clone());
                 tokio::task::spawn_blocking(move || m.on_event(&p, &e));
+            }
+            if let tsuba_proto::events::Event::Notification { id, .. } = &ev {
+                let (m, n, p, e, id) = (fwd_mgr.clone(), notifier_fwd.clone(), pid.clone(), ev.clone(), *id);
+                tokio::task::spawn_blocking(move || notify::on_notification(&m, &n, &p, &e, id));
             }
             let json = dbus::event_json(&ev);
             info!("{pid}: {json}");
@@ -204,6 +256,7 @@ async fn main() -> Result<()> {
     lib_sig.abort();
     let _ = tokio::task::spawn_blocking(gamemode::unblock_on_exit).await;
     hot.abort();
+    battery.abort();
     fwd.abort();
     Ok(())
 }

@@ -45,6 +45,8 @@ pub struct SimState {
     pub writes: Vec<(u8, u8)>,
     /// Every Get command received.
     pub reads: usize,
+    /// Firmware features (debounce, scroll levels, indicators, lift-off…); see [`FeatureSim`].
+    pub feat: FeatureSim,
 }
 
 impl SimState {
@@ -119,6 +121,9 @@ impl SimState {
             self.reads += 1;
         } else {
             self.writes.push((cmd.class, cmd.id));
+        }
+        if let Some(r) = self.answer_features(cmd, a) {
+            return r;
         }
         let arg = |i: usize| a.get(i).copied().unwrap_or(0);
         match (cmd.class, cmd.id) {
@@ -369,4 +374,149 @@ pub fn device(sim: &Sim) -> Device {
     let mut d = Device::simulated(Arc::new(move |cmd, args| s.lock().unwrap().answer(cmd, args))).expect("open /dev/null");
     d.allow_writes(true);
     d
+}
+
+/// Simulated firmware features: the keyboard has key debounce, a startup animation and an
+/// indicator LED switch; the mouse has scroll acceleration / Smart-Reel levels, profile
+/// colours, the lift-off sensor and a wireless-connection status. Everything else answers
+/// "not supported", as unknown commands do on the hardware.
+#[derive(Debug, Clone)]
+pub struct FeatureSim {
+    pub debounce: [u8; 4],
+    pub profile_debounce: BTreeMap<u8, [u8; 4]>,
+    pub startup_disabled: u8,
+    pub indicator: u8,
+    pub accel_level: BTreeMap<u8, u8>,
+    pub reel_threshold: BTreeMap<u8, u8>,
+    pub colour: BTreeMap<u8, [u8; 3]>,
+    pub prox_state: u8,
+    /// Last Set Proximity Sensor Lift Setting (mode, height).
+    pub lift: Option<(u8, u8)>,
+    /// Slots reset with Set Profile Reset, in order.
+    pub resets: Vec<u8>,
+}
+
+impl Default for FeatureSim {
+    fn default() -> Self {
+        FeatureSim {
+            debounce: [0, 20, 0, 40],
+            profile_debounce: BTreeMap::new(),
+            startup_disabled: 0,
+            indicator: 1,
+            accel_level: BTreeMap::new(),
+            reel_threshold: BTreeMap::new(),
+            colour: BTreeMap::new(),
+            prox_state: 1,
+            lift: None,
+            resets: Vec::new(),
+        }
+    }
+}
+
+impl SimState {
+    fn answer_features(&mut self, cmd: Command, a: &[u8]) -> Option<Result<Vec<u8>, HidError>> {
+        let arg = |i: usize| a.get(i).copied().unwrap_or(0);
+        let kb = !self.mouse;
+        let slot = |s: &SimState, p: u8| -> Result<u8, HidError> {
+            let id = if p == 0 { s.active } else { p };
+            if s.profiles.contains_key(&id) { Ok(id) } else { Err(fail()) }
+        };
+        let f = &mut self.feat;
+        Some(match (cmd.class, cmd.id) {
+            (0x02, 0x82) if kb => Ok(f.debounce.to_vec()),
+            (0x02, 0x02) if kb => {
+                f.debounce.copy_from_slice(a.get(..4).unwrap_or(&[0; 4]));
+                Ok(a.to_vec())
+            }
+            (0x02, 0x95) if kb => {
+                let d = f.profile_debounce.get(&arg(0)).copied().unwrap_or([0, 20, 0, 40]);
+                let mut v = vec![arg(0)];
+                v.extend(d);
+                Ok(v)
+            }
+            (0x02, 0x15) if kb => {
+                let mut d = [0; 4];
+                d.copy_from_slice(a.get(1..5).unwrap_or(&[0; 4]));
+                f.profile_debounce.insert(arg(0), d);
+                Ok(a.to_vec())
+            }
+            (0x0f, 0x98) if kb => Ok(vec![f.startup_disabled]),
+            (0x0f, 0x18) if kb => {
+                f.startup_disabled = arg(1);
+                Ok(a.to_vec())
+            }
+            (0x07, 0x90) if kb => Ok(vec![f.indicator]),
+            (0x07, 0x10) if kb => {
+                f.indicator = arg(0);
+                Ok(a.to_vec())
+            }
+            (0x02, 0xa2) | (0x02, 0xa3) | (0x05, 0x8c) if self.mouse => {
+                let id = match slot(self, arg(0)) {
+                    Ok(id) => id,
+                    Err(e) => return Some(Err(e)),
+                };
+                let f = &self.feat;
+                Ok(match cmd.id {
+                    0xa2 => vec![arg(0), f.accel_level.get(&id).copied().unwrap_or(1)],
+                    0xa3 => vec![arg(0), f.reel_threshold.get(&id).copied().unwrap_or(1)],
+                    _ => {
+                        let mut v = vec![arg(0)];
+                        v.extend(f.colour.get(&id).copied().unwrap_or([0, 0xff, 0]));
+                        v
+                    }
+                })
+            }
+            (0x02, 0x22) | (0x02, 0x23) | (0x05, 0x0c) if self.mouse => {
+                let id = match slot(self, arg(0)) {
+                    Ok(id) => id,
+                    Err(e) => return Some(Err(e)),
+                };
+                let f = &mut self.feat;
+                match cmd.id {
+                    0x22 => {
+                        f.accel_level.insert(id, arg(1));
+                    }
+                    0x23 => {
+                        f.reel_threshold.insert(id, arg(1));
+                    }
+                    _ => {
+                        f.colour.insert(id, [arg(1), arg(2), arg(3)]);
+                    }
+                }
+                Ok(a.to_vec())
+            }
+            (0x0b, 0x80) if self.mouse => Ok(vec![1, c::PROXIMITY_SENSOR]),
+            (0x0b, 0x83) if self.mouse && a.get(..2) == Some(&[c::PROXIMITY_CLASS, c::PROXIMITY_SENSOR]) => Ok(vec![arg(0), arg(1), f.prox_state]),
+            (0x0b, 0x85) if self.mouse => Ok(vec![arg(0), arg(1), 5, 3, 0, 0, 0, 0, 0, 0]),
+            (0x0b, 0x03) if self.mouse => {
+                f.prox_state = arg(2);
+                Ok(a.to_vec())
+            }
+            (0x0b, 0x0b) if self.mouse => {
+                f.lift = Some((arg(2), arg(3)));
+                Ok(a.to_vec())
+            }
+            (0x00, 0xb8) if self.mouse => Ok(vec![0]),
+            (0x05, 0x0b) => {
+                if !self.profiles.contains_key(&arg(0)) {
+                    return Some(Err(fail()));
+                }
+                let b = self.blank();
+                self.profiles.insert(arg(0), b);
+                self.feat.resets.push(arg(0));
+                Ok(a.to_vec())
+            }
+            (0x00, 0x0b) => {
+                if arg(0) == 1 {
+                    let b = self.blank();
+                    self.profiles = BTreeMap::from([(1, b)]);
+                    self.active = 1;
+                    self.macros.clear();
+                    self.feat = FeatureSim::default();
+                }
+                Ok(a.to_vec())
+            }
+            _ => return None,
+        })
+    }
 }

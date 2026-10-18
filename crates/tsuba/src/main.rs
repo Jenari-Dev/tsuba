@@ -155,6 +155,20 @@ enum Cmd {
         #[arg(long)]
         confirm: bool,
     },
+    /// Read-only feature probe: send one Get per candidate feature command and report which the
+    /// device answers (supported / not supported). Nothing is written to the device. Saves the
+    /// report as JSON (default: $XDG_DATA_HOME/tsuba/features/<pid>.json) for tsubad and the app.
+    ProbeFeatures {
+        /// Save the reports in this directory instead.
+        #[arg(long)]
+        out: Option<std::path::PathBuf>,
+        /// Print the reports as JSON instead of a table.
+        #[arg(long)]
+        json: bool,
+        /// Only print, don't save.
+        #[arg(long)]
+        no_save: bool,
+    },
     /// Write-path self-test: change a harmless setting, verify, restore, verify.
     WriteSelftest {
         /// Required: acknowledges that this sends Set commands to the device.
@@ -516,6 +530,27 @@ fn run(cmd: &Cmd, info: &DeviceInfo, allow_untested: bool) -> Result<()> {
                 }
                 Kind::Mouse if m.spec.features.dpi_stages => selftest_dpi(&dev)?,
                 k => bail!("no write self-test for this {}", k.as_str()),
+            }
+        }
+        Cmd::ProbeFeatures { out, json, no_save } => {
+            // `dev` was opened without write access: the hid layer refuses every Set on it, and
+            // the probe itself only sends read-only catalog Gets (tsuba_core::features).
+            let report = tsuba_core::features::probe(&dev, &m);
+            if *json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!("firmware {}", report.firmware.as_deref().unwrap_or("?"));
+                print!("{}", report.table());
+                println!("supported: {}", report.supported_keys().join(", "));
+            }
+            if !no_save {
+                let key = tsuba_core::pid_key(m.pid);
+                let path = match out {
+                    Some(d) => d.join(format!("{key}.json")),
+                    None => tsuba_core::features::ProbeReport::default_path(&key),
+                };
+                report.save(&path)?;
+                eprintln!("saved {}", path.display());
             }
         }
         Cmd::Get { size, class, id, args } => {

@@ -235,3 +235,33 @@ mod imports {
         assert_eq!(DeviceLibrary::load(&lib::root(), "028d").unwrap().get(&id).unwrap().name.chars().count(), lib::MAX_NAME_CHARS);
     }
 }
+
+#[test]
+fn per_device_actions_cannot_target_all_devices() {
+    use tsuba_core::config::{Action, DeviceOp, ALL_DEVICES};
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let (mgr, _sim) = rig("028d", 1);
+    for op in [DeviceOp::DpiStageUp, DeviceOp::LightingToggle, DeviceOp::ProfileNext, DeviceOp::BrightnessUp] {
+        assert!(mgr.assign_action("028d", 1, 0, 160, Action::Device { target: ALL_DEVICES.into(), op }).is_err());
+    }
+    assert!(mgr.config.lock().unwrap().device("028d").is_none_or(|d| d.actions.is_empty()), "nothing was saved");
+    assert!(mgr.assign_action("028d", 1, 0, 160, Action::Device { target: ALL_DEVICES.into(), op: DeviceOp::BrightnessAllUp }).is_ok());
+    assert!(mgr.assign_action("028d", 1, 0, 161, Action::Device { target: "028d".into(), op: DeviceOp::BrightnessUp }).is_ok());
+}
+
+#[test]
+fn saving_from_the_devices_keeps_game_mode_and_zones() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let (mgr, _sim) = rig("00aa", 1);
+    let gm = GameModeConfig { active: false, disable_win: false, disable_menu: true, block_shortcuts: false, blocked_combos: Some(vec!["alt_tab".into()]), ..Default::default() };
+    mgr.set_game_mode("00aa", gm.clone()).unwrap();
+    mgr.set_zone("00aa", 1, tsuba_core::config::Lighting { effect: tsuba_core::config::EffectConfig::Static { colour: "00ff00".into() }, brightness: Some(50) }).unwrap();
+    mgr.save_from_devices().unwrap();
+    let cfg = mgr.config.lock().unwrap().clone();
+    let dc = cfg.device("00aa").unwrap();
+    assert_eq!(dc.game_mode.as_ref(), Some(&gm));
+    assert_eq!(dc.zones.len(), 1);
+    // And it is what was written to the file.
+    let on_disk = tsuba_core::Config::load(&mgr.config_path).unwrap();
+    assert_eq!(on_disk.device("00aa").unwrap().game_mode.as_ref(), Some(&gm));
+}

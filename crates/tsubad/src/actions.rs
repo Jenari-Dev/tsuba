@@ -482,8 +482,12 @@ impl Manager {
     /// Bind key `key` (profile/layer) on `pid` to `action`: allocate a dynamic code, write
     /// `RazerKey [code]` to the key, and save the action.
     pub fn assign_action(&self, pid: &str, profile: u8, layer: u8, key: u8, action: Action) -> Result<String> {
-        if let Action::Device { target, .. } = &action {
-            if target != tsuba_core::config::ALL_DEVICES && !self.devices.lock().unwrap().contains_key(target) {
+        if let Action::Device { target, op } = &action {
+            if target == tsuba_core::config::ALL_DEVICES {
+                if !op.is_global() {
+                    bail!("this action acts on one device: pick which");
+                }
+            } else if !self.devices.lock().unwrap().contains_key(target) {
                 bail!("target device {target} isn't connected");
             }
         }

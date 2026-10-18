@@ -247,6 +247,13 @@ pub enum DeviceOp {
     StudioPrevious,
 }
 
+impl DeviceOp {
+    /// Whether the action acts on all devices at once (target `all`); the others need a device.
+    pub fn is_global(&self) -> bool {
+        matches!(self, Self::BrightnessAllUp | Self::BrightnessAllDown | Self::StudioProfile { .. } | Self::StudioNext | Self::StudioPrevious)
+    }
+}
+
 /// Target value of actions that act on every attached device.
 pub const ALL_DEVICES: &str = "all";
 
@@ -478,11 +485,13 @@ pub fn from_state(s: &DeviceState) -> DeviceConfig {
 
 impl DeviceConfig {
     /// Carry over the settings a device can't report back (lighting power options, battery
-    /// lighting, lift-off distance) from an older section, e.g. when re-snapshotting a device.
+    /// lighting, lift-off distance, Game Mode, per-zone lighting) from an older section, e.g. when re-snapshotting a device.
     pub fn keep_software_settings(&mut self, old: &DeviceConfig) {
         self.lighting_power = old.lighting_power.clone();
         self.battery_lighting = old.battery_lighting.clone();
         self.smart_tracking = old.smart_tracking;
+        self.game_mode = old.game_mode.clone();
+        self.zones = old.zones.clone();
     }
 }
 

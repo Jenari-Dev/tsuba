@@ -215,6 +215,8 @@ impl SimState {
             }
             // ---- performance
             (0x00, 0xc0) => Err(unsupported()),
+            (0x00, 0x81) => Ok(vec![1, 2]),
+            (0x00, 0x84) => Ok(vec![0, 0]),
             (0x00, 0x85) => Ok(vec![self.polling_period]),
             (0x00, 0x05) => {
                 self.polling_period = arg(0);

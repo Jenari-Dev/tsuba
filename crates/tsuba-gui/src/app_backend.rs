@@ -136,11 +136,34 @@ pub fn autostart_exec(exe: &Path) -> String {
     let s = exe.to_string_lossy().trim_end_matches(" (deleted)").to_string();
     if s.starts_with("/usr/bin/") {
         "tsuba-app".to_string()
-    } else if s.contains(' ') {
-        format!("\"{s}\"")
     } else {
-        s
+        exec_quote(&s)
     }
+}
+
+/// `arg` as one argument of a Desktop Entry `Exec` line: `%` doubled; quoted when it holds a
+/// character the spec reserves, with `"`, `` ` ``, `$` and `\` escaped (the backslash twice over:
+/// once for the quoting rule, once for the string-value rule).
+fn exec_quote(arg: &str) -> String {
+    let arg = arg.replace('%', "%%");
+    if !arg.chars().any(|c| " \t\n\"'\\><~|&;$*?#()`".contains(c)) {
+        return arg;
+    }
+    let mut out = String::from('"');
+    for c in arg.chars() {
+        match c {
+            '\\' => out.push_str("\\\\\\\\"),
+            '"' | '`' | '$' => {
+                out.push('\\');
+                out.push(c);
+            }
+            '\n' => out.push_str("\\n"),
+            '\t' => out.push_str("\\t"),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
 }
 
 pub fn autostart_entry(exec: &str) -> String {
@@ -458,6 +481,12 @@ mod tests {
         assert_eq!(autostart_exec(Path::new("/usr/bin/tsuba-app")), "tsuba-app");
         assert_eq!(autostart_exec(Path::new("/home/x/.local/bin/tsuba-app (deleted)")), "/home/x/.local/bin/tsuba-app");
         assert_eq!(autostart_exec(Path::new("/opt/my apps/tsuba-app")), "\"/opt/my apps/tsuba-app\"");
+        // Reserved characters: quoted, `\"`, backtick, `$` and `\` escaped, `%` doubled.
+        assert_eq!(autostart_exec(Path::new("/opt/a\"b/t")), "\"/opt/a\\\"b/t\"");
+        assert_eq!(autostart_exec(Path::new("/opt/$HOME/`x`/t")), "\"/opt/\\$HOME/\\`x\\`/t\"");
+        assert_eq!(autostart_exec(Path::new("/opt/a\\b/t")), "\"/opt/a\\\\\\\\b/t\"");
+        assert_eq!(autostart_exec(Path::new("/opt/100%/t")), "/opt/100%%/t");
+        assert_eq!(autostart_exec(Path::new("/opt/a;b/t")), "\"/opt/a;b/t\"");
         let e = autostart_entry("tsuba-app");
         assert!(e.contains("Exec=tsuba-app --minimized\n") && e.starts_with("[Desktop Entry]\n") && e.contains("Icon=io.github.jenaridev.tsuba"));
     }

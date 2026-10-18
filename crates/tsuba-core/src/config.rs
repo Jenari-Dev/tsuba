@@ -472,6 +472,36 @@ mod tests {
     use super::*;
 
     #[test]
+    fn new_actions_survive_the_toml_config() {
+        let actions: Vec<Action> = vec![
+            Action::Type { text: "hi 😀".into() },
+            Action::Audio { op: AudioOp::MicVolumeUp },
+            Action::Audio { op: AudioOp::SetDefaultOutput { name: "alsa_output.x".into(), label: "Speakers".into() } },
+            Action::Audio { op: AudioOp::SetDefaultInput { name: "alsa_input.y".into(), label: String::new() } },
+            Action::Device { target: ALL_DEVICES.into(), op: DeviceOp::BrightnessAllDown },
+            Action::Device { target: ALL_DEVICES.into(), op: DeviceOp::StudioProfile { name: "Fire".into() } },
+            Action::Device { target: ALL_DEVICES.into(), op: DeviceOp::StudioNext },
+        ];
+        let c = Config {
+            devices: vec![DeviceConfig {
+                pid: "028d".into(),
+                actions: actions.iter().enumerate().map(|(i, a)| ActionConfig { code: i as u8, profile: 1, layer: 0, key: 160 + i as u8, action: a.clone() }).collect(),
+                game_mode: Some(GameModeConfig { active: true, blocked_combos: Some(vec!["alt_tab".into(), "meta".into()]), ..Default::default() }),
+                ..Default::default()
+            }],
+            ..Default::default()
+        };
+        let text = toml::to_string(&c).unwrap();
+        assert_eq!(toml::from_str::<Config>(&text).unwrap(), c, "{text}");
+        for a in &actions {
+            assert_eq!(&serde_json::from_str::<Action>(&serde_json::to_string(a).unwrap()).unwrap(), a);
+        }
+        // The old game-mode section (no combos) still reads.
+        let old: GameModeConfig = toml::from_str("active = true\nblock_shortcuts = true\n").unwrap();
+        assert_eq!(old.blocked_combos, None);
+    }
+
+    #[test]
     fn game_mode_combos_match_the_gui_list() {
         let qml = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../tsuba-gui/qml/GameModeCombos.qml")).unwrap();
         for (name, _, _) in GAME_MODE_COMBOS {

@@ -20,7 +20,10 @@ Item {
             try {
                 lib = Qt.createQmlObject("import io.github.jenaridev.tsuba\nLibraryBackend {}", provider, "LibProvider.qml");
             } catch (e) {
-                console.warn("LibProvider: " + e);
+                // Under the headless QML tests the app's module doesn't exist: no noise there.
+                if (String(e).indexOf("is not installed") < 0) {
+                    console.warn("LibProvider: " + e);
+                }
                 lib = null;
             }
         }

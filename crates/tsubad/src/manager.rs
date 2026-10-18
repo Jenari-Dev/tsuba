@@ -517,21 +517,26 @@ impl Manager {
 
     pub fn save_macro(&self, mut mac: tsuba_core::macros::Macro) -> Result<String> {
         use tsuba_core::macros::MacroEvent;
-        let _g = MACROS_LOCK.lock().unwrap();
         anyhow::ensure!(!mac.name.trim().is_empty(), "the macro needs a name");
-        // Run-command events play a shortcut slot: give them one before the macro is encoded.
-        let has_run = mac.events.iter().any(|e| matches!(e, MacroEvent::Run { .. }));
-        self.alloc_run_slots(&mut mac)?;
-        mac.encode()?;
-        let path = tsuba_core::macros::library_path();
-        let mut lib = tsuba_core::macros::Library::load(&path)?;
-        let had_run = lib.get(&mac.guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, MacroEvent::Run { .. })));
-        let guid = lib.upsert(mac)?;
-        lib.save(&path)?;
-        if has_run || had_run {
+        // The library file is changed under the lock; the desktop's shortcut service and the
+        // devices are told afterwards (the desktop may take a while to answer).
+        let (guid, mac, sync) = {
+            let _g = MACROS_LOCK.lock().unwrap();
+            // Run-command events play a shortcut slot: give them one before the macro is encoded.
+            let has_run = mac.events.iter().any(|e| matches!(e, MacroEvent::Run { .. }));
+            self.alloc_run_slots(&mut mac)?;
+            mac.encode()?;
+            let path = tsuba_core::macros::library_path();
+            let mut lib = tsuba_core::macros::Library::load(&path)?;
+            let had_run = lib.get(&mac.guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, MacroEvent::Run { .. })));
+            let guid = lib.upsert(mac)?;
+            lib.save(&path)?;
+            let mac = lib.get(&guid).cloned().context("saved macro")?;
+            (guid, mac, has_run || had_run)
+        };
+        if sync {
             crate::shortcuts::sync(self);
         }
-        let mac = lib.get(&guid).cloned().context("saved macro")?;
         // Refresh copies already on devices (same id, so bindings stay valid).
         for pid in self.attached() {
             self.with_device(&pid, |dev, _| {
@@ -562,7 +567,19 @@ impl Manager {
     }
 
     pub fn delete_macro(&self, guid: &str) -> Result<()> {
-        let _g = MACROS_LOCK.lock().unwrap();
+        let had_run = {
+            let _g = MACROS_LOCK.lock().unwrap();
+            self.delete_macro_locked(guid)?
+        };
+        if had_run {
+            crate::shortcuts::sync(self);
+        }
+        Ok(())
+    }
+
+    /// The part of [`Self::delete_macro`] that runs under the macro lock; returns whether the
+    /// macro had run-command events.
+    fn delete_macro_locked(&self, guid: &str) -> Result<bool> {
         let path = tsuba_core::macros::library_path();
         let mut lib = tsuba_core::macros::Library::load(&path)?;
         for pid in self.attached() {
@@ -580,10 +597,7 @@ impl Manager {
         let had_run = lib.get(guid).is_some_and(|m| m.events.iter().any(|e| matches!(e, tsuba_core::macros::MacroEvent::Run { .. })));
         lib.macros.retain(|m| m.guid != guid);
         lib.save(&path)?;
-        if had_run {
-            crate::shortcuts::sync(self);
-        }
-        Ok(())
+        Ok(had_run)
     }
 
     pub fn import_macro(&self, pid: &str, id: u16) -> Result<String> {

@@ -157,7 +157,7 @@ ColumnLayout {
         spacing: 8
         SynCheckBox {
             objectName: "onlyUnused"
-            visible: ml.usage !== null
+            visible: ml.usage !== null && ml.lib.length > 0
             text: "Not in use (" + ml.unusedCount + ")"
             checked: ml.onlyUnused
             onToggled: ml.onlyUnused = checked

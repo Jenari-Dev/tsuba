@@ -93,3 +93,43 @@ pub fn unload_on_exit() {
         unload(&conn);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    /// Run the KWin script under node with a stand-in `workspace` and `callDBus`: it must report
+    /// the focused window (as strings) on start and on every activation, and an empty window when
+    /// none has the focus.
+    #[test]
+    fn the_kwin_script_reports_window_focus() {
+        let Ok(node) = std::process::Command::new("node").arg("--version").output() else { return };
+        if !node.status.success() {
+            return;
+        }
+        let harness = r#"
+const calls = [];
+let handler = null;
+globalThis.callDBus = (...a) => calls.push(a);
+const win = { pid: 4242, resourceClass: "steam_app_1245620", resourceName: "eldenring.exe", caption: "ELDEN RING" };
+globalThis.workspace = { windowActivated: { connect: f => { handler = f; } }, activeWindow: win };
+eval(require("fs").readFileSync(process.argv[2], "utf8"));
+handler(null);
+handler({ pid: 7, resourceClass: "firefox", resourceName: "Navigator", caption: "Mozilla Firefox" });
+process.stdout.write(JSON.stringify(calls));
+"#;
+        let dir = std::env::temp_dir().join(format!("tsuba-focus-js-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let (js, script) = (dir.join("harness.js"), dir.join("main.js"));
+        std::fs::write(&js, harness).unwrap();
+        std::fs::write(&script, super::SCRIPT).unwrap();
+        let out = std::process::Command::new("node").arg(&js).arg(&script).output().unwrap();
+        assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+        let calls: Vec<Vec<String>> = serde_json::from_slice(&out.stdout).unwrap();
+        let svc = |args: &[&str]| -> Vec<String> {
+            ["io.github.JenAriDev.Tsuba", "/io/github/JenAriDev/Tsuba", "io.github.JenAriDev.Tsuba1.Library", "FocusChanged"].iter().chain(args).map(|s| s.to_string()).collect()
+        };
+        assert_eq!(calls[0], svc(&["4242", "steam_app_1245620", "eldenring.exe", "ELDEN RING"]), "reports the focused window when it starts");
+        assert_eq!(calls[1], svc(&["0", "", "", ""]), "no window: an empty report");
+        assert_eq!(calls[2], svc(&["7", "firefox", "Navigator", "Mozilla Firefox"]));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}

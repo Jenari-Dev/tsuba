@@ -136,3 +136,23 @@ impl LibraryApi {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn text_events_follow_the_requested_layout() {
+        // The layout argument is "name" or "name (variant)", as the app lists them.
+        let Ok(us) = text_events("a@", 0, "us") else { return };
+        assert_eq!(us["layout"], "us");
+        assert_eq!(us["skipped"], "");
+        let Ok(de) = text_events("z@", 3, "de") else { return };
+        assert_eq!(de["events"][0], json!({ "type": "key", "hid": 0x1c, "down": true }), "Z is on the Y key of a German board");
+        assert!(de["events"].as_array().unwrap().contains(&json!({ "type": "delay", "ms": 3 })));
+        let emoji = text_events("hi 😀", 0, "us").unwrap();
+        assert_eq!(emoji["skipped"], "😀");
+        assert!(text_events("x", 0, "nosuchlayout").is_err());
+        assert_eq!(text_events("a", 0, "de (nodeadkeys)").unwrap()["layout"], "de (nodeadkeys)");
+    }
+}

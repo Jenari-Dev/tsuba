@@ -2,6 +2,7 @@
 
 mod app_backend;
 mod backend;
+mod device_backend;
 mod i18n;
 mod studio_api;
 mod synapse;

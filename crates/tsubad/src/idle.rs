@@ -1,7 +1,9 @@
-//! Lighting power options: turn device lighting off when the user is idle or the display has
-//! turned off (KDE's display-off timeout), and back on with the next input. Idle state comes
-//! from the compositor's ext-idle-notify-v1 protocol (no input is read).
+//! Lighting power options: turn device lighting off when the user is idle, the display has
+//! turned off (KDE's display-off timeout) or the session is locked, and back on with the next
+//! input / unlock. Idle state comes from the compositor's ext-idle-notify-v1 protocol (no input
+//! is read); the lock state from the session's `org.freedesktop.ScreenSaver` ActiveChanged signal.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -71,8 +73,37 @@ fn watch(mgr: Arc<Manager>) -> Result<()> {
     }
 }
 
+/// The session is locked (screen locker active).
+static LOCKED: AtomicBool = AtomicBool::new(false);
+
+/// Follow the screen locker: `ActiveChanged(true)` when it locks, `(false)` on unlock. KDE
+/// sends it on two object paths; repeats are ignored.
+fn watch_lock(mgr: Arc<Manager>) -> Result<()> {
+    let conn = zbus::blocking::Connection::session().context("no session bus")?;
+    let rule = zbus::MatchRule::builder().msg_type(zbus::message::Type::Signal).interface("org.freedesktop.ScreenSaver")?.member("ActiveChanged")?.build();
+    let signals = zbus::blocking::MessageIterator::for_match_rule(rule, &conn, Some(16))?;
+    info!("lock watcher running");
+    for msg in signals {
+        let Ok(active) = msg?.body().deserialize::<bool>() else { continue };
+        if LOCKED.swap(active, Ordering::SeqCst) != active {
+            mgr.on_lock_changed(active);
+        }
+    }
+    Ok(())
+}
+
 pub fn spawn(mgr: Arc<Manager>) {
     mgr.restore_dimmed_from_disk();
+    crate::dbus_device::spawn_battery_watch(mgr.clone());
+    let m = mgr.clone();
+    std::thread::Builder::new()
+        .name("lock".into())
+        .spawn(move || {
+            if let Err(e) = watch_lock(m) {
+                warn!("lights off when locked unavailable: {e:#}");
+            }
+        })
+        .ok();
     let m = mgr.clone();
     std::thread::Builder::new()
         .name("idle".into())
@@ -94,6 +125,9 @@ pub fn spawn(mgr: Arc<Manager>) {
 /// Brightness saved while lighting is off for idleness — on disk, so a daemon restart (update,
 /// crash, logout) still restores it.
 fn dimmed_path() -> std::path::PathBuf {
+    if cfg!(test) {
+        return std::env::temp_dir().join(format!("tsubad-test-idle-dimmed-{}.json", std::process::id()));
+    }
     dirs::config_dir().unwrap_or_default().join("tsuba").join("idle-dimmed.json")
 }
 
@@ -135,28 +169,62 @@ impl Manager {
             if idle < Duration::from_secs(min as u64 * 60) || self.dimmed.lock().unwrap().contains_key(&dc.pid) {
                 continue;
             }
-            let saved = self.with_device(&dc.pid, |dev, _| {
-                let mut saved = Vec::new();
-                for r in chroma::regions(&dev.query(chroma::GET_REGION_LIST, &[])?) {
-                    saved.push((r.id, dev.query(chroma::GET_BRIGHTNESS, &[chroma::STORE, r.id])?.get(2).copied().unwrap_or(0)));
-                    dev.query(chroma::SET_BRIGHTNESS, &chroma::encode_brightness(chroma::STORE, r.id, 0))?;
-                }
-                Ok(saved)
-            });
-            match saved {
-                Ok(s) => {
-                    info!("{}: lighting off (idle {} min)", dc.pid, idle.as_secs() / 60);
-                    self.dimmed.lock().unwrap().insert(dc.pid.clone(), s);
-                    self.save_dimmed();
-                }
-                Err(e) => warn!("{}: idle lighting off: {e:#}", dc.pid),
+            self.switch_off(&dc.pid, &format!("idle {} min", idle.as_secs() / 60));
+        }
+    }
+
+    /// Save every region's brightness and set it to 0 (undone by [`Self::lighting_wake`]).
+    fn switch_off(&self, pid: &str, why: &str) {
+        let saved = self.with_device(pid, |dev, _| {
+            let mut saved = Vec::new();
+            for r in chroma::regions(&dev.query(chroma::GET_REGION_LIST, &[])?) {
+                saved.push((r.id, dev.query(chroma::GET_BRIGHTNESS, &[chroma::STORE, r.id])?.get(2).copied().unwrap_or(0)));
+                dev.query(chroma::SET_BRIGHTNESS, &chroma::encode_brightness(chroma::STORE, r.id, 0))?;
+            }
+            Ok(saved)
+        });
+        match saved {
+            Ok(s) => {
+                info!("{pid}: lighting off ({why})");
+                self.dimmed.lock().unwrap().insert(pid.to_string(), s);
+                self.save_dimmed();
+            }
+            Err(e) => warn!("{pid}: lighting off ({why}): {e:#}"),
+        }
+    }
+
+    /// The session was locked (true) or unlocked: devices with "off when locked" follow.
+    pub fn on_lock_changed(&self, locked: bool) {
+        LOCKED.store(locked, Ordering::SeqCst);
+        if !locked {
+            info!("session unlocked");
+            self.lighting_wake();
+            return;
+        }
+        info!("session locked");
+        let cfg = self.config.lock().unwrap().clone();
+        for dc in cfg.devices.iter().filter(|d| d.lighting_power.as_ref().is_some_and(|p| p.on_lock)) {
+            if self.devices.lock().unwrap().contains_key(&dc.pid) && !self.dimmed.lock().unwrap().contains_key(&dc.pid) {
+                self.switch_off(&dc.pid, "session locked");
             }
         }
     }
 
     /// Restore lighting switched off for idleness.
+    /// While the session is locked, devices set to stay off when locked are left off.
     pub fn lighting_wake(&self) {
-        let dimmed: Vec<_> = self.dimmed.lock().unwrap().drain().collect();
+        let keep_off: Vec<String> = if LOCKED.load(Ordering::SeqCst) {
+            self.config.lock().unwrap().devices.iter().filter(|d| d.lighting_power.as_ref().is_some_and(|p| p.on_lock)).map(|d| d.pid.clone()).collect()
+        } else {
+            Vec::new()
+        };
+        let dimmed: Vec<_> = {
+            let mut d = self.dimmed.lock().unwrap();
+            let all: Vec<_> = d.drain().collect();
+            let (stay, go): (Vec<_>, Vec<_>) = all.into_iter().partition(|(pid, _)| keep_off.contains(pid));
+            d.extend(stay);
+            go
+        };
         self.save_dimmed();
         for (pid, saved) in dimmed {
             let r = self.with_device(&pid, |dev, _| {
@@ -170,5 +238,36 @@ impl Manager {
                 Err(e) => warn!("{pid}: restoring lighting: {e:#}"),
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Mutex;
+    use tsuba_core::sim;
+
+    #[test]
+    fn lock_switches_off_and_unlock_restores() {
+        let dir = std::env::temp_dir().join(format!("tsubad-lock-test-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
+        let mgr = Arc::new(Manager::new(false, dir.join("config.toml"), tx).unwrap());
+        let mouse = Arc::new(Mutex::new(sim::new_state("00aa", 1)));
+        let dev = sim::device(&mouse);
+        let counters = dev.counters().clone();
+        mgr.devices.lock().unwrap().insert("00aa".into(), crate::manager::Attached { model: tsuba_hid::model(0x00aa).unwrap(), hidraw: "/dev/null".into(), dev: Arc::new(Mutex::new(dev)), counters });
+        mgr.set_lighting_power("00aa", tsuba_core::config::LightingPower { on_lock: true, display_off_minutes: 10, ..Default::default() }).unwrap();
+        let level = |id: u8| mouse.lock().unwrap().feat.lighting.get(&id).map_or(255, |l| l.1);
+        mgr.on_lock_changed(true);
+        assert_eq!((level(1), level(4), level(10)), (0, 0, 0));
+        // Input on the lock screen doesn't bring the lighting back.
+        mgr.lighting_wake();
+        assert_eq!(level(4), 0);
+        mgr.on_lock_changed(false);
+        assert_eq!((level(1), level(4), level(10)), (255, 255, 255));
+        let _ = std::fs::remove_dir_all(&dir);
+        let _ = std::fs::remove_file(dimmed_path());
     }
 }

@@ -380,6 +380,7 @@ impl Manager {
                 fresh.actions = old.actions.clone();
                 fresh.mode = old.mode.clone();
                 fresh.allow_untested_writes = old.allow_untested_writes;
+                fresh.keep_software_settings(old);
                 if let Some(l) = &old.lighting {
                     if matches!(l.effect, config::EffectConfig::Studio { .. } | config::EffectConfig::Custom { .. }) {
                         fresh.lighting = Some(l.clone());
@@ -428,7 +429,7 @@ impl Manager {
     }
 
     pub fn lighting_power(&self, pid: &str) -> tsuba_core::config::LightingPower {
-        self.config.lock().unwrap().device(pid).and_then(|d| d.lighting_power.clone()).unwrap_or(tsuba_core::config::LightingPower { idle_minutes: 0, display_off: false, display_off_minutes: 10 })
+        self.config.lock().unwrap().device(pid).and_then(|d| d.lighting_power.clone()).unwrap_or(tsuba_core::config::LightingPower { display_off_minutes: 10, ..Default::default() })
     }
 
     pub fn set_lighting_power(&self, pid: &str, p: tsuba_core::config::LightingPower) -> Result<()> {

@@ -34,7 +34,51 @@ QQC2.ScrollView {
     }
     onAdvancedChanged: if (advanced) loadStudioProfiles()
 
-    readonly property var region: st.lighting && st.lighting.length ? st.lighting[0] : null
+    // Mouse zones (logo, scroll wheel, underglow): 0 = every zone, n = st.lighting[n - 1].
+    property int zone: 0
+    readonly property var zones: st.lighting && st.lighting.length > 1 ? st.lighting : []
+    onZoneChanged: Qt.callLater(sync)
+    readonly property var region: st.lighting && st.lighting.length ? st.lighting[Math.max(0, Math.min(zone, st.lighting.length) - 1)] : null
+    // Quick effects (and brightness) for every attached device at once.
+    property bool allDevices: false
+    property bool brightnessAll: false
+    readonly property bool multiDevice: {
+        try {
+            return JSON.parse(backend.devices || "[]").length > 1;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Firmware features from tsubad's read-only probe (status lights, battery info); `devb` is
+    // the daemon's Device interface (null in headless tests unless a test sets a fake).
+    property int profile: 1
+    property string result: ""
+    property var devb: null
+    property var feat: ({})
+    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
+    function tr(translated, plain) {
+        return typeof i18n === "function" ? translated() : plain;
+    }
+    function loadFeatures() {
+        if (!devb) {
+            return;
+        }
+        const s = devb.features(pid, profile);
+        feat = s === "" ? ({}) : JSON.parse(s);
+    }
+    function setFeat(change) {
+        const r = devb.set_features(pid, JSON.stringify(Object.assign({ profile: profile }, change)));
+        result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : r.split("\n").join(" · ");
+        loadFeatures();
+    }
+    function makeDevb() {
+        try {
+            return Qt.createQmlObject("import io.github.jenaridev.tsuba\nDeviceBackend {}", tab, "DeviceBackend");
+        } catch (e) {
+            return null;
+        }
+    }
     readonly property var effectTypes: [
         { type: "static", label: "Static", fw: "Static", colours: 1 },
         { type: "breathing", label: "Breathing", fw: "Breathing", colours: 2 },
@@ -56,7 +100,8 @@ QQC2.ScrollView {
     function softOnHere(e) {
         return !!e.soft || (isMouse && (e.type === "wave" || e.type === "starlight"));
     }
-    readonly property var choices: region ? effectTypes.filter(e => (!e.mouseOnly || isMouse) && (softOnHere(e) || region.supported.indexOf(e.fw) >= 0)) : []
+    // A single zone takes the device's built-in effects only.
+    readonly property var choices: region ? effectTypes.filter(e => (!e.mouseOnly || isMouse) && (zone === 0 || !softOnHere(e)) && (softOnHere(e) || region.supported.indexOf(e.fw) >= 0)) : []
     // Audio Meter options
     property real meterGain: 1.0
     property real meterBoost: 1.0
@@ -87,6 +132,10 @@ QQC2.ScrollView {
         // custom frames) as whatever stored effect it last had, which isn't what was picked.
         const cfg = JSON.parse(backend.config(pid) || "{}");
         let fx = cfg.lighting && cfg.lighting.effect ? cfg.lighting.effect : null;
+        if (zone > 0) {
+            const z = cfg.zones ? cfg.zones[String(region.id)] : null;
+            fx = z && z.effect ? z.effect : null;
+        }
         if (fx && fx.type === "studio" && fx.studio && fx.studio.layers && fx.studio.layers.length === 1) {
             fx = fx.studio.layers[0].effect;
         }
@@ -160,6 +209,10 @@ QQC2.ScrollView {
         }
     }
     Component.onCompleted: {
+        if (!devb) {
+            devb = makeDevb();
+        }
+        loadFeatures();
         loadPower();
         if (typeof backend.env_var === "function" && backend.env_var("TSUBA_ADVANCED") === "1") {   // headless UI check
             advanced = true;
@@ -170,6 +223,21 @@ QQC2.ScrollView {
     }
 
     function apply() {
+        if (zone > 0 && devb && !softOnHere(effect)) {
+            const ze = quickEffect();
+            result = devb.set_zone_effect(pid, region.id, JSON.stringify(ze), Math.round(brightness.value)) ? region.name + ": " + effect.label : tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status);
+            changed();
+            return;
+        }
+        if (allDevices && multiDevice && devb && !softOnHere(effect)) {
+            const r = devb.set_effect_all(JSON.stringify(quickEffect()), Math.round(brightness.value));
+            result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : tr(() => i18n("Applied to every device"), "Applied to every device");
+            changed();
+            return;
+        }
+        if (devb && zones.length > 0 && !softOnHere(effect)) {
+            devb.clear_zones(pid);   // the whole device gets this effect, also at the next login
+        }
         if (softOnHere(effect)) {
             const j = JSON.stringify(softEffect());
             if (backend.set_effect(pid, j, Math.round(brightness.value))) {
@@ -178,6 +246,15 @@ QQC2.ScrollView {
             }
             return;
         }
+        const e = quickEffect();
+        if (backend.set_effect(pid, JSON.stringify(e), Math.round(brightness.value))) {
+            backend.save_lighting(pid, JSON.stringify(e), Math.round(brightness.value));   // restored at login
+            changed();
+        }
+    }
+
+    // The picked built-in effect in the daemon's config JSON form.
+    function quickEffect() {
         const e = { type: effect.type };
         const cs = colours.slice(0, Math.min(colourCount, effect.colours));
         if (effect.type === "static" || effect.type === "reactive") {
@@ -196,16 +273,22 @@ QQC2.ScrollView {
         } else if (hasSpeed) {
             e.speed = speedIdx + 1;
         }
-        if (backend.set_effect(pid, JSON.stringify(e), Math.round(brightness.value))) {
-            backend.save_lighting(pid, JSON.stringify(e), Math.round(brightness.value));   // restored at login
-            changed();
-        }
+        return e;
     }
 
     Timer {
         id: brightnessApply
         interval: 120
-        onTriggered: tab.backend.set_brightness(tab.pid, Math.round(brightness.value))
+        onTriggered: {
+            const v = Math.round(brightness.value);
+            if (tab.zone > 0 && tab.devb) {
+                tab.devb.set_zone_brightness(tab.pid, tab.region.id, v);
+            } else if (tab.brightnessAll && tab.multiDevice && tab.devb) {
+                tab.devb.set_brightness_all(v);
+            } else {
+                tab.backend.set_brightness(tab.pid, v);
+            }
+        }
     }
 
     ColorDialog {
@@ -279,6 +362,18 @@ QQC2.ScrollView {
                         stepSize: 1
                         value: 100
                     }
+                    SynCheckBox {
+                        objectName: "brightnessAll"
+                        visible: tab.multiDevice && tab.devb !== null && tab.zone === 0
+                        text: i18n("Same brightness on every device")
+                        checked: tab.brightnessAll
+                        onToggled: {
+                            tab.brightnessAll = checked;
+                            if (checked) {
+                                brightnessApply.restart();
+                            }
+                        }
+                    }
                 }
 
                 SynCard {
@@ -324,14 +419,39 @@ QQC2.ScrollView {
                             onValueModified: if (idleBox.checked) tab.setPower({ idle_minutes: value })
                         }
                     }
+                    SynCheckBox {
+                        objectName: "offWhenLocked"
+                        text: i18n("When the session is locked")
+                        checked: !!tab.power && !!tab.power.on_lock
+                        onToggled: tab.setPower({ on_lock: checked })
+                    }
                     Text {
                         Layout.fillWidth: true
-                        text: "Lighting comes back with the next key press or mouse movement."
+                        text: i18n("Lighting comes back with the next key press or mouse movement, or when you unlock.")
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 12
                         wrapMode: Text.Wrap
                     }
+                }
+
+                // Status lights stored in the device (profile colour, indicators, power-on animation)
+                DeviceLedsCard {
+                    host: tab
+                }
+                // Wireless: different lighting on battery
+                BatteryLightingCard {
+                    host: tab
+                }
+                Text {
+                    objectName: "lightingResult"
+                    visible: tab.result !== ""
+                    Layout.fillWidth: true
+                    text: tab.result
+                    color: tab.result.startsWith(tab.tr(() => i18n("Failed"), "Failed")) ? Theme.warn : Theme.accent
+                    font.family: Theme.font
+                    font.pixelSize: Theme.small
+                    wrapMode: Text.Wrap
                 }
             }
 
@@ -465,6 +585,25 @@ QQC2.ScrollView {
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
                             wrapMode: Text.Wrap
+                        }
+                        RowLayout {
+                            visible: tab.zones.length > 0
+                            spacing: 12
+                            Label14 {
+                                text: i18n("Zone")
+                            }
+                            SynDropdown {
+                                id: zoneBox
+                                objectName: "zoneBox"
+                                Layout.preferredWidth: 220
+                                model: [i18n("All zones")].concat(tab.zones.map(r => r.name.charAt(0).toUpperCase() + r.name.slice(1)))
+                                onActivated: i => tab.zone = i
+                                Binding {
+                                    target: zoneBox
+                                    property: "currentIndex"
+                                    value: tab.zone
+                                }
+                            }
                         }
                         Label14 {
                             text: "Effect"
@@ -677,8 +816,15 @@ QQC2.ScrollView {
                                 enabled: !tab.readOnly && tab.effect !== null
                                 onClicked: tab.apply()
                             }
+                            SynCheckBox {
+                                objectName: "applyAllDevices"
+                                visible: tab.multiDevice && tab.devb !== null && tab.zone === 0 && !!tab.effect && !tab.softOnHere(tab.effect)
+                                text: i18n("Every device")
+                                checked: tab.allDevices
+                                onToggled: tab.allDevices = checked
+                            }
                             Text {
-                                text: tab.region ? "Applies to: " + tab.st.lighting.map(r => r.name).join(", ") : ""
+                                text: !tab.region ? "" : (tab.zone > 0 ? i18n("Applies to: %1", tab.region.name) : (tab.allDevices && tab.multiDevice && tab.devb !== null && !!tab.effect && !tab.softOnHere(tab.effect) ? i18n("Applies to every device that has this effect") : "Applies to: " + tab.st.lighting.map(r => r.name).join(", ")))
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small

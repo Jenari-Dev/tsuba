@@ -74,6 +74,16 @@ pub struct DeviceConfig {
     /// (`tested = false` in the device database). Off by default: untested devices are read-only.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub allow_untested_writes: bool,
+    /// Per-zone lighting (mice: logo, scroll wheel, underglow), keyed by region id. Applied
+    /// after `lighting`, so a zone keeps its own effect / brightness.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub zones: std::collections::BTreeMap<String, Lighting>,
+    /// Lighting while running on battery (wireless devices); `lighting` comes back on charge.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub battery_lighting: Option<Lighting>,
+    /// Lift-off distance last sent to the mouse (the firmware has no read-back for it).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub smart_tracking: Option<crate::features::SmartTracking>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -87,6 +97,9 @@ pub struct LightingPower {
     /// KDE's display-off timeout (Plasma default: 10 minutes).
     #[serde(default = "ten")]
     pub display_off_minutes: u32,
+    /// Turn off while the session is locked.
+    #[serde(default)]
+    pub on_lock: bool,
 }
 
 fn ten() -> u32 {
@@ -358,21 +371,35 @@ impl Config {
     }
 }
 
-/// Build a config section that reproduces a device's current state.
-pub fn from_state(s: &DeviceState) -> DeviceConfig {
-    let lighting = s.lighting.first().map(|r| Lighting {
+/// The saved form of one region's read-back lighting.
+fn region_lighting(r: &crate::state::RegionState) -> Lighting {
+    let first = || r.colours.first().cloned().unwrap_or_else(|| "ffffff".into());
+    Lighting {
         effect: match r.effect.as_str() {
             "Off" => EffectConfig::Off,
-            "Static" => EffectConfig::Static { colour: r.colours.first().cloned().unwrap_or_else(|| "ffffff".into()) },
+            "Static" => EffectConfig::Static { colour: first() },
             "Breathing" => EffectConfig::Breathing { colours: r.colours.clone() },
             "Wave" => EffectConfig::Wave { direction: 1, speed: wave_speed() },
-            "Reactive" => EffectConfig::Reactive { speed: 2, colour: r.colours.first().cloned().unwrap_or_else(|| "ffffff".into()) },
+            "Reactive" => EffectConfig::Reactive { speed: 2, colour: first() },
             "Starlight" => EffectConfig::Starlight { speed: 2, colours: r.colours.clone() },
             "Ripple" => EffectConfig::Ripple { speed: 2, colours: r.colours.clone() },
             _ => EffectConfig::Spectrum,
         },
         brightness: Some(r.brightness),
-    });
+    }
+}
+
+/// Build a config section that reproduces a device's current state. Regions whose lighting
+/// differs from the first region's are kept as zones.
+pub fn from_state(s: &DeviceState) -> DeviceConfig {
+    let lighting = s.lighting.first().map(region_lighting);
+    let zones = s
+        .lighting
+        .iter()
+        .skip(1)
+        .map(|r| (r.id.to_string(), region_lighting(r)))
+        .filter(|(_, l)| Some(l) != lighting.as_ref())
+        .collect();
     DeviceConfig {
         pid: s.pid.clone(),
         name: Some(s.name.clone()),
@@ -382,10 +409,18 @@ pub fn from_state(s: &DeviceState) -> DeviceConfig {
         dial: s.dial.as_ref().map(|slots| {
             slots.iter().map(|k| DialSlotConfig { function: k.function.clone(), colour: k.colour.clone(), enabled: k.enabled }).collect()
         }),
-        actions: Vec::new(),
-        lighting_power: None,
-        game_mode: None,
-        allow_untested_writes: false,
+        zones,
+        ..Default::default()
+    }
+}
+
+impl DeviceConfig {
+    /// Carry over the settings a device can't report back (lighting power options, battery
+    /// lighting, lift-off distance) from an older section, e.g. when re-snapshotting a device.
+    pub fn keep_software_settings(&mut self, old: &DeviceConfig) {
+        self.lighting_power = old.lighting_power.clone();
+        self.battery_lighting = old.battery_lighting.clone();
+        self.smart_tracking = old.smart_tracking;
     }
 }
 
@@ -423,6 +458,7 @@ mod tests {
                 lighting_power: None,
                 game_mode: None,
                 allow_untested_writes: true,
+                ..Default::default()
             }],
             ..Default::default()
         };
@@ -464,6 +500,25 @@ mod tests {
         // Off is not written out.
         let s = toml::to_string(&Config { devices: vec![DeviceConfig { pid: "0084".into(), ..Default::default() }], ..Default::default() }).unwrap();
         assert!(!s.contains("allow_untested"));
+    }
+
+    #[test]
+    fn device_feature_sections_default_and_roundtrip() {
+        let c: Config = toml::from_str("[[device]]\npid = \"00aa\"\nlighting_power = { idle_minutes = 5 }\n").unwrap();
+        let d = &c.devices[0];
+        assert!(d.zones.is_empty() && d.battery_lighting.is_none() && d.smart_tracking.is_none());
+        assert!(!d.lighting_power.as_ref().unwrap().on_lock);
+        let mut d = d.clone();
+        d.zones.insert("4".into(), Lighting { effect: EffectConfig::Static { colour: "ff0000".into() }, brightness: Some(50) });
+        d.battery_lighting = Some(Lighting { effect: EffectConfig::Off, brightness: None });
+        d.smart_tracking = Some(crate::features::SmartTracking { asymmetric: true, distance_mm: 2, lift_mm: 3, landing_mm: 1 });
+        d.lighting_power.as_mut().unwrap().on_lock = true;
+        let c = Config { devices: vec![d], ..Default::default() };
+        let s = toml::to_string(&c).unwrap();
+        assert_eq!(toml::from_str::<Config>(&s).unwrap(), c, "{s}");
+        // Empty sections are not written.
+        let s = toml::to_string(&Config { devices: vec![DeviceConfig { pid: "028d".into(), ..Default::default() }], ..Default::default() }).unwrap();
+        assert!(!s.contains("zones") && !s.contains("battery_lighting") && !s.contains("smart_tracking"), "{s}");
     }
 
     #[test]

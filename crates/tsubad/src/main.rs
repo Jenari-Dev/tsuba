@@ -10,6 +10,7 @@ mod cache;
 mod dbus;
 mod dbus_app;
 mod diag;
+mod dbus_device;
 mod game_http;
 mod game_lighting;
 mod gamemode;
@@ -101,6 +102,7 @@ async fn main() -> Result<()> {
         .serve_at(dbus::PATH, dbus::Tsuba { mgr: mgr.clone(), game: game.clone() })?
         .serve_at(dbus::PATH, dbus_app::App { notifier: notifier.clone(), read_only: mgr.read_only })?
         .serve_at(dbus::PATH, dbus_lighting::Lighting { mgr: mgr.clone(), game: game.clone() })?
+        .serve_at(dbus::PATH, dbus_device::DeviceIface { mgr: mgr.clone() })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;

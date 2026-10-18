@@ -6,6 +6,7 @@ pub mod apply;
 pub mod chroma_profiles;
 pub mod config;
 pub mod devices;
+pub mod features;
 pub mod fsutil;
 pub mod game_lighting;
 pub mod game_lighting_install;

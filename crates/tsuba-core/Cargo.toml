@@ -1,0 +1,26 @@
+[package]
+name = "tsuba-core"
+description = "Device state, configuration model and apply logic shared by tsuba and tsubad"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsuba-proto.workspace = true
+tsuba-hid.workspace = true
+anyhow.workspace = true
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.1.8"
+serde_json = "1.0.154"
+dirs = "7.0.0"
+snap = "1.1.1"
+libc.workspace = true
+
+[features]
+# A simulated device for tests (tsuba_core::sim).
+sim = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tsuba_packaged)"] }

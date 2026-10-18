@@ -1,0 +1,77 @@
+# Maintainer: JenAriDev
+pkgname=tsuba
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Open-source Razer Synapse replacement: remaps, macros, DPI, lighting and Chroma Studio for Razer keyboards and mice'
+arch=('x86_64')
+url='https://github.com/JenAriDev/tsuba'
+license=('GPL-2.0-or-later')
+depends=(
+    'gcc-libs' 'glibc' 'hicolor-icon-theme'
+    'qt6-base' 'qt6-declarative' 'qt6-svg' 'qqc2-breeze-style' 'ki18n'
+    'libpipewire' 'libpulse' 'xdg-desktop-portal' 'xdg-utils' 'ttf-roboto'
+)
+makedepends=('cargo' 'clang' 'pkgconf' 'mingw-w64-gcc')
+optdepends=(
+    'kglobalaccel: run Launch / Inter-device / Audio actions from device buttons'
+    'systemsettings: "Open system settings" shortcut on the Customize tab'
+    'wine: game lighting for Windows games (the bridge DLLs are installed into Wine/Proton prefixes)'
+)
+options=('!lto')   # cxx-qt's C++ objects must stay native for rust-lld
+install=tsuba.install
+source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "$pkgname-$pkgver"
+    export RUSTUP_TOOLCHAIN=stable
+    cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+    cd "$pkgname-$pkgver"
+    export RUSTUP_TOOLCHAIN=stable
+    export CARGO_TARGET_DIR=target
+    export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$srcdir=/build --cfg tsuba_packaged"
+    # C++ from cxx-qt records __FILE__ paths; map the build dir away there too.
+    export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$srcdir=/build"
+    export CXXFLAGS="${CXXFLAGS:-} -ffile-prefix-map=$srcdir=/build"
+    cargo build --frozen --release --workspace
+    # Game lighting bridge: Windows DLLs (64- and 32-bit) that games in Wine/Proton load.
+    make -C shim B="$srcdir/shim-build"
+}
+
+check() {
+    cd "$pkgname-$pkgver"
+    export RUSTUP_TOOLCHAIN=stable
+    cargo test --frozen --release --workspace --exclude tsuba-gui
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    install -Dm755 -t "$pkgdir/usr/bin" target/release/{tsubad,tsuba,tsuba-app}
+
+    install -Dm644 contrib/tsubad.service "$pkgdir/usr/lib/systemd/user/tsubad.service"
+    sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/tsubad|' "$pkgdir/usr/lib/systemd/user/tsubad.service"
+    install -Dm644 contrib/70-tsuba.rules "$pkgdir/usr/lib/udev/rules.d/70-tsuba.rules"
+
+    # Tsuba's own line-art device drawings (used unless the user has a personal picture pack).
+    # (per-device top.svg files are relative symlinks into devices/_layouts — keep them as links)
+    install -dm755 "$pkgdir/usr/share/tsuba"
+    cp -a --no-preserve=ownership data/devices "$pkgdir/usr/share/tsuba/"
+    install -Dm644 -t "$pkgdir/usr/share/tsuba/devicedb" data/devicedb/*.toml
+
+    # Game lighting bridge DLLs; Tsuba copies them into game prefixes on request (never by itself).
+    install -Dm644 "$srcdir/shim-build/x64/RzChromaSDK64.dll" "$pkgdir/usr/share/tsuba/game-lighting/x64/RzChromaSDK64.dll"
+    install -Dm644 "$srcdir/shim-build/x86/RzChromaSDK.dll" "$pkgdir/usr/share/tsuba/game-lighting/x86/RzChromaSDK.dll"
+
+    install -Dm644 contrib/io.github.jenaridev.tsuba.desktop -t "$pkgdir/usr/share/applications"
+    sed -i 's|^Exec=.*|Exec=tsuba-app|' "$pkgdir/usr/share/applications/io.github.jenaridev.tsuba.desktop"
+    install -Dm644 contrib/io.github.jenaridev.tsuba.svg -t "$pkgdir/usr/share/icons/hicolor/scalable/apps"
+
+    # openrazer hand-over (opt-in, reversible): the package never blacklists drivers by itself.
+    install -Dm755 contrib/openrazer-handover.sh "$pkgdir/usr/bin/tsuba-handover"
+    install -Dm755 contrib/openrazer-restore.sh "$pkgdir/usr/bin/tsuba-handover-restore"
+
+    install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname"
+}

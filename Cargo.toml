@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["crates/tsuba-proto", "crates/tsuba-hid", "crates/tsuba-core", "crates/tsuba", "crates/tsubad", "crates/tsuba-gui"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["JenAriDev"]
+rust-version = "1.85"
+license = "GPL-2.0-or-later"
+
+[workspace.dependencies]
+tsuba-proto = { path = "crates/tsuba-proto" }
+tsuba-hid = { path = "crates/tsuba-hid" }
+tsuba-core = { path = "crates/tsuba-core" }
+thiserror = "2"
+libc = "0.2"
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"

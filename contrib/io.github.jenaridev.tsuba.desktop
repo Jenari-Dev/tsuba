@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Tsuba
+GenericName=Razer device configuration
+Comment=Remap keys, set DPI and lighting for Razer keyboards and mice
+Exec=tsuba-app
+Icon=io.github.jenaridev.tsuba
+Categories=Settings;HardwareSettings;
+Keywords=razer;synapse;keyboard;mouse;dpi;rgb;chroma;macro;
+StartupWMClass=tsuba-app

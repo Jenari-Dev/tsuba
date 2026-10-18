@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="344" height="345" viewBox="0 0 344 345">
+<circle cx="172" cy="172" r="168" fill="#121212" stroke="#4c4c4c" stroke-width="4"/>
+<path d="M80 40 C120 10 224 10 264 40" stroke="#2c2c2c" stroke-width="6" fill="none"/>
+<rect x="156.0" y="108.0" width="32.0" height="80.0" rx="14" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="3"/>
+<circle cx="172" cy="250" r="22" fill="none" stroke="#3c3c3c" stroke-width="4"/>
+<text x="172.0" y="222.0" font-family="Roboto, Noto Sans, sans-serif" font-size="15" fill="#6a6a6a" text-anchor="middle" font-weight="normal">PROFILE</text>
+</svg>

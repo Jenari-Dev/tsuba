@@ -1,0 +1,1 @@
+{"kind":"mousedock","name":"Mouse Dock","layout":"mousedock","grid":[1,1],"art":"tsuba","approximate":true,"views":{"top":{"image":"top.svg","width":600,"height":600,"hotspots":[{"name":"Ring LED 1","pos":null,"led":[0,0],"group":"lighting","rect":[45,549,510,14]}]}}}

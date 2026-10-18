@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    # Arch has current Qt 6, KDE Frameworks and mingw-w64 in its repos.
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm --needed base-devel git rust clang pkgconf \
+            qt6-base qt6-declarative qt6-svg ki18n qqc2-breeze-style \
+            libpipewire libpulse mingw-w64-gcc ttf-roboto
+
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build --release --workspace --locked
+
+      - name: Rust tests
+        run: cargo test --release --workspace --locked
+
+      - name: QML tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_QUICK_BACKEND: software
+        run: crates/tsuba-gui/tests/qml/run.sh
+
+      - name: Game lighting bridge DLLs
+        run: make -C shim
+
+      - name: Device drawings are up to date
+        run: |
+          python3 tools/gen-device-art.py
+          git diff --exit-code -- data/devices

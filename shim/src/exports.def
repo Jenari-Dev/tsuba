@@ -1,0 +1,23 @@
+; Entry points games look up by name (undecorated, cdecl).
+EXPORTS
+    Init
+    InitSDK
+    UnInit
+    CreateEffect
+    CreateKeyboardEffect
+    CreateMouseEffect
+    CreateMousepadEffect
+    CreateHeadsetEffect
+    CreateKeypadEffect
+    CreateChromaLinkEffect
+    SetEffect
+    DeleteEffect
+    RegisterEventNotification
+    UnregisterEventNotification
+    QueryDevice
+    IsConnected
+    IsActive
+    SetEventName
+    UseIdleAnimation
+    UseIdleAnimations
+    UseForwardChromaEvents

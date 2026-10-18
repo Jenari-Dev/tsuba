@@ -1,0 +1,28 @@
+[package]
+name = "tsubad"
+description = "Tsuba device daemon: applies saved settings, handles hardware events, serves D-Bus"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tsuba-proto.workspace = true
+tsuba-hid.workspace = true
+tsuba-core.workspace = true
+anyhow.workspace = true
+zbus = { version = "5.13.2", default-features = false, features = ["tokio", "blocking-api"] }
+tokio = { version = "1.53.2", features = ["rt-multi-thread", "macros", "sync", "time", "signal"] }
+serde_json = "1.0.154"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
+clap = { workspace = true, features = ["derive"] }
+serde = { version = "1.0.229", features = ["derive"] }
+wayland-client = "0.31"
+wayland-protocols = { version = "0.32", features = ["client", "staging"] }
+pipewire = "0.10"
+dirs = "7.0.0"
+
+[dev-dependencies]
+tsuba-core = { workspace = true, features = ["sim"] }

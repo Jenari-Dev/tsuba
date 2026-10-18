@@ -1,0 +1,14 @@
+[Unit]
+Description=Tsuba device daemon (Razer keyboards and mice)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=io.github.JenAriDev.Tsuba
+ExecStart=%h/.local/bin/tsubad
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

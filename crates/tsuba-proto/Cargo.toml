@@ -1,0 +1,11 @@
+[package]
+name = "tsuba-proto"
+description = "Razer protocol 2.5 framing, command table and payload decoders"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+thiserror.workspace = true

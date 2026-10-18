@@ -1,0 +1,2365 @@
+{
+ "kind": "keyboard",
+ "grid": [
+  9,
+  24
+ ],
+ "art": "tsuba",
+ "views": {
+  "top": {
+   "image": "top.svg",
+   "width": 2108,
+   "height": 680,
+   "body": [
+    76,
+    72,
+    2076,
+    664
+   ],
+   "wrist": {
+    "image": "wrist.svg",
+    "rect": [
+     76.0,
+     665.0,
+     2000,
+     184
+    ]
+   },
+   "hotspots": [
+    {
+     "name": "Esc",
+     "pos": 110,
+     "led": [
+      0,
+      2
+     ],
+     "group": null,
+     "rect": [
+      243.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F1",
+     "pos": 112,
+     "led": [
+      0,
+      4
+     ],
+     "group": "functions",
+     "rect": [
+      403.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F2",
+     "pos": 113,
+     "led": [
+      0,
+      5
+     ],
+     "group": "functions",
+     "rect": [
+      483.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F3",
+     "pos": 114,
+     "led": [
+      0,
+      6
+     ],
+     "group": "functions",
+     "rect": [
+      563.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F4",
+     "pos": 115,
+     "led": [
+      0,
+      7
+     ],
+     "group": "functions",
+     "rect": [
+      643.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F5",
+     "pos": 116,
+     "led": [
+      0,
+      8
+     ],
+     "group": "functions",
+     "rect": [
+      763.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F6",
+     "pos": 117,
+     "led": [
+      0,
+      9
+     ],
+     "group": "functions",
+     "rect": [
+      843.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F7",
+     "pos": 118,
+     "led": [
+      0,
+      10
+     ],
+     "group": "functions",
+     "rect": [
+      923.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F8",
+     "pos": 119,
+     "led": [
+      0,
+      11
+     ],
+     "group": "functions",
+     "rect": [
+      1003.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F9",
+     "pos": 120,
+     "led": [
+      0,
+      12
+     ],
+     "group": "functions",
+     "rect": [
+      1123.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F10",
+     "pos": 121,
+     "led": [
+      0,
+      13
+     ],
+     "group": "functions",
+     "rect": [
+      1203.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F11",
+     "pos": 122,
+     "led": [
+      0,
+      14
+     ],
+     "group": "functions",
+     "rect": [
+      1283.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F12",
+     "pos": 123,
+     "led": [
+      0,
+      15
+     ],
+     "group": "functions",
+     "rect": [
+      1363.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Print Screen",
+     "pos": 124,
+     "led": [
+      0,
+      16
+     ],
+     "group": null,
+     "rect": [
+      1463.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Scroll Lock",
+     "pos": 125,
+     "led": [
+      0,
+      17
+     ],
+     "group": null,
+     "rect": [
+      1543.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Pause",
+     "pos": 126,
+     "led": [
+      0,
+      18
+     ],
+     "group": null,
+     "rect": [
+      1623.5,
+      111.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "` ~",
+     "pos": 1,
+     "led": [
+      1,
+      2
+     ],
+     "group": "alphabets",
+     "rect": [
+      243.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "1",
+     "pos": 2,
+     "led": [
+      1,
+      3
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      323.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "2",
+     "pos": 3,
+     "led": [
+      1,
+      4
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      403.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "3",
+     "pos": 4,
+     "led": [
+      1,
+      5
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      483.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "4",
+     "pos": 5,
+     "led": [
+      1,
+      6
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      563.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "5",
+     "pos": 6,
+     "led": [
+      1,
+      7
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      643.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "6",
+     "pos": 7,
+     "led": [
+      1,
+      8
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      723.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "7",
+     "pos": 8,
+     "led": [
+      1,
+      9
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      803.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "8",
+     "pos": 9,
+     "led": [
+      1,
+      10
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      883.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "9",
+     "pos": 10,
+     "led": [
+      1,
+      11
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      963.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "0",
+     "pos": 11,
+     "led": [
+      1,
+      12
+     ],
+     "group": "alphabets,numberRows",
+     "rect": [
+      1043.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "- _",
+     "pos": 12,
+     "led": [
+      1,
+      13
+     ],
+     "group": "alphabets",
+     "rect": [
+      1123.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "= +",
+     "pos": 13,
+     "led": [
+      1,
+      14
+     ],
+     "group": "alphabets",
+     "rect": [
+      1203.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Backspace",
+     "pos": 15,
+     "led": [
+      1,
+      15
+     ],
+     "group": "alphabets",
+     "rect": [
+      1283.5,
+      231.5,
+      153,
+      73
+     ]
+    },
+    {
+     "name": "Tab",
+     "pos": 16,
+     "led": [
+      2,
+      2
+     ],
+     "group": "alphabets",
+     "rect": [
+      243.5,
+      311.5,
+      113.0,
+      73
+     ]
+    },
+    {
+     "name": "Q",
+     "pos": 17,
+     "led": [
+      2,
+      3
+     ],
+     "group": "alphabets",
+     "rect": [
+      363.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "W",
+     "pos": 18,
+     "led": [
+      2,
+      4
+     ],
+     "group": "wasd,alphabets",
+     "rect": [
+      443.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "E",
+     "pos": 19,
+     "led": [
+      2,
+      5
+     ],
+     "group": "alphabets",
+     "rect": [
+      523.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "R",
+     "pos": 20,
+     "led": [
+      2,
+      6
+     ],
+     "group": "alphabets",
+     "rect": [
+      603.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "T",
+     "pos": 21,
+     "led": [
+      2,
+      7
+     ],
+     "group": "alphabets",
+     "rect": [
+      683.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Y",
+     "pos": 22,
+     "led": [
+      2,
+      8
+     ],
+     "group": "alphabets",
+     "rect": [
+      763.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "U",
+     "pos": 23,
+     "led": [
+      2,
+      9
+     ],
+     "group": "alphabets",
+     "rect": [
+      843.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "I",
+     "pos": 24,
+     "led": [
+      2,
+      10
+     ],
+     "group": "alphabets",
+     "rect": [
+      923.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "O",
+     "pos": 25,
+     "led": [
+      2,
+      11
+     ],
+     "group": "alphabets",
+     "rect": [
+      1003.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "P",
+     "pos": 26,
+     "led": [
+      2,
+      12
+     ],
+     "group": "alphabets",
+     "rect": [
+      1083.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "[ {",
+     "pos": 27,
+     "led": [
+      2,
+      13
+     ],
+     "group": "alphabets",
+     "rect": [
+      1163.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "] }",
+     "pos": 28,
+     "led": [
+      2,
+      14
+     ],
+     "group": "alphabets",
+     "rect": [
+      1243.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "\\ |",
+     "pos": 29,
+     "led": [
+      2,
+      15
+     ],
+     "group": "alphabets",
+     "rect": [
+      1323.5,
+      311.5,
+      113.0,
+      73
+     ]
+    },
+    {
+     "name": "Caps Lock",
+     "pos": 30,
+     "led": [
+      3,
+      2
+     ],
+     "group": "alphabets",
+     "rect": [
+      243.5,
+      391.5,
+      133.0,
+      73
+     ]
+    },
+    {
+     "name": "A",
+     "pos": 31,
+     "led": [
+      3,
+      3
+     ],
+     "group": "wasd,alphabets",
+     "rect": [
+      383.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "S",
+     "pos": 32,
+     "led": [
+      3,
+      4
+     ],
+     "group": "wasd,alphabets",
+     "rect": [
+      463.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "D",
+     "pos": 33,
+     "led": [
+      3,
+      5
+     ],
+     "group": "wasd,alphabets",
+     "rect": [
+      543.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "F",
+     "pos": 34,
+     "led": [
+      3,
+      6
+     ],
+     "group": "alphabets",
+     "rect": [
+      623.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "G",
+     "pos": 35,
+     "led": [
+      3,
+      7
+     ],
+     "group": "alphabets",
+     "rect": [
+      703.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "H",
+     "pos": 36,
+     "led": [
+      3,
+      8
+     ],
+     "group": "alphabets",
+     "rect": [
+      783.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "J",
+     "pos": 37,
+     "led": [
+      3,
+      9
+     ],
+     "group": "alphabets",
+     "rect": [
+      863.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "K",
+     "pos": 38,
+     "led": [
+      3,
+      10
+     ],
+     "group": "alphabets",
+     "rect": [
+      943.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "L",
+     "pos": 39,
+     "led": [
+      3,
+      11
+     ],
+     "group": "alphabets",
+     "rect": [
+      1023.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "; :",
+     "pos": 40,
+     "led": [
+      3,
+      12
+     ],
+     "group": "alphabets",
+     "rect": [
+      1103.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "' \"",
+     "pos": 41,
+     "led": [
+      3,
+      13
+     ],
+     "group": "alphabets",
+     "rect": [
+      1183.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Enter",
+     "pos": 43,
+     "led": [
+      3,
+      15
+     ],
+     "group": "alphabets",
+     "rect": [
+      1263.5,
+      391.5,
+      173.0,
+      73
+     ]
+    },
+    {
+     "name": "Left Shift",
+     "pos": 44,
+     "led": [
+      4,
+      2
+     ],
+     "group": "alphabets",
+     "rect": [
+      243.5,
+      471.5,
+      173.0,
+      73
+     ]
+    },
+    {
+     "name": "Z",
+     "pos": 46,
+     "led": [
+      4,
+      4
+     ],
+     "group": "alphabets",
+     "rect": [
+      423.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "X",
+     "pos": 47,
+     "led": [
+      4,
+      5
+     ],
+     "group": "alphabets",
+     "rect": [
+      503.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "C",
+     "pos": 48,
+     "led": [
+      4,
+      6
+     ],
+     "group": "alphabets",
+     "rect": [
+      583.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "V",
+     "pos": 49,
+     "led": [
+      4,
+      7
+     ],
+     "group": "alphabets",
+     "rect": [
+      663.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "B",
+     "pos": 50,
+     "led": [
+      4,
+      8
+     ],
+     "group": "alphabets",
+     "rect": [
+      743.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "N",
+     "pos": 51,
+     "led": [
+      4,
+      9
+     ],
+     "group": "alphabets",
+     "rect": [
+      823.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M",
+     "pos": 52,
+     "led": [
+      4,
+      10
+     ],
+     "group": "alphabets",
+     "rect": [
+      903.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": ", <",
+     "pos": 53,
+     "led": [
+      4,
+      11
+     ],
+     "group": "alphabets",
+     "rect": [
+      983.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": ". >",
+     "pos": 54,
+     "led": [
+      4,
+      12
+     ],
+     "group": "alphabets",
+     "rect": [
+      1063.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "/ ?",
+     "pos": 55,
+     "led": [
+      4,
+      13
+     ],
+     "group": "alphabets",
+     "rect": [
+      1143.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Right Shift",
+     "pos": 57,
+     "led": [
+      4,
+      15
+     ],
+     "group": "alphabets",
+     "rect": [
+      1223.5,
+      471.5,
+      213.0,
+      73
+     ]
+    },
+    {
+     "name": "Left Ctrl",
+     "pos": 58,
+     "led": [
+      5,
+      2
+     ],
+     "group": "alphabets",
+     "rect": [
+      243.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Windows / Meta",
+     "pos": 127,
+     "led": [
+      5,
+      3
+     ],
+     "group": "alphabets",
+     "rect": [
+      343.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Left Alt",
+     "pos": 60,
+     "led": [
+      5,
+      4
+     ],
+     "group": "alphabets",
+     "rect": [
+      443.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Space",
+     "pos": 61,
+     "led": [
+      5,
+      8
+     ],
+     "group": "alphabets",
+     "rect": [
+      543.5,
+      551.5,
+      493.0,
+      73
+     ]
+    },
+    {
+     "name": "Right Alt",
+     "pos": 62,
+     "led": [
+      5,
+      12
+     ],
+     "group": "alphabets",
+     "rect": [
+      1043.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Fn",
+     "pos": 59,
+     "led": [
+      5,
+      13
+     ],
+     "group": "alphabets",
+     "rect": [
+      1143.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Menu",
+     "pos": 129,
+     "led": [
+      5,
+      14
+     ],
+     "group": "alphabets",
+     "rect": [
+      1243.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Right Ctrl",
+     "pos": 64,
+     "led": [
+      5,
+      15
+     ],
+     "group": "alphabets",
+     "rect": [
+      1343.5,
+      551.5,
+      93.0,
+      73
+     ]
+    },
+    {
+     "name": "Insert",
+     "pos": 75,
+     "led": [
+      1,
+      16
+     ],
+     "group": null,
+     "rect": [
+      1463.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Home",
+     "pos": 80,
+     "led": [
+      1,
+      17
+     ],
+     "group": null,
+     "rect": [
+      1543.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Page Up",
+     "pos": 85,
+     "led": [
+      1,
+      18
+     ],
+     "group": null,
+     "rect": [
+      1623.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Delete",
+     "pos": 76,
+     "led": [
+      2,
+      16
+     ],
+     "group": null,
+     "rect": [
+      1463.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "End",
+     "pos": 81,
+     "led": [
+      2,
+      17
+     ],
+     "group": null,
+     "rect": [
+      1543.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Page Down",
+     "pos": 86,
+     "led": [
+      2,
+      18
+     ],
+     "group": null,
+     "rect": [
+      1623.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Up",
+     "pos": 83,
+     "led": [
+      4,
+      17
+     ],
+     "group": "arrows",
+     "rect": [
+      1543.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Left",
+     "pos": 79,
+     "led": [
+      5,
+      16
+     ],
+     "group": "arrows",
+     "rect": [
+      1463.5,
+      551.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Down",
+     "pos": 84,
+     "led": [
+      5,
+      17
+     ],
+     "group": "arrows",
+     "rect": [
+      1543.5,
+      551.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Right",
+     "pos": 89,
+     "led": [
+      5,
+      18
+     ],
+     "group": "arrows",
+     "rect": [
+      1623.5,
+      551.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Num Lock",
+     "pos": 90,
+     "led": [
+      1,
+      19
+     ],
+     "group": "numpad",
+     "rect": [
+      1723.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad /",
+     "pos": 95,
+     "led": [
+      1,
+      20
+     ],
+     "group": "numpad",
+     "rect": [
+      1803.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad *",
+     "pos": 100,
+     "led": [
+      1,
+      21
+     ],
+     "group": "numpad",
+     "rect": [
+      1883.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad -",
+     "pos": 105,
+     "led": [
+      1,
+      22
+     ],
+     "group": "numpad",
+     "rect": [
+      1963.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 7",
+     "pos": 91,
+     "led": [
+      2,
+      19
+     ],
+     "group": "numpad",
+     "rect": [
+      1723.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 8",
+     "pos": 96,
+     "led": [
+      2,
+      20
+     ],
+     "group": "numpad",
+     "rect": [
+      1803.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 9",
+     "pos": 101,
+     "led": [
+      2,
+      21
+     ],
+     "group": "numpad",
+     "rect": [
+      1883.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad +",
+     "pos": 106,
+     "led": [
+      2,
+      22
+     ],
+     "group": "numpad",
+     "rect": [
+      1963.5,
+      311.5,
+      73,
+      153
+     ]
+    },
+    {
+     "name": "Numpad 4",
+     "pos": 92,
+     "led": [
+      3,
+      19
+     ],
+     "group": "numpad",
+     "rect": [
+      1723.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 5",
+     "pos": 97,
+     "led": [
+      3,
+      20
+     ],
+     "group": "numpad",
+     "rect": [
+      1803.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 6",
+     "pos": 102,
+     "led": [
+      3,
+      21
+     ],
+     "group": "numpad",
+     "rect": [
+      1883.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 1",
+     "pos": 93,
+     "led": [
+      4,
+      19
+     ],
+     "group": "numpad",
+     "rect": [
+      1723.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 2",
+     "pos": 98,
+     "led": [
+      4,
+      20
+     ],
+     "group": "numpad",
+     "rect": [
+      1803.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad 3",
+     "pos": 103,
+     "led": [
+      4,
+      21
+     ],
+     "group": "numpad",
+     "rect": [
+      1883.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Numpad Enter",
+     "pos": 108,
+     "led": [
+      4,
+      22
+     ],
+     "group": "numpad",
+     "rect": [
+      1963.5,
+      471.5,
+      73,
+      153
+     ]
+    },
+    {
+     "name": "Numpad 0",
+     "pos": 99,
+     "led": [
+      5,
+      20
+     ],
+     "group": "numpad",
+     "rect": [
+      1723.5,
+      551.5,
+      153,
+      73
+     ]
+    },
+    {
+     "name": "Numpad .",
+     "pos": 104,
+     "led": [
+      5,
+      21
+     ],
+     "group": "numpad",
+     "rect": [
+      1883.5,
+      551.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M5",
+     "pos": 164,
+     "led": [
+      1,
+      1
+     ],
+     "group": "macro",
+     "rect": [
+      123.5,
+      231.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M4",
+     "pos": 163,
+     "led": [
+      2,
+      1
+     ],
+     "group": "macro",
+     "rect": [
+      123.5,
+      311.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M3",
+     "pos": 162,
+     "led": [
+      3,
+      1
+     ],
+     "group": "macro",
+     "rect": [
+      123.5,
+      391.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M2",
+     "pos": 161,
+     "led": [
+      4,
+      1
+     ],
+     "group": "macro",
+     "rect": [
+      123.5,
+      471.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "M1",
+     "pos": 160,
+     "led": [
+      5,
+      1
+     ],
+     "group": "macro",
+     "rect": [
+      123.5,
+      551.5,
+      73,
+      73
+     ]
+    },
+    {
+     "name": "Command dial",
+     "pos": 169,
+     "led": [
+      0,
+      1
+     ],
+     "group": "extra",
+     "rect": [
+      115.5,
+      103.5,
+      89.0,
+      89.0
+     ],
+     "shape": "round"
+    },
+    {
+     "name": "Previous",
+     "pos": 201,
+     "led": [
+      0,
+      19
+     ],
+     "group": "multimedia",
+     "rect": [
+      1727.5,
+      111.5,
+      65.0,
+      65.0
+     ],
+     "shape": "round"
+    },
+    {
+     "name": "Play / Pause",
+     "pos": 205,
+     "led": [
+      0,
+      20
+     ],
+     "group": "multimedia",
+     "rect": [
+      1807.5,
+      111.5,
+      65.0,
+      65.0
+     ],
+     "shape": "round"
+    },
+    {
+     "name": "Next",
+     "pos": 202,
+     "led": [
+      0,
+      21
+     ],
+     "group": "multimedia",
+     "rect": [
+      1887.5,
+      111.5,
+      65.0,
+      65.0
+     ],
+     "shape": "round"
+    },
+    {
+     "name": "Mute",
+     "pos": 200,
+     "led": [
+      0,
+      22
+     ],
+     "group": "multimedia",
+     "rect": [
+      1967.5,
+      111.5,
+      65.0,
+      65.0
+     ],
+     "shape": "round"
+    },
+    {
+     "name": "Volume roller",
+     "pos": 204,
+     "led": null,
+     "group": "extra",
+     "rect": [
+      1728.0,
+      32.0,
+      304.0,
+      48.0
+     ]
+    },
+    {
+     "name": "Side button 1",
+     "pos": 207,
+     "led": null,
+     "group": "extra",
+     "rect": [
+      32.0,
+      236.0,
+      25.6,
+      92.0
+     ]
+    },
+    {
+     "name": "Side button 2",
+     "pos": 208,
+     "led": null,
+     "group": "extra",
+     "rect": [
+      32.0,
+      344.0,
+      25.6,
+      92.0
+     ]
+    },
+    {
+     "name": "Side button 3",
+     "pos": 209,
+     "led": null,
+     "group": "extra",
+     "rect": [
+      32.0,
+      452.0,
+      25.6,
+      92.0
+     ]
+    },
+    {
+     "name": "Underglow 6-0",
+     "pos": null,
+     "led": [
+      6,
+      0
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      72.0,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-1",
+     "pos": null,
+     "led": [
+      6,
+      1
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      159.1,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-2",
+     "pos": null,
+     "led": [
+      6,
+      2
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      246.2,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-3",
+     "pos": null,
+     "led": [
+      6,
+      3
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      333.3,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-4",
+     "pos": null,
+     "led": [
+      6,
+      4
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      420.4,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-5",
+     "pos": null,
+     "led": [
+      6,
+      5
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      507.6,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-6",
+     "pos": null,
+     "led": [
+      6,
+      6
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      594.7,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-7",
+     "pos": null,
+     "led": [
+      6,
+      7
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      681.8,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-8",
+     "pos": null,
+     "led": [
+      6,
+      8
+     ],
+     "group": "underglow",
+     "rect": [
+      52,
+      768.9,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 7-0",
+     "pos": null,
+     "led": [
+      7,
+      0
+     ],
+     "group": "underglow",
+     "rect": [
+      52.0,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-1",
+     "pos": null,
+     "led": [
+      7,
+      1
+     ],
+     "group": "underglow",
+     "rect": [
+      154.6,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-2",
+     "pos": null,
+     "led": [
+      7,
+      2
+     ],
+     "group": "underglow",
+     "rect": [
+      257.1,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-3",
+     "pos": null,
+     "led": [
+      7,
+      3
+     ],
+     "group": "underglow",
+     "rect": [
+      359.6,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-4",
+     "pos": null,
+     "led": [
+      7,
+      4
+     ],
+     "group": "underglow",
+     "rect": [
+      462.2,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-5",
+     "pos": null,
+     "led": [
+      7,
+      5
+     ],
+     "group": "underglow",
+     "rect": [
+      564.8,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-6",
+     "pos": null,
+     "led": [
+      7,
+      6
+     ],
+     "group": "underglow",
+     "rect": [
+      667.3,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-7",
+     "pos": null,
+     "led": [
+      7,
+      7
+     ],
+     "group": "underglow",
+     "rect": [
+      769.9,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-8",
+     "pos": null,
+     "led": [
+      7,
+      8
+     ],
+     "group": "underglow",
+     "rect": [
+      872.4,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-9",
+     "pos": null,
+     "led": [
+      7,
+      9
+     ],
+     "group": "underglow",
+     "rect": [
+      975.0,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-10",
+     "pos": null,
+     "led": [
+      7,
+      10
+     ],
+     "group": "underglow",
+     "rect": [
+      1077.5,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-11",
+     "pos": null,
+     "led": [
+      7,
+      11
+     ],
+     "group": "underglow",
+     "rect": [
+      1180.0,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-12",
+     "pos": null,
+     "led": [
+      7,
+      12
+     ],
+     "group": "underglow",
+     "rect": [
+      1282.6,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-13",
+     "pos": null,
+     "led": [
+      7,
+      13
+     ],
+     "group": "underglow",
+     "rect": [
+      1385.2,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-14",
+     "pos": null,
+     "led": [
+      7,
+      14
+     ],
+     "group": "underglow",
+     "rect": [
+      1487.7,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-15",
+     "pos": null,
+     "led": [
+      7,
+      15
+     ],
+     "group": "underglow",
+     "rect": [
+      1590.2,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-16",
+     "pos": null,
+     "led": [
+      7,
+      16
+     ],
+     "group": "underglow",
+     "rect": [
+      1692.8,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-17",
+     "pos": null,
+     "led": [
+      7,
+      17
+     ],
+     "group": "underglow",
+     "rect": [
+      1795.3,
+      859.0,
+      99.6,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-18",
+     "pos": null,
+     "led": [
+      7,
+      18
+     ],
+     "group": "underglow",
+     "rect": [
+      1897.9,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 7-19",
+     "pos": null,
+     "led": [
+      7,
+      19
+     ],
+     "group": "underglow",
+     "rect": [
+      2000.5,
+      859.0,
+      99.5,
+      14
+     ]
+    },
+    {
+     "name": "Underglow 6-9",
+     "pos": null,
+     "led": [
+      6,
+      9
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      771.9,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-10",
+     "pos": null,
+     "led": [
+      6,
+      10
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      684.8,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-11",
+     "pos": null,
+     "led": [
+      6,
+      11
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      597.7,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-12",
+     "pos": null,
+     "led": [
+      6,
+      12
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      510.6,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-13",
+     "pos": null,
+     "led": [
+      6,
+      13
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      423.4,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-14",
+     "pos": null,
+     "led": [
+      6,
+      14
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      336.3,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-15",
+     "pos": null,
+     "led": [
+      6,
+      15
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      249.2,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-16",
+     "pos": null,
+     "led": [
+      6,
+      16
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      162.1,
+      14,
+      84.1
+     ]
+    },
+    {
+     "name": "Underglow 6-17",
+     "pos": null,
+     "led": [
+      6,
+      17
+     ],
+     "group": "underglow",
+     "rect": [
+      2086,
+      75.0,
+      14,
+      84.1
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1432" height="652" viewBox="0 0 1432 652">
+<rect x="40.0" y="40.0" width="1352.0" height="572.0" rx="22" fill="#151515" stroke="#4c4c4c" stroke-width="3"/>
+<rect x="79.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="116.0" y="119.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Esc</text>
+<rect x="179.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="185.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="216.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F1</text>
+<rect x="259.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="265.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="296.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F2</text>
+<rect x="339.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="345.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="376.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F3</text>
+<rect x="419.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="425.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="456.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F4</text>
+<rect x="519.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="525.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="556.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F5</text>
+<rect x="599.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="605.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="636.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F6</text>
+<rect x="679.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="685.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="716.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F7</text>
+<rect x="759.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="765.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="796.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F8</text>
+<rect x="859.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="865.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="896.0" y="120.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F9</text>
+<rect x="939.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="945.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="976.0" y="119.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F10</text>
+<rect x="1019.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1025.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1056.0" y="119.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F11</text>
+<rect x="1099.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1105.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1136.0" y="119.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F12</text>
+<rect x="1279.5" y="79.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1285.5" y="84.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1316.0" y="119.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Del</text>
+<rect x="79.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="116.0" y="219.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">` ~</text>
+<rect x="159.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="165.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="196.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">1</text>
+<rect x="239.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="245.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="276.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">2</text>
+<rect x="319.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="325.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="356.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">3</text>
+<rect x="399.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="405.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="436.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">4</text>
+<rect x="479.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="485.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="516.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">5</text>
+<rect x="559.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="565.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="596.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">6</text>
+<rect x="639.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="645.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="676.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">7</text>
+<rect x="719.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="725.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="756.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">8</text>
+<rect x="799.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="805.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="836.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">9</text>
+<rect x="879.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="885.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="916.0" y="220.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">0</text>
+<rect x="959.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="965.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="996.0" y="219.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">- _</text>
+<rect x="1039.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1045.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1076.0" y="219.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">= +</text>
+<rect x="1119.5" y="179.5" width="153.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1125.5" y="184.5" width="141.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1196.0" y="218.4" font-family="Roboto, Noto Sans, sans-serif" font-size="15" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Backspace</text>
+<rect x="1279.5" y="179.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1285.5" y="184.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1316.0" y="219.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Home</text>
+<rect x="79.5" y="259.5" width="113.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="264.5" width="101.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="136.0" y="299.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Tab</text>
+<rect x="199.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="205.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="236.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Q</text>
+<rect x="279.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="285.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="316.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">W</text>
+<rect x="359.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="365.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="396.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">E</text>
+<rect x="439.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="445.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="476.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">R</text>
+<rect x="519.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="525.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="556.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">T</text>
+<rect x="599.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="605.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="636.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Y</text>
+<rect x="679.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="685.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="716.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">U</text>
+<rect x="759.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="765.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="796.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">I</text>
+<rect x="839.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="845.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="876.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">O</text>
+<rect x="919.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="925.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="956.0" y="300.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">P</text>
+<rect x="999.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1005.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1036.0" y="299.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">[ {</text>
+<rect x="1079.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1085.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1116.0" y="299.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">] }</text>
+<rect x="1159.5" y="259.5" width="113.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1165.5" y="264.5" width="101.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1216.0" y="299.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">\ |</text>
+<rect x="1279.5" y="259.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1285.5" y="264.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1316.0" y="299.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">PgUp</text>
+<rect x="79.5" y="339.5" width="133.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="344.5" width="121.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="146.0" y="378.4" font-family="Roboto, Noto Sans, sans-serif" font-size="15" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Caps Lock</text>
+<rect x="219.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="225.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="256.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">A</text>
+<rect x="299.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="305.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="336.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">S</text>
+<rect x="379.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="385.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="416.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">D</text>
+<rect x="459.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="465.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="496.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">F</text>
+<rect x="539.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="545.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="576.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">G</text>
+<rect x="619.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="625.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="656.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">H</text>
+<rect x="699.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="705.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="736.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">J</text>
+<rect x="779.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="785.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="816.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">K</text>
+<rect x="859.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="865.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="896.0" y="380.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">L</text>
+<rect x="939.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="945.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="976.0" y="379.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">; :</text>
+<rect x="1019.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1025.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1056.0" y="379.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">' "</text>
+<rect x="1099.5" y="339.5" width="173.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1105.5" y="344.5" width="161.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1186.0" y="379.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Enter</text>
+<rect x="1279.5" y="339.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1285.5" y="344.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1316.0" y="379.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">PgDn</text>
+<rect x="79.5" y="419.5" width="173.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="424.5" width="161.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="166.0" y="459.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Shift</text>
+<rect x="259.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="265.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="296.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Z</text>
+<rect x="339.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="345.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="376.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">X</text>
+<rect x="419.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="425.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="456.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">C</text>
+<rect x="499.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="505.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="536.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">V</text>
+<rect x="579.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="585.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="616.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">B</text>
+<rect x="659.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="665.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="696.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">N</text>
+<rect x="739.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="745.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="776.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">M</text>
+<rect x="819.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="825.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="856.0" y="459.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">, &lt;</text>
+<rect x="899.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="905.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="936.0" y="459.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">. &gt;</text>
+<rect x="979.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="985.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1016.0" y="459.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">/ ?</text>
+<rect x="1059.5" y="419.5" width="133.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1065.5" y="424.5" width="121.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1126.0" y="459.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Shift</text>
+<rect x="1199.5" y="419.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1205.5" y="424.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1236.0" y="460.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">↑</text>
+<rect x="79.5" y="499.5" width="93.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="85.5" y="504.5" width="81.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="126.0" y="539.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Ctrl</text>
+<rect x="179.5" y="499.5" width="93.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="185.5" y="504.5" width="81.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="226.0" y="539.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Win</text>
+<rect x="279.5" y="499.5" width="93.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="285.5" y="504.5" width="81.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="326.0" y="539.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Alt</text>
+<rect x="379.5" y="499.5" width="493.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="385.5" y="504.5" width="481.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="879.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="885.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="916.0" y="539.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Alt</text>
+<rect x="959.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="965.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="996.0" y="540.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Fn</text>
+<rect x="1039.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1045.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1076.0" y="539.1" font-family="Roboto, Noto Sans, sans-serif" font-size="17" fill="#a8a8a8" text-anchor="middle" font-weight="normal">Ctrl</text>
+<rect x="1119.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1125.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1156.0" y="540.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">←</text>
+<rect x="1199.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1205.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1236.0" y="540.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">↓</text>
+<rect x="1279.5" y="499.5" width="73.0" height="73.0" rx="9" fill="#1d1d1d" stroke="#5c5c5c" stroke-width="2"/>
+<rect x="1285.5" y="504.5" width="61.0" height="59.0" rx="6" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+<text x="1316.0" y="540.9" font-family="Roboto, Noto Sans, sans-serif" font-size="22" fill="#a8a8a8" text-anchor="middle" font-weight="normal">→</text>
+</svg>

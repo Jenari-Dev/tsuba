@@ -1,0 +1,235 @@
+{
+ "kind": "mouse",
+ "art": "tsuba",
+ "views": {
+  "top": {
+   "image": "top.svg",
+   "width": 561,
+   "height": 905,
+   "hotspots": [
+    {
+     "name": "Left Click",
+     "pos": 1,
+     "anchor": [
+      250,
+      140
+     ],
+     "side": "left"
+    },
+    {
+     "name": "Right Click",
+     "pos": 2,
+     "anchor": [
+      422,
+      140
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Scroll Up",
+     "pos": 9,
+     "anchor": [
+      336,
+      150
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Scroll Click",
+     "pos": 3,
+     "anchor": [
+      336,
+      189
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Scroll Down",
+     "pos": 10,
+     "anchor": [
+      336,
+      228
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Scroll Left",
+     "pos": 52,
+     "anchor": [
+      308,
+      189
+     ],
+     "side": "left"
+    },
+    {
+     "name": "Scroll Right",
+     "pos": 53,
+     "anchor": [
+      364,
+      189
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Scroll Mode Toggle",
+     "pos": 106,
+     "anchor": [
+      336,
+      279
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Sensitivity Stage Up",
+     "pos": 96,
+     "anchor": [
+      336,
+      321
+     ],
+     "side": "right"
+    },
+    {
+     "name": "Sensitivity Clutch",
+     "pos": 15,
+     "anchor": [
+      195,
+      242
+     ],
+     "side": "left"
+    },
+    {
+     "name": "Mouse Button 5",
+     "pos": 5,
+     "anchor": [
+      179,
+      338
+     ],
+     "side": "left"
+    },
+    {
+     "name": "Mouse Button 4",
+     "pos": 4,
+     "anchor": [
+      177,
+      430
+     ],
+     "side": "left"
+    }
+   ],
+   "leds": [
+    {
+     "name": "scroll wheel",
+     "anchor": [
+      336,
+      189
+     ]
+    },
+    {
+     "name": "logo",
+     "anchor": [
+      336,
+      686
+     ]
+    },
+    {
+     "name": "underglow 1",
+     "anchor": [
+      148.9,
+      422.6
+     ]
+    },
+    {
+     "name": "underglow 2",
+     "anchor": [
+      86.4,
+      522.8
+     ]
+    },
+    {
+     "name": "underglow 3",
+     "anchor": [
+      66.5,
+      642.6
+     ]
+    },
+    {
+     "name": "underglow 4",
+     "anchor": [
+      113.6,
+      756.8
+     ]
+    },
+    {
+     "name": "underglow 5",
+     "anchor": [
+      190.1,
+      853.9
+     ]
+    },
+    {
+     "name": "underglow 6",
+     "anchor": [
+      305.3,
+      896.5
+     ]
+    },
+    {
+     "name": "underglow 7",
+     "anchor": [
+      427.2,
+      879.7
+     ]
+    },
+    {
+     "name": "underglow 8",
+     "anchor": [
+      512.2,
+      792.9
+     ]
+    },
+    {
+     "name": "underglow 9",
+     "anchor": [
+      531.1,
+      670.9
+     ]
+    },
+    {
+     "name": "underglow 10",
+     "anchor": [
+      523.6,
+      546.8
+     ]
+    },
+    {
+     "name": "underglow 11",
+     "anchor": [
+      527.0,
+      422.5
+     ]
+    }
+   ]
+  },
+  "bottom": {
+   "image": "bottom.svg",
+   "width": 344,
+   "height": 345,
+   "hotspots": [
+    {
+     "name": "Profile Button",
+     "pos": 14,
+     "anchor": [
+      172,
+      148
+     ],
+     "side": "left"
+    }
+   ],
+   "inset": {
+    "cx": 172,
+    "cy": 172,
+    "r": 168
+   }
+  }
+ }
+}

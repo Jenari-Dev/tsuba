@@ -302,7 +302,7 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
         };
         if let Some(hz) = dw.polling_hz {
             let j = json!({ "polling_hz": hz });
-            step(&trf("polling rate %1 Hz", &[&hz])), call::<_, Vec<String>>(&conn, "SetPerformance", &(t.pid.clone(), j.to_string())).map(|_| ()));
+            step(&trf("polling rate %1 Hz", &[&hz]), call::<_, Vec<String>>(&conn, "SetPerformance", &(t.pid.clone(), j.to_string())).map(|_| ()));
         }
         let b = dw.brightness.unwrap_or(255);
         if let Some(e) = &dw.effect {
@@ -310,7 +310,7 @@ pub fn import(path: &str, selection: &str, mut progress: impl FnMut(String)) -> 
             let r = call::<_, Vec<String>>(&conn, "SetEffect", &(t.pid.clone(), ej.clone(), b)).and_then(|_| call::<_, ()>(&conn, "SaveLighting", &(t.pid.clone(), ej, b)));
             step(&trf("lighting %1", &[&tsuba_core::config::effect_name(e)]), r);
         } else if let Some(pc) = dw.brightness {
-            step(&trf("brightness %1%", &[&pc])), call::<_, ()>(&conn, "SetBrightness", &(t.pid.clone(), pc)));
+            step(&trf("brightness %1%", &[&pc]), call::<_, ()>(&conn, "SetBrightness", &(t.pid.clone(), pc)));
         }
         if let Some(slots) = &dw.dial {
             step(&tr("command dial modes"), call::<_, Vec<String>>(&conn, "SetDial", &(t.pid.clone(), serde_json::to_string(slots).unwrap_or_default())).map(|_| ()));

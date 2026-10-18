@@ -433,7 +433,13 @@ pub struct Geometry {
     pub pos: HashMap<(u8, u8), (f32, f32)>,
     /// Width / height of the area the normalised positions were stretched from.
     pub aspect: f32,
+    /// Hardware LEDs of the four media keys (previous, play/pause, next, mute) as the picture
+    /// pack names them; None when the pack has no such hotspots.
+    pub media: Option<[(u8, u8); 4]>,
 }
+
+/// Names of the media-key hotspots in a keyboard pack, in the order of [`Geometry::media`].
+pub const MEDIA_KEYS: [&str; 4] = ["Previous", "Play / Pause", "Next", "Mute"];
 
 impl Geometry {
     /// Every grid cell, positioned by its row/column.
@@ -444,7 +450,7 @@ impl Geometry {
                 pos.insert((r, c), ((c as f32 + 0.5) / cols as f32, (r as f32 + 0.5) / rows as f32));
             }
         }
-        Self { rows, cols, pos, aspect: cols as f32 / rows as f32 }
+        Self { rows, cols, pos, aspect: cols as f32 / rows as f32, media: None }
     }
 
     /// Real LED positions (e.g. hotspot centres on the device render), normalised to 0..1.
@@ -459,7 +465,7 @@ impl Geometry {
             let a = std::f32::consts::PI - 0.5 + t * (std::f32::consts::PI + 1.0);
             pos.insert((0, 2 + i), (0.5 + 0.46 * a.cos(), 0.55 - 0.42 * a.sin()));
         }
-        Self { rows: 1, cols: 13, pos, aspect: 0.7 }
+        Self { rows: 1, cols: 13, pos, aspect: 0.7, media: None }
     }
 
     pub fn from_points(rows: u8, cols: u8, points: &[LedPoint]) -> Self {
@@ -472,7 +478,7 @@ impl Geometry {
         }
         let (w, h) = ((x1 - x0).max(1e-6), (y1 - y0).max(1e-6));
         let pos = points.iter().map(|(rc, (x, y))| (*rc, ((x - x0) / w, (y - y0) / h))).collect();
-        Self { rows, cols, pos, aspect: (w / h).clamp(0.1, 10.0) }
+        Self { rows, cols, pos, aspect: (w / h).clamp(0.1, 10.0), media: None }
     }
 }
 
@@ -493,7 +499,15 @@ impl Geometry {
             })
             .filter(|((r, c), _)| *r < rows && *c < cols)
             .collect();
-        (!points.is_empty()).then(|| Self::from_points(rows, cols, &points))
+        let mut geo = (!points.is_empty()).then(|| Self::from_points(rows, cols, &points))?;
+        let led_of = |name: &str| -> Option<(u8, u8)> {
+            let h = spots.iter().find(|h| h["name"] == name)?;
+            let led = h["led"].as_array()?;
+            Some((led.first()?.as_u64()? as u8, led.get(1)?.as_u64()? as u8))
+        };
+        let media: Vec<(u8, u8)> = MEDIA_KEYS.iter().filter_map(|n| led_of(n)).collect();
+        geo.media = <[(u8, u8); 4]>::try_from(media).ok();
+        Some(geo)
     }
 }
 
@@ -1198,6 +1212,56 @@ mod database_pack_tests {
                 assert_eq!(v["approximate"], true, "{pid}");
             }
         }
+    }
+
+    fn media_leds_file() -> std::collections::BTreeMap<String, [u8; 2]> {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tools/media-leds.json");
+        serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap()
+    }
+
+    /// The built-in BlackWidow V4 Pro pack carries exactly the media LEDs of
+    /// `tools/media-leds.json` (the one place to correct them), and the lighting-grid map
+    /// follows the pack. Regenerate with `python3 tools/gen-device-art.py` after editing the file.
+    #[test]
+    fn media_key_leds_come_from_the_single_source_file() {
+        let want = media_leds_file();
+        let order = ["previous", "play_pause", "next", "mute"];
+        let expect: Vec<(u8, u8)> = order.iter().map(|k| (want[*k][0], want[*k][1])).collect();
+        let dir = crate::devices::builtin_dir("028d").unwrap();
+        let g = Geometry::from_pack(&dir.join("device.json"), 9, 24).expect("geometry");
+        let media = g.media.expect("the pack names the four media keys");
+        assert_eq!(media.to_vec(), expect, "data/devices/028d is out of date: run tools/gen-device-art.py");
+        // Four different LEDs on the top row of the matrix, each a real LED of the pack.
+        let mut uniq = expect.clone();
+        uniq.sort();
+        uniq.dedup();
+        assert_eq!(uniq.len(), 4);
+        assert!(expect.iter().all(|rc| rc.0 == 0 && g.pos.contains_key(rc)), "{expect:?}");
+    }
+
+    /// Moving the media LEDs in the pack moves where games' media-key colours land.
+    #[test]
+    fn game_lighting_media_keys_follow_the_pack() {
+        let dir = crate::devices::builtin_dir("028d").unwrap();
+        let mut doc: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("device.json")).unwrap()).unwrap();
+        // Pretend play/pause turned out to sit at (0, 23): swap it with a spare LED position.
+        for h in doc["views"]["top"]["hotspots"].as_array_mut().unwrap() {
+            if h["name"] == "Play / Pause" {
+                h["led"] = serde_json::json!([0, 23]);
+            }
+        }
+        let tmp = std::env::temp_dir().join(format!("tsuba-pack-{}", std::process::id()));
+        std::fs::create_dir_all(&tmp).unwrap();
+        let f = tmp.join("device.json");
+        std::fs::write(&f, doc.to_string()).unwrap();
+        let g = Geometry::from_pack(&f, 9, 24).unwrap();
+        assert_eq!(g.media.unwrap()[1], (0, 23));
+        let map = crate::game_lighting::blackwidow_v4_pro_v1(&g);
+        // SDK (0, 19) is the play/pause key: it now feeds hardware (0, 23), not (0, 20).
+        let src = 19u16;
+        assert_eq!(map.sources(0, 23), &[src]);
+        assert!(!map.sources(0, 20).contains(&src));
+        std::fs::remove_dir_all(&tmp).unwrap();
     }
 
     #[test]

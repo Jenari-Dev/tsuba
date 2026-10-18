@@ -686,6 +686,12 @@ pub fn blackwidow_v4_pro_v1(geo: &Geometry) -> CellMap {
     for r in 0..KEYBOARD.0 {
         for c in 0..KEYBOARD.1 {
             let hw = if c == 0 && (1..=5).contains(&r) { (6 - r, 1) } else { (r, c + 1) };
+            // The four media keys (SDK row 0, columns 18–21) sit where the picture pack says
+            // their LEDs are (so a corrected pack also corrects games).
+            let hw = match (r, c, geo.media) {
+                (0, 18..=21, Some(media)) => media[c as usize - 18],
+                _ => hw,
+            };
             m.set(hw, &[(r, c)]);
         }
     }

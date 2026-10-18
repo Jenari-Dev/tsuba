@@ -34,8 +34,8 @@ fn lighting_is_stored_with_a_profile_applied_on_activation_and_follows_edits() {
     let ids = profile_ids(&mgr, "028d");
     let (a, b) = (ids[0].clone(), ids[1].clone());
     mgr.library_activate("028d", &a).unwrap();
-    // Store what the device shows now (the saved lighting, as the simulated device has no lighting).
-    mgr.store_lighting("028d", red()).unwrap();
+    // What the device shows now (the simulated device answers lighting commands, so it is read back).
+    mgr.set_effect_all(EffectConfig::Static { colour: "ff0000".into() }, Some(60)).unwrap();
     mgr.library_set_lighting("028d", &a, "current").unwrap();
     let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
     assert_eq!(l.get(&a).unwrap().lighting, Some(red()));

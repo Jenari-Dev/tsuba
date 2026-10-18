@@ -887,7 +887,7 @@ Rectangle {
                                         id: recordButton
                                         objectName: "recordBtn"
                                         text: page.recording ? i18nc("button: stop recording", "Stop") : i18nc("button: start recording", "Record")
-                                        implicitWidth: 122
+                                        minWidth: 122
                                         enabled: !page.backend.readonly
                                         focusPolicy: Qt.NoFocus
                                         onClicked: page.recording ? page.stopRecording() : page.startRecording()

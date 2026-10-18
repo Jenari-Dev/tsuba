@@ -338,7 +338,7 @@ SynCard {
         SynButton {
             visible: ed.confirmReset
             text: i18n("Cancel")
-            implicitWidth: 80
+            minWidth: 80
             onClicked: ed.confirmReset = false
         }
         SynButton {
@@ -346,7 +346,7 @@ SynCard {
             visible: ed.confirmReset
             text: i18n("Reset")
             primary: true
-            implicitWidth: 80
+            minWidth: 80
             onClicked: ed.resetModes()
         }
     }

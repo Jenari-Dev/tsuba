@@ -400,7 +400,7 @@ ColumnLayout {
                         SynButton {
                             objectName: "importRowButton"
                             text: i18n("Import")
-                            implicitWidth: 72
+                            minWidth: 72
                             onClicked: ml.importDeviceMacro(modelData.pid, modelData.m.id)
                         }
                     }
@@ -542,14 +542,14 @@ ColumnLayout {
                 }
                 SynButton {
                     text: i18n("Cancel")
-                    implicitWidth: 80
+                    minWidth: 80
                     onClicked: ml.done()
                 }
                 SynButton {
                     objectName: "macroActionOk"
                     text: ml.action === "delete" ? i18n("Delete") : i18n("Save")
                     primary: true
-                    implicitWidth: 80
+                    minWidth: 80
                     onClicked: ml.apply()
                 }
             }

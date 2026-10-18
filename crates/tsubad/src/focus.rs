@@ -45,6 +45,20 @@ fn unload(conn: &Connection) {
     let _ = kwin(conn, "/Scripting", "org.kde.kwin.Scripting", "unloadScript", &(NAME,));
 }
 
+/// The unique name that owns org.kde.KWin now (None without KWin).
+fn kwin_owner(conn: &Connection) -> Option<String> {
+    const DBUS: &str = "org.freedesktop.DBus";
+    conn.call_method(Some(DBUS), "/org/freedesktop/DBus", Some(DBUS), "GetNameOwner", &("org.kde.KWin",)).ok()?.body().deserialize().ok()
+}
+
+/// Whether KWin was replaced since `last` was taken (a restarted KWin has lost our script).
+/// `last` is updated.
+fn kwin_restarted(last: &mut Option<String>, now: Option<String>) -> bool {
+    let restarted = *last != now;
+    *last = now;
+    restarted
+}
+
 /// Whether any enabled link wants the focus.
 fn wanted() -> bool {
     AppLinks::load(&app_links::path()).map(|l| l.links.iter().any(|l| l.enabled && l.only_when_focused)).unwrap_or(false)
@@ -58,7 +72,15 @@ pub fn spawn(mgr: Arc<Manager>) {
             let Ok(conn) = Connection::session() else { return };
             let mut loaded = false;
             let mut failed = false;
+            let mut owner = kwin_owner(&conn);
             loop {
+                // KWin restarted (a new bus owner): the script is gone with the old one.
+                if kwin_restarted(&mut owner, kwin_owner(&conn)) {
+                    info!("focus: KWin restarted");
+                    loaded = false;
+                    failed = false;
+                    *mgr.actions.focus.lock().unwrap() = None;
+                }
                 let want = wanted();
                 if want && !loaded && !failed {
                     match load(&conn) {
@@ -96,6 +118,15 @@ pub fn unload_on_exit() {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn a_new_kwin_owner_means_the_script_must_be_loaded_again() {
+        let mut last = Some(":1.5".to_string());
+        assert!(!super::kwin_restarted(&mut last, Some(":1.5".into())));
+        assert!(super::kwin_restarted(&mut last, Some(":1.9".into())), "restarted");
+        assert!(super::kwin_restarted(&mut last, None), "gone");
+        assert!(super::kwin_restarted(&mut last, Some(":1.12".into())), "back after being gone: try again (a failed attempt while it was away is forgotten)");
+    }
+
     /// Run the KWin script under node with a stand-in `workspace` and `callDBus`: it must report
     /// the focused window (as strings) on start and on every activation, and an empty window when
     /// none has the focus.

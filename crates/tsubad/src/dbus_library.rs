@@ -47,6 +47,14 @@ pub fn text_events(text: &str, delay_ms: u32, want: &str) -> anyhow::Result<Valu
     Ok(json!({ "events": t.events, "skipped": t.skipped, "layout": name.label() }))
 }
 
+/// Whether `sender` (a unique bus name) currently owns the well-known name `name`.
+async fn is_owner(conn: &zbus::Connection, sender: Option<&str>, name: &'static str) -> bool {
+    let Some(sender) = sender else { return false };
+    let Ok(dbus) = fdo::DBusProxy::new(conn).await else { return false };
+    let Ok(name) = zbus::names::BusName::try_from(name) else { return false };
+    dbus.get_name_owner(name).await.is_ok_and(|o| o.as_str() == sender)
+}
+
 #[interface(name = "io.github.JenAriDev.Tsuba1.Library")]
 impl LibraryApi {
     /// Which library profiles bind each macro and which bindings lost their macro (JSON).
@@ -135,7 +143,12 @@ impl LibraryApi {
     }
 
     /// The focused window changed (called by the KWin script): process id, class, name, title.
-    async fn focus_changed(&self, pid: String, class: String, name: String, caption: String) -> fdo::Result<()> {
+    async fn focus_changed(&self, #[zbus(header)] hdr: zbus::message::Header<'_>, #[zbus(connection)] conn: &zbus::Connection, pid: String, class: String, name: String, caption: String) -> fdo::Result<()> {
+        // Only KWin (the owner of org.kde.KWin) may report the focus: any other program on
+        // the bus could otherwise make a linked game look focused, or not.
+        if !is_owner(conn, hdr.sender().map(|s| s.as_str()), "org.kde.KWin").await {
+            return Err(fdo::Error::AccessDenied("only KWin may report the focused window".into()));
+        }
         let info = FocusInfo { pid: pid.trim().parse().unwrap_or(0), class, name, caption };
         let m = self.mgr.clone();
         tokio::task::spawn_blocking(move || m.focus_changed(info)).await.map_err(|e| fdo::Error::Failed(e.to_string()))?;
@@ -146,6 +159,37 @@ impl LibraryApi {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_kwin_may_report_the_focus() {
+        use std::io::{BufRead, BufReader};
+        use std::process::{Command, Stdio};
+        let Ok(mut child) = Command::new("dbus-daemon").args(["--session", "--nofork", "--print-address=1"]).stdout(Stdio::piped()).spawn() else { return };
+        let mut addr = String::new();
+        BufReader::new(child.stdout.take().unwrap()).read_line(&mut addr).unwrap();
+        let addr = addr.trim().to_string();
+        let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+        rt.block_on(async {
+            let build = || zbus::connection::Builder::address(addr.as_str()).unwrap();
+            let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
+            let dir = std::env::temp_dir().join(format!("tsuba-focus-sender-{}", std::process::id()));
+            let mgr = Arc::new(Manager::new(true, dir.join("config.toml"), tx).unwrap());
+            let daemon = build().name("io.github.JenAriDev.TestTsuba").unwrap().serve_at("/t", LibraryApi { mgr: mgr.clone() }).unwrap().build().await.unwrap();
+            let kwin = build().name("org.kde.KWin").unwrap().build().await.unwrap();
+            let other = build().build().await.unwrap();
+            let call = |c: zbus::Connection| async move {
+                c.call_method(Some("io.github.JenAriDev.TestTsuba"), "/t", Some("io.github.JenAriDev.Tsuba1.Library"), "FocusChanged", &("4242", "game", "game.exe", "Game")).await
+            };
+            assert!(call(other).await.is_err(), "another client reported the focus");
+            assert!(mgr.actions.focus.lock().unwrap().is_none());
+            call(kwin).await.unwrap();
+            assert_eq!(mgr.actions.focus.lock().unwrap().as_ref().map(|f| f.pid), Some(4242));
+            drop(daemon);
+        });
+        let _ = child.kill();
+        let _ = child.wait();
+        let _ = std::fs::remove_dir_all(std::env::temp_dir().join(format!("tsuba-focus-sender-{}", std::process::id())));
+    }
 
     #[test]
     fn text_events_follow_the_requested_layout() {

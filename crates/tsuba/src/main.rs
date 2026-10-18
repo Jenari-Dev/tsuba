@@ -1,3 +1,5 @@
+mod led_guide;
+
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use tsuba_hid::{discover, discover_events, poll_readable, Device, DeviceInfo, EventReader, Kind};
@@ -77,6 +79,19 @@ enum Cmd {
         col: u8,
         #[arg(long, default_value = "3")]
         seconds: u64,
+        #[arg(long)]
+        confirm: bool,
+    },
+    /// Guided check of which lighting-grid LED is which media key (previous / play-pause / next /
+    /// mute): lights one LED at a time and asks what you saw, then prints the line for
+    /// tools/media-leds.json. Run it yourself in a terminal; it lights the device briefly.
+    LedGuide {
+        /// How long each LED stays lit.
+        #[arg(long, default_value = "4")]
+        seconds: u64,
+        /// Columns of row 0 to try, in order (default: 20,22,21,19,23,18,24,17).
+        #[arg(long, value_delimiter = ',')]
+        cols: Vec<u8>,
         #[arg(long)]
         confirm: bool,
     },
@@ -332,6 +347,20 @@ fn run(cmd: &Cmd, info: &DeviceInfo, allow_untested: bool) -> Result<()> {
             let mut dev = dev;
             dev.allow_writes(true);
             led_test(&dev, *row, *col, *seconds)?;
+        }
+        Cmd::LedGuide { seconds, cols, confirm } => {
+            if !m.kind.has_keys() || !m.spec.per_led() {
+                bail!("led-guide targets per-key keyboards");
+            }
+            if !confirm {
+                bail!("pass --confirm to send Set commands");
+            }
+            let mut dev = dev;
+            dev.allow_writes(true);
+            let cols: Vec<u8> = if cols.is_empty() { led_guide::DEFAULT_COLS.to_vec() } else { cols.clone() };
+            let current = std::collections::BTreeMap::from([("previous", [0, 19]), ("play_pause", [0, 20]), ("next", [0, 21]), ("mute", [0, 22])]);
+            let stdin = std::io::stdin();
+            led_guide::run(&cols, *seconds, &current, &mut stdin.lock(), &mut std::io::stdout(), &mut |col, secs| led_pattern(&dev, &[((0, col), [255, 255, 255])], secs))?;
         }
         Cmd::LedProbe { seconds, confirm } => {
             if !confirm {

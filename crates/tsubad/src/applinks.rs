@@ -79,7 +79,7 @@ impl Manager {
     fn chroma_live(&self, name: &str) -> Result<()> {
         let lib = cp::ChromaProfiles::load(&cp::path())?;
         let prof = lib.get(name).cloned().context("no such lighting profile")?;
-        for (pid, studio) in prof.devices {
+        for (pid, studio) in prof.expanded() {
             if self.devices.lock().unwrap().contains_key(&pid) && !studio.layers.is_empty() {
                 self.start_studio(&pid, studio)?;
             }

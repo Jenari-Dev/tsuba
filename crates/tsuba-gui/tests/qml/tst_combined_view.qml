@@ -37,25 +37,90 @@ Item {
     TestCase {
         name: "CombinedView"
         when: windowShown
-        function test_selection_switches_device() {
+        function test_canvas_layers_target_devices() {
             wait(100);
             compare(studio.tabNames.length, 3);
             studio.addLayer("static");
+            compare(studio.layers.length, 1);
+            compare(studio.layers[0].targets, undefined, "a device layer has no canvas targets");
             studio.showCombined(true);
             verify(studio.combined);
             // Both devices get a live preview, the edited one last.
             verify(fake.started.indexOf("00aa") >= 0);
             compare(fake.started[fake.started.length - 1], "028d");
-            // Picking a LED on the mouse makes it the edited device, keeping the keyboard's unsaved layer.
-            studio.pickLeds("00aa", { "0,1": true });
-            compare(studio.editPid, "00aa");
-            verify(studio.combined);
-            compare(studio.profile.devices["028d"].layers.length, 1);
+            // The canvas starts empty: the device layer stays on the keyboard.
             compare(studio.layers.length, 0);
-            studio.pickLeds("028d", { "0,2": true });
-            compare(studio.editPid, "028d");
-            compare(studio.layers.length, 1);
-            compare(studio.layers[0].leds.length, 1);
+            compare(studio.profile.devices["028d"].layers.length, 1);
+            // A canvas layer starts on every device.
+            studio.addLayer("wave");
+            compare(Object.keys(studio.layers[0].targets).sort().join(), "00aa,028d");
+            compare(studio.coverText(studio.layers[0]), "Keyboard + Mouse");
+            // Picking LEDs on the mouse narrows its target; the keyboard keeps its whole device.
+            studio.pickLeds("00aa", { "0,1": true });
+            compare(studio.layers[0].targets["00aa"].length, 1);
+            compare(studio.layers[0].targets["028d"].length, 0);
+            compare(studio.editPid, "028d", "picking never switches the edited device");
+            // Clearing a device's LEDs drops it from the layer.
+            studio.pickLeds("00aa", {});
+            compare(studio.layers[0].targets["00aa"], undefined);
+            studio.toggleTarget("00aa");
+            compare(Object.keys(studio.layers[0].targets).length, 2);
+            studio.toggleTarget("00aa");
+            studio.toggleTarget("028d");
+            compare(Object.keys(studio.layers[0].targets).length, 1, "the last device stays");
+        }
+        function test_selection_per_device() {
+            studio.showCombined(true);
+            studio.current = studio.layers.length - 1;
+            studio.cleared = false;
+            studio.updateCurrent(l => l.targets = { "00aa": [[0, 0], [0, 1]] });
+            compare(Object.keys(studio.selectionFor("00aa")).length, 2);
+            compare(Object.keys(studio.selectionFor("028d")).length, 0);
+        }
+        function test_span_moves_a_layer_to_the_canvas_and_back() {
+            studio.showCombined(false);
+            studio.switchDevice("028d");
+            const n = studio.layers.length;
+            studio.addLayer("fire");
+            compare(studio.layers.length, n + 1);
+            studio.spanCurrent();
+            verify(studio.combined);
+            compare(studio.layers[studio.current].effect.type, "fire");
+            verify(studio.layers[studio.current].targets !== undefined);
+            studio.updateCurrent(l => l.targets = { "00aa": [] });
+            const cn = studio.layers.length;
+            studio.unspanCurrent();
+            compare(studio.layers.length, cn - 1);
+            // The layer now belongs to the mouse alone.
+            studio.switchDevice("00aa");
+            compare(studio.layers[studio.layers.length - 1].effect.type, "fire");
+            compare(studio.layers[studio.layers.length - 1].targets, undefined);
+            studio.switchDevice("028d");
+        }
+        function test_placements_move_and_reset() {
+            const before = studio.placementOf("00aa");
+            studio.movePlacement("00aa", before.x - 5, before.y);
+            verify(studio.arranged);
+            verify(studio.placementOf("00aa").x < before.x);
+            studio.scalePlacement("00aa", 1.1);
+            verify(studio.placementOf("00aa").w > before.w);
+            // Devices cannot leave the stage.
+            studio.movePlacement("00aa", -50, 999);
+            compare(studio.placementOf("00aa").x, 0);
+            verify(studio.placementOf("00aa").y + studio.placementOf("00aa").h <= studio.stageH + 1e-6);
+            studio.resetPlacements();
+            verify(!studio.arranged);
+        }
+        function test_profile_carries_the_canvas() {
+            studio.showCombined(true);
+            studio.addLayer("static");
+            const p = studio.currentProfile();
+            verify(p.canvas !== undefined);
+            verify(p.canvas.layers.length >= 1);
+            verify(p.canvas.placements["028d"] !== undefined);
+            studio.showCombined(false);
+            const q = studio.currentProfile();
+            verify(q.canvas.layers.length >= 1, "canvas layers are kept while a device is edited");
         }
         function test_zoom_around_cursor() {
             zc.fit();

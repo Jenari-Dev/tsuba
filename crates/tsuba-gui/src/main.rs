@@ -3,6 +3,7 @@
 mod app_backend;
 mod backend;
 mod i18n;
+mod studio_api;
 mod synapse;
 mod tray;
 

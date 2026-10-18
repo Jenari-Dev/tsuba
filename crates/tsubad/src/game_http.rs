@@ -197,6 +197,8 @@ struct Request {
     headers: Vec<(String, String)>,
     body: Vec<u8>,
     keep_alive: bool,
+    /// The client's local port (for finding which process is talking).
+    peer_port: u16,
 }
 
 impl Request {
@@ -287,7 +289,7 @@ fn read_request(r: &mut BufReader<Conn>) -> std::io::Result<Option<Request>> {
             headers.push((k.trim().to_string(), v.trim().to_string()));
         }
     }
-    let mut req = Request { method: method.to_ascii_uppercase(), path: target.split(['?', '#']).next().unwrap_or("").to_string(), headers, body: Vec::new(), keep_alive: false };
+    let mut req = Request { method: method.to_ascii_uppercase(), path: target.split(['?', '#']).next().unwrap_or("").to_string(), headers, body: Vec::new(), keep_alive: false, peer_port: 0 };
     let conn = req.header("connection").map(|c| c.to_ascii_lowercase()).unwrap_or_default();
     req.keep_alive = if version == "HTTP/1.1" { !conn.contains("close") } else { conn.contains("keep-alive") };
     if req.header("transfer-encoding").is_some_and(|t| t.to_ascii_lowercase().contains("chunked")) {
@@ -372,6 +374,7 @@ fn serve(sh: &Arc<Shared>, ctx: &Ctx, stream: TcpStream) {
     let _ = stream.set_read_timeout(Some(IDLE));
     let _ = stream.set_write_timeout(Some(Duration::from_secs(5)));
     let _ = stream.set_nodelay(true);
+    let peer_port = stream.peer_addr().map(|a| a.port()).unwrap_or(0);
     let Ok(mut w) = stream.try_clone() else { return };
     let mut r = BufReader::new(Conn { s: stream, deadline: Instant::now() + IDLE });
     loop {
@@ -379,7 +382,10 @@ fn serve(sh: &Arc<Shared>, ctx: &Ctx, stream: TcpStream) {
             return;
         }
         let req = match read_request(&mut r) {
-            Ok(Some(req)) => req,
+            Ok(Some(mut req)) => {
+                req.peer_port = peer_port;
+                req
+            }
             Ok(None) => return,
             Err(e) => {
                 if e.kind() == std::io::ErrorKind::InvalidData {
@@ -485,7 +491,7 @@ fn handle(gl: &Arc<GameLighting>, sh: &Arc<Shared>, ctx: &Ctx, req: &Request, we
                 panic!("test panic");
             }
             ("GET", "/razer/chromasdk") => Response::json(json!({ "core": VERSION, "device": VERSION, "version": VERSION })),
-            ("POST", "/razer/chromasdk") => create_session(gl, sh, &body),
+            ("POST", "/razer/chromasdk") => create_session(gl, sh, &body, req.peer_port),
             (_, "/razer/chromasdk") => Response { status: 405, ..Response::result(result::NOT_SUPPORTED) },
             _ => Response { status: 404, ..Response::result(result::NOT_FOUND) },
         },
@@ -502,11 +508,17 @@ fn session_token() -> String {
     b.iter().map(|x| format!("{x:02x}")).collect()
 }
 
-fn create_session(gl: &Arc<GameLighting>, sh: &Arc<Shared>, body: &Value) -> Response {
+fn create_session(gl: &Arc<GameLighting>, sh: &Arc<Shared>, body: &Value, peer_port: u16) -> Response {
     if !body.is_object() {
         return Response::result(result::INVALID_PARAMETER);
     }
-    let info = AppInfo::from_json(body);
+    let mut info = AppInfo::from_json(body);
+    info.exe = if peer_port == 0 { String::new() } else { tsuba_core::game_lighting::peer_process(peer_port).unwrap_or_default() };
+    // The user's allow / block list (per application).
+    if !gl.admit(&info) {
+        info!("game lighting: refused {:?} ({:?}): blocked by the user", info.title, info.exe);
+        return Response::result(result::ACCESS_DENIED);
+    }
     let Some(id) = lock(&gl.engine).create(info.clone(), 0, Instant::now()) else {
         return Response::result(result::FAILED);
     };
@@ -957,5 +969,53 @@ mod tests {
         assert_eq!(s["author"], "AB");
         assert!(st.to_string().len() < 64 * 1024, "status is {} bytes", st.to_string().len());
         gl.shutdown();
+    }
+
+    /// A blocked application is refused (RZRESULT_ACCESS_DENIED), its running sessions end, and
+    /// "only allowed" mode refuses applications that have no rule.
+    #[test]
+    fn blocked_applications_are_refused() {
+        let (gl, port) = server();
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
+        let id = v["sessionid"].as_u64().unwrap();
+        let key = gl.status()["sessions"][0]["app"].as_str().unwrap().to_string();
+        // The connecting process was found from the socket (this test process), not guessed from the title.
+        assert!(!key.is_empty() && !key.starts_with("title:"), "{key}");
+        // The application was recorded so the user can pick a rule for it later.
+        assert!(gl.rules_json()["apps"].as_array().unwrap().iter().any(|a| a["key"] == key.as_str() && a["rule"] == "default" && a["connected"] == true));
+        gl.set_app_rule(&key, "block").unwrap();
+        assert!(!gl.engine.lock().unwrap().contains(id as u32), "the running session ended");
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
+        assert_eq!(v["result"], result::ACCESS_DENIED);
+        assert!(v["sessionid"].is_null());
+        gl.set_app_rule(&key, "default").unwrap();
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
+        assert!(v["sessionid"].as_u64().is_some());
+        // Allow-list mode: no rule = refused; "allow" = in.
+        gl.set_only_allowed(true).unwrap();
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
+        assert_eq!(v["result"], result::ACCESS_DENIED);
+        gl.set_app_rule(&key, "allow").unwrap();
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Some Game"}"#));
+        assert!(v["sessionid"].as_u64().is_some());
+        assert!(gl.set_app_rule(&key, "bogus").is_err());
+        gl.shutdown();
+    }
+
+    #[test]
+    fn rules_are_saved_and_reloaded() {
+        let dir = std::env::temp_dir().join(format!("tsuba-rules-{}", std::process::id()));
+        let file = dir.join("apps.json");
+        let (gl, port) = server();
+        gl.use_rules_file(file.clone());
+        let (_, _, v) = call(port, "POST", "/razer/chromasdk", Some(r#"{"title":"Persist Me"}"#));
+        assert!(v["sessionid"].as_u64().is_some());
+        let key = gl.status()["sessions"][0]["app"].as_str().unwrap().to_string();
+        gl.set_app_rule(&key, "block").unwrap();
+        let again = tsuba_core::game_lighting::AppRules::load(&file);
+        assert_eq!(again.rules.get(&key), Some(&false));
+        assert!(again.seen.contains_key(&key));
+        gl.shutdown();
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }

@@ -147,6 +147,11 @@ impl Manager {
         self.studios.lock().unwrap().remove(pid);
     }
 
+    /// Whether a Lighting Studio profile is being rendered on this device right now.
+    pub fn studio_running(&self, pid: &str) -> bool {
+        self.studios.lock().unwrap().contains_key(pid)
+    }
+
     /// Whether game lighting currently drives this device.
     pub fn game_holds(&self, pid: &str) -> bool {
         self.game_held.lock().unwrap().contains_key(pid)
@@ -443,7 +448,7 @@ impl Manager {
         let mut lib = cp::ChromaProfiles::load(&cp::path())?;
         let prof = lib.get(name).cloned().context("no such lighting profile")?;
         let mut done = Vec::new();
-        for (pid, studio) in prof.devices {
+        for (pid, studio) in prof.expanded() {
             if !self.devices.lock().unwrap().contains_key(&pid) || studio.layers.is_empty() {
                 continue;
             }

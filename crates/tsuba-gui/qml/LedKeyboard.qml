@@ -28,6 +28,17 @@ Item {
     readonly property real ox: (width - (bx1 - bx0) * s) / 2 - bx0 * s
     readonly property real oy: (height - (by1 - by0) * s) / 2 - by0 * s
 
+    // Studio canvas: the drawing's extent and the box round the LED centres, in picture units.
+    readonly property rect contentPic: Qt.rect(bx0, by0, bx1 - bx0, by1 - by0)
+    readonly property rect ledsPic: {
+        if (!leds.length) {
+            return Qt.rect(0, 0, 1, 1);
+        }
+        const xs = leds.map(h => h.rect[0] + h.rect[2] / 2), ys = leds.map(h => h.rect[1] + h.rect[3] / 2);
+        const x0 = Math.min(...xs), y0 = Math.min(...ys);
+        return Qt.rect(x0, y0, Math.max(1, Math.max(...xs) - x0), Math.max(1, Math.max(...ys) - y0));
+    }
+
     function keyOf(h) {
         return h.led[0] + "," + h.led[1];
     }

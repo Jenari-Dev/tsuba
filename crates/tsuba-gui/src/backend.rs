@@ -239,6 +239,11 @@ pub mod qobject {
         #[qinvokable]
         fn device_pack(self: &Backend, pid: &QString) -> QString;
 
+        /// Lighting Studio helpers (canvas expansion, profile files, game-lighting apps, audio
+        /// sources, who controls the lighting): see `studio_api.rs`. JSON in, JSON out.
+        #[qinvokable]
+        fn studio_call(self: &Backend, method: &QString, arg: &QString) -> QString;
+
         /// Whether the user has a personal picture pack for this device (else Tsuba's line art).
         #[qinvokable]
         fn has_personal_pack(self: &Backend, pid: &QString) -> bool;
@@ -962,6 +967,10 @@ impl qobject::Backend {
         let Ok(mut v) = serde_json::from_str::<serde_json::Value>(&text) else { return QString::default() };
         v["dir"] = serde_json::Value::from(format!("file://{}/", base.display()));
         QString::from(&v.to_string())
+    }
+
+    pub fn studio_call(&self, method: &QString, arg: &QString) -> QString {
+        QString::from(&crate::studio_api::call(&method.to_string(), &arg.to_string()))
     }
 
     pub fn has_personal_pack(&self, pid: &QString) -> bool {

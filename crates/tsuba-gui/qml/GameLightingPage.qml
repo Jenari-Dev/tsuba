@@ -18,6 +18,8 @@ Rectangle {
     property bool testing: false
     property string testResult: ""
     property bool testOk: true
+    // Per-application rules: {only_allowed, apps: [{key, name, exe, rule, allowed, last_seen, connected}]}.
+    property var rules: ({ only_allowed: false, apps: [] })
 
     color: Theme.bg
 
@@ -64,6 +66,34 @@ Rectangle {
     }
     function reloadStatus() {
         gl = JSON.parse(backend.game_lighting() || "{}");
+        reloadRules();
+    }
+    property string rulesJson: ""
+    function reloadRules() {
+        if (typeof backend.studio_call === "function") {
+            // Only rebuild the list when something changed (the safety-net timer calls this).
+            const j = backend.studio_call("apps", "") || "{}";
+            if (j !== rulesJson) {
+                rulesJson = j;
+                rules = JSON.parse(j);
+            }
+        }
+    }
+    // rule: "allow" | "block" | "default"
+    function setRule(key, rule) {
+        const r = JSON.parse(backend.studio_call("set_app", JSON.stringify({ key: key, rule: rule })) || "{}");
+        if (r.ok === false) {
+            say(false, r.error || i18n("Couldn't change the rule."));
+        }
+        // After the segmented control has settled (it is rebuilt with the list).
+        Qt.callLater(() => Qt.callLater(reloadStatus));
+    }
+    function setOnlyAllowed(on) {
+        const r = JSON.parse(backend.studio_call("only_allowed", on ? "true" : "false") || "{}");
+        if (r.ok === false) {
+            say(false, r.error || i18n("Couldn't change the setting."));
+        }
+        reloadStatus();
     }
     function reloadPrefixes() {
         scan = JSON.parse(backend.game_lighting_prefixes() || "{}");
@@ -216,6 +246,33 @@ Rectangle {
                             font.pixelSize: Theme.small
                             wrapMode: Text.Wrap
                         }
+                        // Who controls each device's lighting right now.
+                        Flow {
+                            Layout.fillWidth: true
+                            Layout.topMargin: 4
+                            spacing: 14
+                            visible: page.gl.available
+                            Repeater {
+                                model: JSON.parse(page.backend.devices || "[]")
+                                delegate: Row {
+                                    required property var modelData
+                                    spacing: 8
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: modelData.name.replace(" (wired)", "")
+                                        textFormat: Text.PlainText
+                                        color: Theme.textDim
+                                        font.family: Theme.font
+                                        font.pixelSize: Theme.small
+                                    }
+                                    LightingOwnerChip {
+                                        objectName: "ownerChip" + modelData.pid
+                                        backend: page.backend
+                                        pid: modelData.pid
+                                    }
+                                }
+                            }
+                        }
                         RowLayout {
                             Layout.topMargin: 6
                             spacing: 10
@@ -284,6 +341,86 @@ Rectangle {
                 }
                 Item {
                     Layout.fillWidth: true
+                }
+            }
+
+            // ---- applications allowed to control the lighting
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 10
+                spacing: 10
+                SectionLabel {
+                    caption: i18n("Applications")
+                }
+                HelpButton {
+                    size: 16
+                    text: i18n("Every program that connects to Tsuba's lighting service is listed here the first time it does. Block one to stop it from ever controlling your lighting (a blocked program that is running is disconnected at once). Programs are told apart by their process name.")
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+            }
+            SynCheckBox {
+                objectName: "glOnlyAllowed"
+                text: i18n("Only allow applications I have approved")
+                enabled: page.gl.available
+                checked: page.rules.only_allowed === true
+                onToggled: page.setOnlyAllowed(checked)
+            }
+            Text {
+                visible: page.rules.apps.length === 0
+                Layout.fillWidth: true
+                text: i18n("No program has connected yet. When a game does, it appears here so you can allow or block it.")
+                color: Theme.textDim
+                font.family: Theme.font
+                font.pixelSize: Theme.small
+                wrapMode: Text.Wrap
+            }
+            Repeater {
+                model: page.rules.apps
+                delegate: Rectangle {
+                    required property var modelData
+                    objectName: "appRow_" + modelData.key
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 52
+                    color: Theme.card
+                    border.color: Theme.borderSoft
+                    radius: 2
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 16
+                        anchors.rightMargin: 12
+                        spacing: 12
+                        Column {
+                            Layout.fillWidth: true
+                            Text {
+                                width: parent.width
+                                // Names come from the program: never interpreted as markup.
+                                textFormat: Text.PlainText
+                                text: modelData.name || modelData.exe || modelData.key
+                                color: modelData.allowed ? Theme.text : Theme.textDim
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize
+                                elide: Text.ElideRight
+                            }
+                            Text {
+                                width: parent.width
+                                textFormat: Text.PlainText
+                                text: (modelData.exe && modelData.exe !== modelData.name ? modelData.exe + " · " : "") + (modelData.connected ? i18n("connected now") : (modelData.allowed ? i18n("allowed") : i18n("blocked")))
+                                color: modelData.connected ? Theme.accent : Theme.textDim
+                                font.family: Theme.font
+                                font.pixelSize: 11
+                                elide: Text.ElideRight
+                            }
+                        }
+                        ModeTabs {
+                            objectName: "appRule_" + modelData.key
+                            minTabWidth: 78
+                            model: [i18n("Default"), i18n("Allow"), i18n("Block")]
+                            currentIndex: ["default", "allow", "block"].indexOf(modelData.rule)
+                            onActivated: i => page.setRule(modelData.key, ["default", "allow", "block"][i])
+                        }
+                    }
                 }
             }
 

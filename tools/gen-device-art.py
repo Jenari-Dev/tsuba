@@ -119,8 +119,14 @@ NAV = [  # (x, y, w, h, label, pos, led, group, name)
 ]
 MACRO = [('M5', 164, (1, 1), 1.5), ('M4', 163, (2, 1), 2.5), ('M3', 162, (3, 1), 3.5),
          ('M2', 161, (4, 1), 4.5), ('M1', 160, (5, 1), 5.5)]
-MEDIA = [('Previous', 201, (0, 19), '⏮'), ('Play / Pause', 205, (0, 20), '⏯'),
-         ('Next', 202, (0, 21), '⏭'), ('Mute', 200, (0, 22), '')]
+# Lighting-grid (row, column) of the four media keys: ONE line to change in tools/media-leds.json
+# (keys previous, play_pause, next, mute). Run `tsuba -d 028d led-guide --confirm` to find out
+# which LED belongs to which key, put the answers there, then run this script (and
+# tools/patch-pack-leds.py for a personal picture pack).
+with open(os.path.join(ROOT, 'tools', 'media-leds.json')) as _f:
+    MEDIA_LEDS = {k: tuple(v) for k, v in json.load(_f).items()}
+MEDIA = [('Previous', 201, MEDIA_LEDS['previous'], '⏮'), ('Play / Pause', 205, MEDIA_LEDS['play_pause'], '⏯'),
+         ('Next', 202, MEDIA_LEDS['next'], '⏭'), ('Mute', 200, MEDIA_LEDS['mute'], '')]
 SIDE = [('Side button 1', 207), ('Side button 2', 208), ('Side button 3', 209)]
 UNDERGLOW = [(6, c) for c in range(18)] + [(7, c) for c in range(20)]
 

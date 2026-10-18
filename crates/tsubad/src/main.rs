@@ -18,6 +18,7 @@ mod library;
 mod manager;
 mod notify;
 mod shortcuts;
+mod dbus_lighting;
 mod studio_runner;
 
 use std::path::PathBuf;
@@ -87,6 +88,7 @@ async fn main() -> Result<()> {
     game.listen_allowed.store(!mgr.read_only || port_override.is_some(), std::sync::atomic::Ordering::Relaxed);
     game.underglow.store(mgr.config.lock().unwrap().game_lighting_underglow_enabled(), std::sync::atomic::Ordering::Relaxed);
     game.web.store(mgr.config.lock().unwrap().game_lighting_web_enabled(), std::sync::atomic::Ordering::Relaxed);
+    game.use_rules_file(tsuba_core::game_lighting::rules_path());
 
     // Desktop notifications (their own bus connection: the settings object below needs the notifier first).
     let notifier = Arc::new(notify::Notifier::new(
@@ -98,6 +100,7 @@ async fn main() -> Result<()> {
         .name(dbus::BUS_NAME)?
         .serve_at(dbus::PATH, dbus::Tsuba { mgr: mgr.clone(), game: game.clone() })?
         .serve_at(dbus::PATH, dbus_app::App { notifier: notifier.clone(), read_only: mgr.read_only })?
+        .serve_at(dbus::PATH, dbus_lighting::Lighting { mgr: mgr.clone(), game: game.clone() })?
         .build()
         .await
         .context("D-Bus: is another tsubad already running?")?;

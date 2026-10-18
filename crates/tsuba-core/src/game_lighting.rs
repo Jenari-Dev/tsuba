@@ -22,12 +22,152 @@ pub type Rgb = [u8; 3];
 /// Result codes (the documented `RzErrors` values the REST interface returns).
 pub mod result {
     pub const SUCCESS: i64 = 0;
+    /// The user blocked this application from controlling the lighting.
+    pub const ACCESS_DENIED: i64 = 5;
     pub const NOT_SUPPORTED: i64 = 50;
     pub const INVALID_PARAMETER: i64 = 87;
     pub const DEVICE_NOT_CONNECTED: i64 = 1167;
     pub const NOT_FOUND: i64 = 1168;
     /// `0x80004005`, as the signed 32-bit number clients compare against.
     pub const FAILED: i64 = -2147467259;
+}
+
+// ---- Which applications may control the lighting -----------------------------------------
+
+/// Per-application allow / block list for game lighting, kept in
+/// `~/.config/tsuba/game-lighting-apps.json`. Applications are told apart by their process
+/// name (found from the connection) and fall back to the title they announce.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+pub struct AppRules {
+    /// false (default): every application may, except those blocked. true: only allowed ones.
+    #[serde(default)]
+    pub only_allowed: bool,
+    /// App key → true (allow) / false (block). Missing = follow `only_allowed`.
+    #[serde(default)]
+    pub rules: std::collections::BTreeMap<String, bool>,
+    /// Applications that connected before, so the user can set a rule after the fact.
+    #[serde(default)]
+    pub seen: std::collections::BTreeMap<String, SeenApp>,
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, PartialEq)]
+pub struct SeenApp {
+    /// The title the application announced.
+    pub name: String,
+    /// Process name when it could be found.
+    pub exe: String,
+    /// Unix seconds of the last connection.
+    pub last_seen: u64,
+}
+
+/// At most this many remembered applications / rules.
+const MAX_APPS: usize = 200;
+
+pub fn rules_path() -> std::path::PathBuf {
+    dirs::config_dir().unwrap_or_else(|| std::path::PathBuf::from(".")).join("tsuba").join("game-lighting-apps.json")
+}
+
+/// The key rules are stored under: the lower-cased process name, else `title:<title>`.
+pub fn app_key(exe: &str, title: &str) -> String {
+    let clean = |s: &str| s.chars().filter(|c| !c.is_control()).take(64).collect::<String>().trim().to_lowercase();
+    match clean(exe) {
+        e if !e.is_empty() => e,
+        _ => format!("title:{}", clean(title)),
+    }
+}
+
+impl AppRules {
+    pub fn load(path: &std::path::Path) -> Self {
+        std::fs::read_to_string(path).ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default()
+    }
+
+    pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
+        if let Some(d) = path.parent() {
+            std::fs::create_dir_all(d)?;
+        }
+        let tmp = path.with_extension("json.tmp");
+        std::fs::write(&tmp, serde_json::to_string_pretty(self)?)?;
+        std::fs::rename(&tmp, path)?;
+        Ok(())
+    }
+
+    /// May the application with this key control the lighting?
+    pub fn allowed(&self, key: &str) -> bool {
+        self.rules.get(key).copied().unwrap_or(!self.only_allowed)
+    }
+
+    /// Remember that an application connected.
+    pub fn record(&mut self, key: &str, name: &str, exe: &str, now: u64) {
+        if !self.seen.contains_key(key) && self.seen.len() >= MAX_APPS {
+            if let Some(old) = self.seen.iter().min_by_key(|(_, v)| v.last_seen).map(|(k, _)| k.clone()) {
+                self.seen.remove(&old);
+            }
+        }
+        self.seen.insert(key.to_string(), SeenApp { name: name.chars().filter(|c| !c.is_control()).take(64).collect(), exe: exe.chars().filter(|c| !c.is_control()).take(64).collect(), last_seen: now });
+    }
+
+    /// Set (Some) or clear (None) an application's rule.
+    pub fn set_rule(&mut self, key: &str, allow: Option<bool>) -> anyhow::Result<()> {
+        anyhow::ensure!(!key.is_empty() && key.len() <= 80 && !key.chars().any(char::is_control), "bad application key");
+        match allow {
+            Some(a) => {
+                anyhow::ensure!(self.rules.contains_key(key) || self.rules.len() < MAX_APPS, "too many rules");
+                self.rules.insert(key.to_string(), a);
+            }
+            None => {
+                self.rules.remove(key);
+            }
+        }
+        Ok(())
+    }
+}
+
+/// The process name behind a loopback TCP connection that *we* accepted, given the client's
+/// local port (the peer port of our socket). Linux only; None when it can't be found.
+pub fn peer_process(client_port: u16) -> Option<String> {
+    let inode = ["/proc/net/tcp", "/proc/net/tcp6"].iter().find_map(|f| tcp_inode(&std::fs::read_to_string(f).ok()?, client_port))?;
+    let want = format!("socket:[{inode}]");
+    for e in std::fs::read_dir("/proc").ok()?.flatten() {
+        let name = e.file_name();
+        let Some(pid) = name.to_str().filter(|n| n.bytes().all(|b| b.is_ascii_digit())) else { continue };
+        let Ok(fds) = std::fs::read_dir(e.path().join("fd")) else { continue };
+        if fds.flatten().any(|fd| std::fs::read_link(fd.path()).is_ok_and(|l| l.as_os_str() == want.as_str())) {
+            let comm = std::fs::read_to_string(format!("/proc/{pid}/comm")).unwrap_or_default();
+            let cmdline = std::fs::read(format!("/proc/{pid}/cmdline")).unwrap_or_default();
+            return Some(process_name(comm.trim(), &cmdline));
+        }
+    }
+    None
+}
+
+/// Socket inode of the loopback connection whose *local* port is `port`, from a
+/// `/proc/net/tcp` listing.
+fn tcp_inode(listing: &str, port: u16) -> Option<u64> {
+    for line in listing.lines().skip(1) {
+        let f: Vec<&str> = line.split_whitespace().collect();
+        let local = f.get(1)?;
+        let (addr, p) = local.rsplit_once(':')?;
+        let loopback = addr == "0100007F" || addr == "00000000000000000000000001000000" || addr.ends_with("0000FFFF0100007F");
+        if loopback && u16::from_str_radix(p, 16).ok() == Some(port) {
+            return f.get(9)?.parse().ok().filter(|i: &u64| *i != 0);
+        }
+    }
+    None
+}
+
+/// A readable process name: `comm`, or for Wine's loader the Windows program in its command line.
+fn process_name(comm: &str, cmdline: &[u8]) -> String {
+    let wine_loader = comm.starts_with("wine") || comm.ends_with("-preloader");
+    if wine_loader {
+        for arg in cmdline.split(|b| *b == 0).skip(1) {
+            let a = String::from_utf8_lossy(arg);
+            let base = a.rsplit(['\\', '/']).next().unwrap_or("");
+            if base.to_ascii_lowercase().ends_with(".exe") {
+                return base.to_string();
+            }
+        }
+    }
+    comm.to_string()
 }
 
 /// Bit marking an active key in a keyboard key overlay.
@@ -546,6 +686,12 @@ pub fn blackwidow_v4_pro_v1(geo: &Geometry) -> CellMap {
     for r in 0..KEYBOARD.0 {
         for c in 0..KEYBOARD.1 {
             let hw = if c == 0 && (1..=5).contains(&r) { (6 - r, 1) } else { (r, c + 1) };
+            // The four media keys (SDK row 0, columns 18–21) sit where the picture pack says
+            // their LEDs are (so a corrected pack also corrects games).
+            let hw = match (r, c, geo.media) {
+                (0, 18..=21, Some(media)) => media[c as usize - 18],
+                _ => hw,
+            };
             m.set(hw, &[(r, c)]);
         }
     }
@@ -930,5 +1076,74 @@ mod tests {
         assert_eq!(rows, vec![vec![[10, 0, 0], [0, 20, 0], [0, 0, 0]]]);
         // Receivers have no target.
         assert!(DeviceMap::new(0x1, tsuba_hid::Kind::Receiver, Output::Zones(vec![]), None).is_none());
+    }
+}
+
+#[cfg(test)]
+mod app_rules_tests {
+    use super::*;
+
+    #[test]
+    fn default_allows_everyone_and_blocklist_wins() {
+        let mut r = AppRules::default();
+        assert!(r.allowed("game.exe"));
+        r.set_rule("game.exe", Some(false)).unwrap();
+        assert!(!r.allowed("game.exe"));
+        assert!(r.allowed("other.exe"));
+        r.set_rule("game.exe", None).unwrap();
+        assert!(r.allowed("game.exe"));
+    }
+
+    #[test]
+    fn allow_list_mode_blocks_unknown_apps() {
+        let mut r = AppRules { only_allowed: true, ..Default::default() };
+        assert!(!r.allowed("new.exe"));
+        r.set_rule("new.exe", Some(true)).unwrap();
+        assert!(r.allowed("new.exe"));
+    }
+
+    #[test]
+    fn keys_prefer_the_process_name() {
+        assert_eq!(app_key("Game.EXE", "My Game"), "game.exe");
+        assert_eq!(app_key("", " My Game "), "title:my game");
+    }
+
+    #[test]
+    fn rules_roundtrip_and_survive_garbage() {
+        let dir = std::env::temp_dir().join(format!("tsuba-gla-{}", std::process::id()));
+        let f = dir.join("rules.json");
+        let mut r = AppRules::default();
+        r.set_rule("a.exe", Some(false)).unwrap();
+        r.record("a.exe", "A", "a.exe", 5);
+        r.save(&f).unwrap();
+        assert_eq!(AppRules::load(&f), r);
+        std::fs::write(&f, "{not json").unwrap();
+        assert_eq!(AppRules::load(&f), AppRules::default());
+        assert!(r.set_rule("", Some(true)).is_err());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn seen_list_is_bounded() {
+        let mut r = AppRules::default();
+        for i in 0..250u64 {
+            r.record(&format!("app{i}"), "x", "x", i);
+        }
+        assert_eq!(r.seen.len(), MAX_APPS);
+        assert!(r.seen.contains_key("app249") && !r.seen.contains_key("app0"));
+    }
+
+    #[test]
+    fn finds_the_socket_inode_of_a_loopback_client() {
+        let listing = "  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode\n   0: 0100007F:D431 0100007F:D3DB 01 00000000:00000000 00:00000000 00000000  1000        0 424242 1 0000000000000000 100 0 0 10 0\n   1: 0100007F:D3DB 0100007F:D431 01 00000000:00000000 00:00000000 00000000  1000        0 777 1 0000000000000000 100 0 0 10 0\n";
+        assert_eq!(tcp_inode(listing, 0xD431), Some(424242));
+        assert_eq!(tcp_inode(listing, 0x1234), None);
+    }
+
+    #[test]
+    fn wine_programs_are_named_by_their_exe() {
+        assert_eq!(process_name("Game.exe", b""), "Game.exe");
+        assert_eq!(process_name("wine64-preloader", b"/usr/bin/wine64-preloader\0Z:\\games\\Cool Game\\cool.exe\0-flag\0"), "cool.exe");
+        assert_eq!(process_name("wine64-preloader", b"/usr/bin/wine64-preloader\0"), "wine64-preloader");
     }
 }

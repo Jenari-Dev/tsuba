@@ -56,9 +56,16 @@ pub struct AppInfo {
     pub contact: String,
     pub category: String,
     pub devices: Vec<String>,
+    /// Process name found from the connection (empty when unknown). Set by the server, never by the client.
+    pub exe: String,
 }
 
 impl AppInfo {
+    /// The key the user's allow / block rules are stored under.
+    pub fn key(&self) -> String {
+        gl::app_key(&self.exe, &self.title)
+    }
+
     pub fn from_json(v: &serde_json::Value) -> Self {
         Self {
             title: clean(&v["title"], 64),
@@ -70,6 +77,7 @@ impl AppInfo {
                 .as_array()
                 .map(|a| a.iter().filter(|x| x.is_string()).take(MAX_DEVICE_SUPPORTED).map(|x| clean(x, MAX_DEVICE_NAME_CHARS)).collect())
                 .unwrap_or_default(),
+            exe: String::new(),
         }
     }
 }
@@ -290,6 +298,8 @@ pub struct GameLighting {
     /// website could otherwise change the lighting.
     pub web: AtomicBool,
     pub timeout: Mutex<Duration>,
+    /// Which applications may control the lighting (and the file it is saved to, if any).
+    rules: Mutex<(gl::AppRules, Option<std::path::PathBuf>)>,
     stop: AtomicBool,
     output: Mutex<Option<JoinHandle<()>>>,
     pub(crate) server: Mutex<Option<crate::game_http::Server>>,
@@ -325,6 +335,7 @@ impl GameLighting {
             underglow: AtomicBool::new(false),
             web: AtomicBool::new(false),
             timeout: Mutex::new(SESSION_TIMEOUT),
+            rules: Mutex::new((gl::AppRules::default(), None)),
             stop: AtomicBool::new(false),
             output: Mutex::new(None),
             server: Mutex::new(None),
@@ -339,6 +350,91 @@ impl GameLighting {
 
     pub fn enabled(&self) -> bool {
         self.enabled.load(Ordering::Relaxed)
+    }
+
+    /// Load the allow / block list from `path` and keep it saved there.
+    pub fn use_rules_file(&self, path: std::path::PathBuf) {
+        *lock(&self.rules) = (gl::AppRules::load(&path), Some(path));
+    }
+
+    /// Whether this application may open a session (and remember that it tried).
+    pub(crate) fn admit(&self, info: &AppInfo) -> bool {
+        let key = info.key();
+        let now = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+        let mut r = lock(&self.rules);
+        let seen_before = r.0.seen.contains_key(&key);
+        r.0.record(&key, &info.title, &info.exe, now);
+        // Only write the file for a new application (not for every session of a known one).
+        if !seen_before {
+            if let Some(p) = r.1.clone() {
+                let _ = r.0.save(&p);
+            }
+        }
+        r.0.allowed(&key)
+    }
+
+    /// The rules, plus the connected applications, as JSON for the GUI:
+    /// `{"only_allowed", "apps": [{"key", "name", "exe", "rule": "allow"|"block"|"default", "allowed", "last_seen", "connected"}]}`.
+    pub fn rules_json(&self) -> serde_json::Value {
+        let connected: Vec<String> = lock(&self.engine).sessions.values().map(|s| s.info.key()).collect();
+        let r = lock(&self.rules);
+        let mut keys: Vec<&String> = r.0.seen.keys().chain(r.0.rules.keys()).collect();
+        keys.sort();
+        keys.dedup();
+        let apps: Vec<_> = keys
+            .into_iter()
+            .map(|k| {
+                let seen = r.0.seen.get(k);
+                json!({
+                    "key": k,
+                    "name": seen.map(|s| s.name.clone()).unwrap_or_default(),
+                    "exe": seen.map(|s| s.exe.clone()).unwrap_or_default(),
+                    "rule": match r.0.rules.get(k) { Some(true) => "allow", Some(false) => "block", None => "default" },
+                    "allowed": r.0.allowed(k),
+                    "last_seen": seen.map(|s| s.last_seen).unwrap_or(0),
+                    "connected": connected.contains(k),
+                })
+            })
+            .collect();
+        json!({ "only_allowed": r.0.only_allowed, "apps": apps })
+    }
+
+    /// Set an application's rule ("allow" / "block" / "default") and end its sessions when it
+    /// is no longer allowed.
+    pub fn set_app_rule(&self, key: &str, rule: &str) -> Result<()> {
+        let allow = match rule {
+            "allow" => Some(true),
+            "block" => Some(false),
+            "default" => None,
+            _ => anyhow::bail!("rule must be allow, block or default"),
+        };
+        self.change_rules(|r| r.set_rule(key, allow))
+    }
+
+    /// Switch between "everyone except blocked" and "only allowed applications".
+    pub fn set_only_allowed(&self, on: bool) -> Result<()> {
+        self.change_rules(|r| {
+            r.only_allowed = on;
+            Ok(())
+        })
+    }
+
+    fn change_rules(&self, f: impl FnOnce(&mut gl::AppRules) -> Result<()>) -> Result<()> {
+        {
+            let mut r = lock(&self.rules);
+            f(&mut r.0)?;
+            if let Some(p) = r.1.clone() {
+                r.0.save(&p)?;
+            }
+        }
+        let rules = lock(&self.rules).0.clone();
+        let gone: Vec<u32> = lock(&self.engine).sessions.values().filter(|s| !rules.allowed(&s.info.key())).map(|s| s.id).collect();
+        for id in gone {
+            info!("game lighting: session {id} ended (application blocked)");
+            self.end_session(id);
+        }
+        self.status_changed();
+        Ok(())
     }
 
     /// Start or stop the REST server (and the output thread with it). Ending the server
@@ -431,6 +527,8 @@ impl GameLighting {
                     "author": s.info.author,
                     "contact": s.info.contact,
                     "category": s.info.category,
+                    "app": s.info.key(),
+                    "exe": s.info.exe,
                     "device_supported": s.info.devices,
                     "since": s.since.duration_since(SystemTime::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0),
                     "targets": s.active.keys().map(|t| t.as_str()).collect::<Vec<_>>(),

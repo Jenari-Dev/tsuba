@@ -108,7 +108,7 @@ fn profiles_export_to_a_folder_without_overwriting() {
     let again = mgr.library_export_many("00aa", &ids[..1], dir_s).unwrap();
     assert!(again[0].ends_with("Fast_Slow_ mix_ 2.tsuba-profile.json"), "never overwrites: {again:?}");
     // What was written imports back.
-    let id = mgr.library_import("00aa", &paths[0]).unwrap();
+    let id = mgr.library_import("00aa", &paths[0], "").unwrap();
     assert!(DeviceLibrary::load(&lib::root(), "00aa").unwrap().get(&id).is_some());
     assert!(mgr.library_export_many("00aa", &ids, "/definitely/not/a/folder").is_err());
     assert!(mgr.library_export_many("00aa", &["0".repeat(32)], dir_s).is_err());

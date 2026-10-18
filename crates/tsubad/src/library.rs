@@ -769,9 +769,26 @@ impl Manager {
         std::fs::write(path, text).with_context(|| format!("writing {path}"))
     }
 
-    pub fn library_import(&self, pid: &str, path: &str) -> Result<String> {
-        let text = std::fs::read_to_string(path).with_context(|| format!("reading {path}"))?;
-        let mut p = lib::import(pid, &text)?;
+    /// What importing `path` would bring along that runs things on this computer (Launch, Open
+    /// URL and Type actions): `{"name", "software": [{"layer", "key", "kind", "text"}],
+    /// "digest"}`. The app shows the list and passes `digest` to [`Self::library_import`] to
+    /// approve exactly these.
+    pub fn library_import_preview(&self, pid: &str, path: &str) -> Result<serde_json::Value> {
+        let text = lib::read_import_file(path)?;
+        let imp = lib::import(pid, &text, "")?;
+        Ok(serde_json::json!({ "name": imp.profile.name, "software": imp.software, "digest": lib::approval_digest(&imp.software) }))
+    }
+
+    /// Add a profile from a file. Software actions in it are dropped unless `approved` is the
+    /// digest [`Self::library_import_preview`] gave for the file as it is now.
+    pub fn library_import(&self, pid: &str, path: &str, approved: &str) -> Result<String> {
+        let text = lib::read_import_file(path)?;
+        let imp = lib::import(pid, &text, approved)?;
+        ensure!(approved.is_empty() || imp.approved, "the file changed since it was shown: its commands are not what was approved");
+        if !imp.software.is_empty() && !imp.approved {
+            info!("{pid}: imported a profile without its {} software action(s) (not approved)", imp.software.len());
+        }
+        let mut p = imp.profile;
         let _g = self.lib_lock.lock().unwrap();
         let mut l = self.lib_load(pid)?;
         p.name = l.unique_name(&p.name, None);
@@ -1636,13 +1653,13 @@ pub(crate) mod tests {
         let id = mgr.library_save("00aa", &serde_json::to_string(&p).unwrap()).unwrap();
         let file = temp_config().join("exported.tsuba-profile.json");
         mgr.library_export("00aa", &id, file.to_str().unwrap()).unwrap();
-        let copy = mgr.library_import("00aa", file.to_str().unwrap()).unwrap();
+        let copy = mgr.library_import("00aa", file.to_str().unwrap(), "").unwrap();
         let l = mgr.lib_load("00aa").unwrap();
         assert_eq!(l.get(&copy).unwrap().synapse_guid, None, "two profiles with one Synapse GUID");
         assert_eq!(l.by_synapse("syn-exp").unwrap().id, id);
         // Into a library without it (e.g. another computer), the GUID comes along.
         mgr.library_delete("00aa", &id).unwrap();
-        let again = mgr.library_import("00aa", file.to_str().unwrap()).unwrap();
+        let again = mgr.library_import("00aa", file.to_str().unwrap(), "").unwrap();
         assert_eq!(mgr.lib_load("00aa").unwrap().get(&again).unwrap().synapse_guid.as_deref(), Some("syn-exp"));
     }
 

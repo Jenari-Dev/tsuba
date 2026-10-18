@@ -162,3 +162,76 @@ mod resets {
         assert!(!DeviceLibrary::load(&lib::root(), "028d").unwrap().state.seen.is_empty());
     }
 }
+
+mod imports {
+    use super::*;
+    use tsuba_core::config::Action;
+    use tsuba_core::library::{self as lib, ActionBinding, DeviceLibrary, LibraryProfile};
+
+    fn file(name: &str, body: &str) -> String {
+        let p = crate::library::tests::temp_config().join(name);
+        std::fs::write(&p, body).unwrap();
+        p.to_str().unwrap().to_string()
+    }
+
+    fn profile_file(name: &str, p: &LibraryProfile) -> String {
+        file(name, &lib::export("028d", p).unwrap())
+    }
+
+    fn with_commands() -> LibraryProfile {
+        let mut p = LibraryProfile::new("Evil\u{1b}[31m profile\n");
+        p.actions = vec![
+            ActionBinding { layer: 0, key: 160, action: Action::Launch { command: "touch /tmp/x".into() } },
+            ActionBinding { layer: 0, key: 161, action: Action::Url { url: "https://example.org".into() } },
+            ActionBinding { layer: 1, key: 162, action: Action::Audio { op: tsuba_core::config::AudioOp::VolumeUp } },
+        ];
+        p
+    }
+
+    #[test]
+    fn imported_commands_need_approval_and_names_are_clean() {
+        let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        let (mgr, _sim) = rig("028d", 1);
+        let path = profile_file("cmds.tsuba-profile.json", &with_commands());
+        let pre = mgr.library_import_preview("028d", &path).unwrap();
+        assert_eq!(pre["name"], "Evil[31m profile");
+        assert_eq!(pre["software"].as_array().unwrap().len(), 2, "launch and url, not audio");
+        assert_eq!(pre["software"][0]["text"], "touch /tmp/x");
+        // Without approval the commands are left out, the harmless action stays.
+        let id = mgr.library_import("028d", &path, "").unwrap();
+        let l = DeviceLibrary::load(&lib::root(), "028d").unwrap();
+        let p = l.get(&id).unwrap();
+        assert_eq!(p.name, "Evil[31m profile");
+        assert_eq!(p.actions.len(), 1);
+        assert!(matches!(p.actions[0].action, Action::Audio { .. }));
+        // With the digest the user saw, they are kept.
+        let digest = pre["digest"].as_str().unwrap();
+        let id2 = mgr.library_import("028d", &path, digest).unwrap();
+        assert_eq!(DeviceLibrary::load(&lib::root(), "028d").unwrap().get(&id2).unwrap().actions.len(), 3);
+        // A file that changed after the preview is refused, not imported with unseen commands.
+        let mut changed = with_commands();
+        changed.actions[0] = ActionBinding { layer: 0, key: 160, action: Action::Launch { command: "rm -rf ~".into() } };
+        let path2 = profile_file("cmds.tsuba-profile.json", &changed);
+        assert!(mgr.library_import("028d", &path2, digest).is_err());
+    }
+
+    #[test]
+    fn import_files_are_bounded_regular_files() {
+        let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+        let (mgr, _sim) = rig("028d", 1);
+        let big = file("big.json", &" ".repeat(lib::MAX_IMPORT_BYTES as usize + 10));
+        assert!(mgr.library_import("028d", &big, "").unwrap_err().to_string().contains("too big"));
+        // A FIFO with no writer would block a plain read forever.
+        let fifo = crate::library::tests::temp_config().join("pipe.json");
+        let _ = std::fs::remove_file(&fifo);
+        assert!(std::process::Command::new("mkfifo").arg(&fifo).status().unwrap().success());
+        let t0 = std::time::Instant::now();
+        assert!(mgr.library_import("028d", fifo.to_str().unwrap(), "").is_err());
+        assert!(t0.elapsed() < std::time::Duration::from_secs(2));
+        assert!(mgr.library_import("028d", "/dev/zero", "").is_err());
+        assert!(mgr.library_import("028d", "/dev/null", "").is_err());
+        let long = LibraryProfile::new(&"x".repeat(500));
+        let id = mgr.library_import("028d", &profile_file("long.json", &long), "").unwrap();
+        assert_eq!(DeviceLibrary::load(&lib::root(), "028d").unwrap().get(&id).unwrap().name.chars().count(), lib::MAX_NAME_CHARS);
+    }
+}

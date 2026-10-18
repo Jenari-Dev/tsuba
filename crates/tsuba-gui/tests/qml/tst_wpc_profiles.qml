@@ -42,6 +42,10 @@ Item {
             const a = JSON.parse(args);
             calls = calls.concat([[method, a]]);
             switch (method) {
+            case "Tsuba1.GetLibraryImportPreview":
+                if (failPaths.indexOf(a[1]) >= 0)
+                    return JSON.stringify({ ok: false, error: "this profile is for device 00aa" });
+                return JSON.stringify({ ok: true, value: JSON.stringify({ name: "P", software: a[1].indexOf("cmd") >= 0 ? [{ layer: 0, key: 160, kind: "launch", text: "konsole -e htop" }] : [], digest: a[1].indexOf("cmd") >= 0 ? "d1g3st" : "" }) });
             case "Tsuba1.ImportLibraryProfile":
                 return failPaths.indexOf(a[1]) >= 0 ? JSON.stringify({ ok: false, error: "this profile is for device 00aa" }) : JSON.stringify({ ok: true, value: "newid" });
             case "Tsuba1.ExportLibraryProfile":
@@ -81,14 +85,29 @@ Item {
 
         function test_import_reports_each_file() {
             page.importFiles(["file:///t/a.tsuba-profile.json", "file:///t/b.json"]);
-            compare(fakeLib.calls.map(c => c[0]), ["Tsuba1.ImportLibraryProfile", "Tsuba1.ImportLibraryProfile"]);
-            compare(fakeLib.calls[1][1], ["028d", "/t/b.json"]);
+            compare(fakeLib.calls.map(c => c[0]), ["Tsuba1.GetLibraryImportPreview", "Tsuba1.ImportLibraryProfile", "Tsuba1.GetLibraryImportPreview", "Tsuba1.ImportLibraryProfile"]);
+            compare(fakeLib.calls[3][1], ["028d", "/t/b.json", ""]);
             compare(page.profileStatus, "Imported 2 profiles");
             fakeLib.failPaths = ["/t/wrong.json"];
             page.importFiles(["file:///t/ok.json", "file:///t/wrong.json"]);
             compare(page.profileStatus, "Imported 1 profile; wrong.json: this profile is for device 00aa");
             page.importFiles(["file:///t/wrong.json"]);
             verify(page.profileStatus.indexOf("Failed: wrong.json") === 0, page.profileStatus);
+        }
+        function test_imported_commands_wait_for_approval() {
+            page.importFiles(["file:///t/cmd.json", "file:///t/b.json"]);
+            // Stops at the file with a command, listing it; nothing imported yet.
+            compare(page.approval.software[0].text, "konsole -e htop");
+            compare(fakeLib.calls.filter(c => c[0] === "Tsuba1.ImportLibraryProfile").length, 0);
+            page.answerApproval(false);
+            const imports = fakeLib.calls.filter(c => c[0] === "Tsuba1.ImportLibraryProfile");
+            compare(imports[0][1], ["028d", "/t/cmd.json", ""], "declined: no digest, the commands are left out");
+            compare(imports.length, 2);
+            compare(page.profileStatus, "Imported 2 profiles");
+            fakeLib.calls = [];
+            page.importFiles(["file:///t/cmd.json"]);
+            page.answerApproval(true);
+            compare(fakeLib.calls.filter(c => c[0] === "Tsuba1.ImportLibraryProfile")[0][1], ["028d", "/t/cmd.json", "d1g3st"]);
         }
         function test_export_one_and_several() {
             compare(page.fileNameFor(page.current), "Fast _ Slow_ mix_.tsuba-profile.json");

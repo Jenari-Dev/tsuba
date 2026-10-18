@@ -612,8 +612,97 @@ pub fn export(pid: &str, p: &LibraryProfile) -> Result<String> {
     Ok(serde_json::to_string_pretty(&Export { tsuba_profile: 1, device: library_key(pid), profile: p })?)
 }
 
-/// Parse an exported profile for device `pid`: a new id, not pinned.
-pub fn import(pid: &str, text: &str) -> Result<LibraryProfile> {
+/// The largest profile file `import` reads. A real profile is a few KiB.
+pub const MAX_IMPORT_BYTES: u64 = 4 * 1024 * 1024;
+/// Longest profile name kept.
+pub const MAX_NAME_CHARS: usize = 80;
+
+/// Read a profile file: a regular file (no pipes or devices, which could block or never end)
+/// of at most [`MAX_IMPORT_BYTES`].
+pub fn read_import_file(path: &str) -> Result<String> {
+    use std::io::Read as _;
+    // O_NONBLOCK so opening a FIFO without a writer returns at once; checked below anyway.
+    #[cfg(unix)]
+    let file = {
+        use std::os::unix::fs::OpenOptionsExt;
+        std::fs::OpenOptions::new().read(true).custom_flags(libc::O_NONBLOCK).open(path)
+    };
+    #[cfg(not(unix))]
+    let file = std::fs::File::open(path);
+    let file = file.with_context(|| format!("opening {path}"))?;
+    let meta = file.metadata().with_context(|| format!("reading {path}"))?;
+    ensure!(meta.is_file(), "{path} is not a regular file");
+    ensure!(meta.len() <= MAX_IMPORT_BYTES, "{path} is too big for a profile ({} bytes, at most {MAX_IMPORT_BYTES})", meta.len());
+    let mut bytes = Vec::new();
+    file.take(MAX_IMPORT_BYTES + 1).read_to_end(&mut bytes).with_context(|| format!("reading {path}"))?;
+    ensure!(bytes.len() as u64 <= MAX_IMPORT_BYTES, "{path} is too big for a profile");
+    String::from_utf8(bytes).map_err(|_| anyhow::anyhow!("{path} is not text"))
+}
+
+/// A name safe to show and to use in file names and notifications: no control characters,
+/// no surrounding blanks, at most [`MAX_NAME_CHARS`] characters.
+pub fn clean_name(name: &str) -> String {
+    let s: String = name.chars().filter(|c| !c.is_control()).collect();
+    s.trim().chars().take(MAX_NAME_CHARS).collect::<String>().trim().to_string()
+}
+
+/// A software action in an imported profile: it runs commands or opens things on this
+/// computer when the key is pressed, so it needs the user's approval before it is kept.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SoftwareAction {
+    pub layer: u8,
+    pub key: u8,
+    /// "launch", "url" or "type".
+    pub kind: &'static str,
+    /// The command line / URL / text.
+    pub text: String,
+}
+
+/// Launch / Open-URL / Type actions of `p`.
+pub fn software_actions(p: &LibraryProfile) -> Vec<SoftwareAction> {
+    p.actions
+        .iter()
+        .filter_map(|a| {
+            let (kind, text) = match &a.action {
+                Action::Launch { command } => ("launch", command),
+                Action::Url { url } => ("url", url),
+                Action::Type { text } => ("type", text),
+                _ => return None,
+            };
+            Some(SoftwareAction { layer: a.layer, key: a.key, kind, text: text.clone() })
+        })
+        .collect()
+}
+
+/// A stable fingerprint of a list of software actions: the app shows the list to the user and
+/// sends this back to say "these exact ones are approved", so a file that changed in between
+/// is not imported with commands nobody saw.
+pub fn approval_digest(list: &[SoftwareAction]) -> String {
+    if list.is_empty() {
+        return String::new();
+    }
+    let mut h: u64 = 0xcbf29ce484222325;
+    for a in list {
+        for b in format!("{}\u{1f}{}\u{1f}{}\u{1f}{}\u{1e}", a.layer, a.key, a.kind, a.text).bytes() {
+            h = (h ^ b as u64).wrapping_mul(0x100000001b3);
+        }
+    }
+    format!("{h:016x}")
+}
+
+/// An imported profile and the software actions the file carried.
+pub struct Imported {
+    pub profile: LibraryProfile,
+    /// Every software action in the file (kept only when approved).
+    pub software: Vec<SoftwareAction>,
+    /// Whether they were kept.
+    pub approved: bool,
+}
+
+/// Parse an exported profile for device `pid`: a new id, not pinned, a clean name. Software
+/// actions (commands, URLs, typed text) are removed unless `approved` is the
+/// [`approval_digest`] of exactly the ones the file carries.
+pub fn import(pid: &str, text: &str, approved: &str) -> Result<Imported> {
     let e: Export = serde_json::from_str(text).context("not a Tsuba profile file")?;
     if e.tsuba_profile != 1 {
         bail!("unsupported profile file version {}", e.tsuba_profile);
@@ -621,9 +710,18 @@ pub fn import(pid: &str, text: &str) -> Result<LibraryProfile> {
     let want = library_key(pid);
     let kind = |p: &str| u16::from_str_radix(p, 16).ok().and_then(tsuba_hid::db::get).map(|s| s.kind);
     ensure!(e.device == want || (kind(&e.device).is_some() && kind(&e.device) == kind(&want)), "this profile is for device {} (this one is {want})", e.device);
-    let mut p = e.profile.duplicate(&e.profile.name);
-    p.synapse_guid = e.profile.synapse_guid;
-    Ok(p)
+    let name = match clean_name(&e.profile.name) {
+        n if n.is_empty() => "Imported profile".to_string(),
+        n => n,
+    };
+    let mut p = e.profile.duplicate(&name);
+    p.synapse_guid = e.profile.synapse_guid.filter(|g| g.len() <= 80 && !g.chars().any(|c| c.is_control()));
+    let software = software_actions(&p);
+    let keep = software.is_empty() || (!approved.is_empty() && approved == approval_digest(&software));
+    if !keep {
+        p.actions.retain(|a| !matches!(a.action, Action::Launch { .. } | Action::Url { .. } | Action::Type { .. }));
+    }
+    Ok(Imported { profile: p, software, approved: keep })
 }
 
 #[cfg(test)]

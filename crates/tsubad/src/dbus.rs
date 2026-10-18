@@ -412,10 +412,19 @@ impl Tsuba {
         logged(&format!("{pid}: export library profile"), blocking(move || mgr.library_export(&pid, &id, &path)).await)
     }
 
-    /// Add a profile from a file written by ExportLibraryProfile. Returns its id.
-    async fn import_library_profile(&self, pid: String, path: String) -> fdo::Result<String> {
+    /// What a profile file would bring along that runs on this computer (JSON, see the
+    /// daemon's `library_import_preview`): the app lists it for the user's approval.
+    async fn get_library_import_preview(&self, pid: String, path: String) -> fdo::Result<String> {
         let mgr = self.mgr.clone();
-        logged(&format!("{pid}: import library profile"), blocking(move || mgr.library_import(&pid, &path)).await)
+        Ok(blocking(move || mgr.library_import_preview(&pid, &path)).await?.to_string())
+    }
+
+    /// Add a profile from a file written by ExportLibraryProfile. Returns its id. Commands,
+    /// URLs and typed text in the file are left out unless `approved` is the digest the
+    /// preview gave for them.
+    async fn import_library_profile(&self, pid: String, path: String, approved: String) -> fdo::Result<String> {
+        let mgr = self.mgr.clone();
+        logged(&format!("{pid}: import library profile"), blocking(move || mgr.library_import(&pid, &path, &approved)).await)
     }
 
     /// The on-board slot unpinned profiles are written into (0 = whichever slot is active).

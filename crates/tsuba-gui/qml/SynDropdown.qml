@@ -16,7 +16,7 @@ QQC2.ComboBox {
         color: Theme.card
         radius: 2
         border.width: 1
-        border.color: control.popup.visible || control.activeFocus ? Theme.accent : (control.hovered ? "#8a8a8a" : Theme.border)
+        border.color: control.popup.visible || control.activeFocus ? Theme.accent : (control.hovered ? Theme.textDim : Theme.border)
     }
     contentItem: Text {
         text: control.displayText
@@ -41,7 +41,7 @@ QQC2.ComboBox {
         highlighted: control.highlightedIndex === index
         padding: 0
         background: Rectangle {
-            color: parent.highlighted ? "#2d2d2d" : "transparent"
+            color: parent.highlighted ? Theme.hoverFill : "transparent"
         }
         contentItem: Text {
             leftPadding: 12

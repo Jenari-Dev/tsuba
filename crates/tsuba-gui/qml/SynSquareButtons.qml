@@ -28,8 +28,8 @@ Item {
                 width: root.buttonSize
                 height: root.buttonSize
                 radius: 3
-                color: hov.hovered ? "#2d2d2d" : "transparent"
-                border.color: active ? Theme.accent : "#5d5d5d"
+                color: hov.hovered ? Theme.hoverFill : "transparent"
+                border.color: active ? Theme.accent : Theme.border
                 border.width: active ? 2 : 1
                 Text {
                     anchors.centerIn: parent

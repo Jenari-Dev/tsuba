@@ -20,7 +20,7 @@ QQC2.CheckBox {
             anchors.centerIn: parent
             visible: control.checked
             text: "✓"
-            color: "#101010"
+            color: Theme.accentText
             font.pixelSize: 13
             font.bold: true
         }

@@ -12,7 +12,7 @@ QQC2.AbstractButton {
     hoverEnabled: true
 
     background: Rectangle {
-        color: control.primary ? (control.hovered ? Theme.accentHover : Theme.accent) : (control.hovered ? "#1affffff" : "transparent")
+        color: control.primary ? (control.hovered ? Theme.accentHover : Theme.accent) : (control.hovered ? Theme.hoverTint : "transparent")
         border.color: control.primary ? "transparent" : (control.hovered ? Theme.accent : Theme.border)
         border.width: 1
         opacity: control.enabled ? 1 : 0.4
@@ -24,7 +24,7 @@ QQC2.AbstractButton {
         font.pixelSize: Theme.small
         font.letterSpacing: 1
         font.bold: true
-        color: control.primary ? Theme.bg : Theme.text
+        color: control.primary ? Theme.accentText : Theme.text
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         opacity: control.enabled ? 1 : 0.5

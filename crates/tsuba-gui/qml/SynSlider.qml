@@ -35,7 +35,7 @@ QQC2.Slider {
             width: parent.width
             height: 4
             radius: 2
-            color: control.enabled ? Theme.sliderRest : "#3a3a3a"
+            color: control.enabled ? Theme.sliderRest : Theme.inactive
             Rectangle {
                 width: control.visualPosition * parent.width
                 height: parent.height

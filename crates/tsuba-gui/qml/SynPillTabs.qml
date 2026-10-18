@@ -27,7 +27,7 @@ Item {
         visible: root.outlined
         radius: height / 2
         color: "transparent"
-        border.color: "#707070"
+        border.color: Theme.textDim
         border.width: 1
     }
     Row {
@@ -43,7 +43,7 @@ Item {
                 width: Math.max(root.minTabWidth, caption.implicitWidth + 28)
                 height: root.pillHeight
                 radius: height / 2
-                color: active ? Theme.accent : (hover.hovered && !root.outlined ? "#2d2d2d" : "transparent")
+                color: active ? Theme.accent : (hover.hovered && !root.outlined ? Theme.hoverFill : "transparent")
                 Text {
                     id: caption
                     anchors.centerIn: parent

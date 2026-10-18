@@ -26,8 +26,8 @@ Row {
             width: Math.max(root.minTabWidth, caption.implicitWidth + 30)
             height: 28
             radius: 14
-            color: active ? Theme.accent : (hover.hovered ? "#2d2d2d" : "transparent")
-            border.color: active ? Theme.accent : "#707070"
+            color: active ? Theme.accent : (hover.hovered ? Theme.hoverFill : "transparent")
+            border.color: active ? Theme.accent : Theme.textDim
             border.width: 1
             Text {
                 id: caption

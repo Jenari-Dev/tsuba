@@ -11,7 +11,7 @@ depends=(
     'qt6-base' 'qt6-declarative' 'qt6-svg' 'qqc2-breeze-style' 'ki18n'
     'libpipewire' 'libpulse' 'xdg-desktop-portal' 'xdg-utils' 'ttf-roboto'
 )
-makedepends=('cargo' 'clang' 'pkgconf' 'mingw-w64-gcc')
+makedepends=('cargo' 'clang' 'pkgconf' 'mingw-w64-gcc' 'gettext')
 optdepends=(
     'kglobalaccel: run Launch / Inter-device / Audio actions from device buttons'
     'systemsettings: "Open system settings" shortcut on the Customize tab'
@@ -39,6 +39,8 @@ build() {
     cargo build --frozen --release --workspace
     # Game lighting bridge: Windows DLLs (64- and 32-bit) that games in Wine/Proton load.
     make -C shim B="$srcdir/shim-build"
+    # Translations (po/*.po -> tsuba.mo)
+    sh po/build.sh "$srcdir/locale-build"
 }
 
 check() {
@@ -72,6 +74,15 @@ package() {
     # openrazer hand-over (opt-in, reversible): the package never blacklists drivers by itself.
     install -Dm755 contrib/openrazer-handover.sh "$pkgdir/usr/bin/tsuba-handover"
     install -Dm755 contrib/openrazer-restore.sh "$pkgdir/usr/bin/tsuba-handover-restore"
+
+    # Translations: <data dir>/locale/<lang>/LC_MESSAGES/tsuba.mo (KDE's i18n looks there)
+    for mo in "$srcdir"/locale-build/*/LC_MESSAGES/tsuba.mo; do
+        lang=${mo#"$srcdir"/locale-build/}
+        install -Dm644 "$mo" "$pkgdir/usr/share/locale/$lang"
+    done
+
+    # Documentation (the app's About page links to the online copies)
+    install -Dm644 -t "$pkgdir/usr/share/doc/$pkgname" README.md docs/*.md
 
     install -Dm644 LICENSE -t "$pkgdir/usr/share/licenses/$pkgname"
 }

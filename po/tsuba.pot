@@ -1,0 +1,798 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the tsuba package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: tsuba\n"
+"Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
+"POT-Creation-Date: 2026-10-18 20:40+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: crates/tsuba-gui/qml/AboutPage.qml:21 crates/tsuba-gui/qml/HomePage.qml:451
+msgid ""
+"Tsuba is an independent open-source project, not affiliated with or endorsed "
+"by Razer Inc. Razer, Synapse, Chroma, HyperShift, BlackWidow and Basilisk "
+"are trademarks of Razer Inc., named here only to identify compatible "
+"hardware."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:37
+msgid "Copied."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:81
+msgid "Version %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:87
+msgid "Open-source control for Razer keyboards and mice on Linux."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:99
+msgid "Links"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:103
+msgid "Project page"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:107
+msgid "Documentation"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:111 crates/tsuba-gui/qml/Main.qml:627
+#: crates/tsuba-gui/qml/SettingsPage.qml:465
+msgid "Troubleshooting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:115 crates/tsuba-gui/qml/Main.qml:630
+#: crates/tsuba-gui/qml/SettingsPage.qml:483
+msgid "Report a problem"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:125
+msgid "Licence"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:126
+msgid ""
+"Tsuba is free software, released under the GNU General Public License, "
+"version 2 or (at your option) any later version. You may use, study, change "
+"and share it under those terms. There is no warranty."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:131
+msgid "Hide licence text"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:131
+msgid "Show licence text"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:136
+msgid "Hide third-party licences"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:136
+msgid "Show third-party licences"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:164
+msgid "This computer"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:165
+msgid "Include these lines when you report a problem."
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:182
+msgid "Copy details"
+msgstr ""
+
+#: crates/tsuba-gui/qml/AboutPage.qml:196
+msgid "Independent project"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DeviceStateBanner.qml:84
+msgid "Dismiss"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:57
+msgid "Make it yours"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:57
+msgid "Welcome to Tsuba"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:57
+msgid "Your devices"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:79
+msgid ""
+"Tsuba lets you remap keys and buttons, record macros, set DPI and polling "
+"rate, and design lighting for your Razer keyboard and mouse, without Razer's "
+"Windows software."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:87
+msgid ""
+"Your settings are stored on this computer, and sent to your devices when "
+"they are plugged in. Tsuba never reads what you type and doesn't use the "
+"internet."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:96
+msgid ""
+"Tsuba is an independent project, not affiliated with or endorsed by Razer "
+"Inc."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:110
+msgid "Found %1 device(s):"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:110
+msgid "No device found yet."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:130
+msgid ""
+"Plug in a Razer keyboard or mouse (or the wireless dongle). If it still "
+"doesn't show up, the Home page explains what to do. You can finish this "
+"welcome now and come back to it."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:138
+#: crates/tsuba-gui/qml/SetupGuide.qml:160
+msgid "Check again"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:150
+#: crates/tsuba-gui/qml/SettingsPage.qml:181
+msgid "Theme"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:157
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
+msgid "Automatic"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:157
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
+msgid "Dark"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:157
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
+msgid "Light"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:166
+#: crates/tsuba-gui/qml/SettingsPage.qml:294
+msgid "Language"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:173
+msgid "System"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:180
+msgid "A language change applies the next time Tsuba starts."
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:189
+msgid "Launch Tsuba at login (in the tray)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:213
+msgid "Skip"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:222
+msgid "Back"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:229
+msgid "Get started"
+msgstr ""
+
+#: crates/tsuba-gui/qml/FirstRunPanel.qml:229
+msgid "Next"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:122
+msgid "WIRED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:122
+msgid "WIRELESS"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:162
+msgid "UNTESTED"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:246
+msgid "On-board profile %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:284
+msgid "Other"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:288
+msgid ""
+"Hold a button's Shift layer key to reach a second set of assignments on the "
+"same device."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:289
+msgid ""
+"Linked games switches profiles for you when a game starts and puts them back "
+"when it closes."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:290
+msgid ""
+"Lighting Studio can layer several effects on a keyboard, each on its own set "
+"of keys."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:291
+msgid "Game lighting lets games that support Razer Chroma light your devices."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:292
+msgid ""
+"With the tray icon you can switch a device's profile without opening Tsuba."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:293
+msgid ""
+"If something doesn't work, Settings has a diagnostics export you can attach "
+"to a bug report."
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:310
+msgid "Devices"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:373
+msgid "Modules"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:381 crates/tsuba-gui/qml/Main.qml:117
+msgid "Lighting Studio"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:382
+msgid "Needs a per-LED device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:388 crates/tsuba-gui/qml/Main.qml:470
+msgid "Macro"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:393 crates/tsuba-gui/qml/Main.qml:122
+#: crates/tsuba-gui/qml/Main.qml:476
+msgid "Linked games"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:399 crates/tsuba-gui/qml/Main.qml:126
+msgid "Game lighting"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:400
+msgid "Games light up your devices"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:406 crates/tsuba-gui/qml/Main.qml:130
+#: crates/tsuba-gui/qml/Main.qml:628 crates/tsuba-gui/qml/SetupGuide.qml:155
+msgid "Supported devices"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:407
+msgid "Browse every model Tsuba knows"
+msgstr ""
+
+#: crates/tsuba-gui/qml/HomePage.qml:429
+msgid "Tip: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "mute"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "next"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "play / pause"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "previous"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "volume down"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:57
+msgid "volume up"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:65
+msgid "%1: sensitivity %2 DPI"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:68
+msgid "%1: scroll wheel free-spin"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:68
+msgid "%1: scroll wheel tactile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:83 crates/tsuba-gui/qml/Main.qml:247
+#: crates/tsuba-gui/qml/Main.qml:464
+msgid "Tsuba"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:134
+msgid "Macros"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:138 crates/tsuba-gui/qml/Main.qml:247
+#: crates/tsuba-gui/qml/Main.qml:700
+msgid "Settings"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:142
+msgid "About"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:204
+msgid ""
+"OpenRazer's kernel driver is loaded. It can take devices away from Tsuba or "
+"fight over lighting."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:204
+msgid ""
+"Run tsuba-handover in a terminal to switch it off. Undo with tsuba-handover-"
+"restore."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:206
+msgid ""
+"%1 is running. It and Tsuba both control your lighting, so colours may "
+"flicker or reset."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:206
+msgid "Close one of them, or only use one at a time."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:212
+msgid ""
+"Two %1 are connected. Tsuba controls one of each model; the second is left "
+"alone."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:247
+msgid "Open Tsuba"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:247
+msgid "Profiles"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:247
+msgid "Quit"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:581
+msgid "tsubad connected"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:581
+msgid "tsubad not running"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:581
+msgid "tsubad · read-only"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:610
+msgid "Help"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:629
+msgid "Show the welcome"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:631 crates/tsuba-gui/qml/SettingsPage.qml:469
+msgid "About Tsuba"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:724
+msgid ""
+"The Tsuba service is running read-only: nothing you change is sent to your "
+"devices."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:731
+#, javascript-format
+msgid "Battery at %1%. Plug in the cable to charge."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:737
+msgid ""
+"This device isn't answering. A wireless device may be asleep: move it or "
+"press a button."
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:738
+msgid "Try again"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:810
+msgid "Ready"
+msgstr ""
+
+#: crates/tsuba-gui/qml/Main.qml:810
+msgid "Tsuba was updated: close and reopen it to use the new version."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:56
+msgid "Could not save: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:56
+msgid "Saved to %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:117
+msgid "General"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:119
+msgid "Launch Tsuba at login"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:120
+msgid ""
+"Starts minimised in the system tray, so notifications and the tray menu are "
+"ready."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:131
+msgid "Start the background service at login"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:132
+msgid ""
+"The Tsuba service (tsubad) applies your settings to your devices. Keep this "
+"on."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:143
+msgid "When Tsuba opens, show"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:146
+msgid "Home"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:146
+msgid "Last page"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:152
+msgid "Closing the window keeps Tsuba in the tray"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:153
+msgid ""
+"No system tray found on this desktop, so closing the window quits Tsuba."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:153
+msgid "Quit from the tray icon's menu."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:162
+msgid "Show tips on the Home page"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:169
+msgid "Show the welcome again"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:179
+msgid "Appearance"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:182
+msgid "Automatic follows your desktop's light or dark setting."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:191
+#: crates/tsuba-gui/qml/SettingsPage.qml:282
+msgid "Accent colour"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:235
+msgid "Reset to Tsuba default"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:244
+msgid "Device pictures"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:250
+msgid "My picture pack"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:250
+msgid "Tsuba drawings"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:257
+msgid "Takes effect when you reopen a device tab."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:265
+msgid "My own pictures"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:296
+msgid "System default"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:301
+msgid "Language of the app"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:302
+msgid ""
+"Only the app's own text changes. Messages from the Tsuba service and the "
+"command-line tool stay in English."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:321
+msgid "Restart Tsuba to use the new language."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:330
+msgid "Restart now"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:345
+msgid "Notifications"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:346
+msgid ""
+"Short pop-ups when something changes on a device. They come from the Tsuba "
+"service, so they also appear when this window is closed."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:346
+msgid "Start the Tsuba service to change these."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:359
+msgid "Sensitivity (DPI) stage changes"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:364
+msgid "Profile changes from the device's profile button"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:369
+msgid "Dial changes"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:374
+msgid "Scroll wheel mode (free-spin or tactile)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:379
+msgid "A device connects or disconnects"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:385
+msgid "Low battery"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:395
+msgid "Warn at"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:413
+msgid "Battery full"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:419
+msgid "Show routine messages as an on-screen display (KDE Plasma)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:424
+msgid "Play the desktop's notification sound"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:434
+msgid "Send a test notification"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:435
+msgid "The service didn't answer."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:452
+msgid "Help and diagnostics"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:453
+msgid ""
+"If something doesn't work, export diagnostics and attach the file to an "
+"issue. It lists the Razer devices the system sees, your Linux and desktop "
+"versions, the service's recent log and the shape of your settings. It "
+"contains no key assignments, macro text, serial numbers, user name or file "
+"paths."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:458
+msgid "Export diagnostics…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:484
+msgid "Opens the issue page in your browser."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:486
+msgid "Open"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:502
+msgid "Save diagnostics"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:503
+msgid "Zip archive (*.zip)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:506
+msgid "Writing…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:38
+msgid "The Tsuba service isn't installed"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:39
+msgid "The Tsuba service isn't running"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:40
+msgid "Tsuba isn't allowed to open your device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:41
+msgid "Another driver is holding your device"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:42
+msgid "This Razer device isn't supported yet"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:43
+msgid "No Razer device found"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:44
+msgid "The system sees your device, but Tsuba lists none"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:45
+msgid "Checking your setup…"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:51
+msgid ""
+"Tsuba talks to your devices through a small background service, tsubad. "
+"Install the Tsuba package (or follow the install guide), then start the "
+"service."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:53
+msgid ""
+"Tsuba talks to your devices through a small background service, tsubad. "
+"Start it now, or let it start at every login."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:56
+msgid ""
+"The access rule is installed, but it only applies to devices plugged in "
+"after it was loaded. Unplug and replug the device once, or log out and in "
+"again."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:57
+msgid ""
+"Your user needs permission to use Razer devices. Install Tsuba's udev rule "
+"with this command, then unplug and replug the device once:"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:59
+msgid ""
+"A Razer device is connected but the system gave Tsuba no way to talk to it. "
+"This usually means OpenRazer's driver has taken it over. The hand-over "
+"command below gives it back (undo with tsuba-handover-restore)."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:61
+msgid ""
+"A Razer device is connected, but this model isn't in Tsuba's list yet. You "
+"can see which models are supported, and send diagnostics if you'd like it "
+"added."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:63
+msgid ""
+"Plug in a Razer keyboard or mouse with its USB cable, or put the wireless "
+"dongle in a USB port (try another port if nothing happens). Tsuba talks to "
+"devices over USB."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:65
+msgid ""
+"The device is visible to the system, but the service lists none. Restarting "
+"the service usually fixes this; if it doesn't, export diagnostics."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:120
+msgid "Product id: %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:131
+msgid "Restart service"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:131
+msgid "Start service"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:138
+msgid "Copy command"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:143
+msgid "Copied. Paste it in a terminal."
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:149
+msgid "Install guide"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:167
+msgid "Export diagnostics"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SetupGuide.qml:183
+msgid "Still stuck? The troubleshooting page lists the usual causes."
+msgstr ""

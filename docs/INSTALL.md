@@ -14,7 +14,7 @@ cd contrib/arch && ./build-local.sh
 sudo pacman -U contrib/arch/tsuba-*-x86_64.pkg.tar.zst
 ```
 
-Then start the daemon for your user (it also starts at every login):
+Then start the daemon for your user (it also starts at every login), and open Tsuba from your application menu:
 
 ```bash
 systemctl --user enable --now tsubad
@@ -33,6 +33,11 @@ tsuba-handover
 
 It stops the OpenRazer daemon, blacklists its kernel modules, rebinds the devices to the generic HID driver
 and switches them to normal mode. Undo with `tsuba-handover-restore`. Nothing is uninstalled.
+
+## Debian, Ubuntu, Fedora (recipes, not yet tried)
+
+`contrib/deb/build-deb.sh` and `contrib/rpm/tsuba.spec` build a `.deb` / `.rpm` from a source checkout. They have
+not been run on those distributions yet; the dependency names may need adjusting. Reports are welcome.
 
 ## From source (any distribution)
 
@@ -53,9 +58,25 @@ Install `target/release/{tsubad,tsuba,tsuba-app}` somewhere on your `PATH`, copy
 `shim/build/{x64,x86}` to `/usr/share/tsuba/{devices,devicedb,game-lighting/…}` (a source checkout also
 finds them next to the build tree).
 
+## After installing
+
+- Open **Tsuba**. If no device shows up, Home tells you why and what to do; [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+  has the details.
+- In **Settings**: turn on *Launch Tsuba at login* (starts in the tray), pick light, dark or automatic theme,
+  choose which notifications you want, and pick English or 日本語 (restart Tsuba afterwards).
+- To remove Tsuba again: [UNINSTALL.md](UNINSTALL.md).
+
+## Translations
+
+Translations live in `po/` and are installed as `/usr/share/locale/<lang>/LC_MESSAGES/tsuba.mo` by the package.
+From a source checkout: `po/build.sh` writes them to `target/locale`; start the app with
+`XDG_DATA_DIRS=$PWD/target:$XDG_DATA_DIRS`. `po/update.sh` refreshes the template after strings change.
+
 ## Optional
 
 - **KDE Plasma** (`kglobalaccel`): needed for Launch / Inter-device / Audio actions on device buttons
   and for Game Mode's shortcut blocking.
+- **A system tray**: KDE Plasma has one; GNOME needs the AppIndicator extension. Without one, closing the
+  window quits Tsuba.
 - **Wine / Proton**: needed only to use game lighting with games that load Razer's native library;
   the Game lighting page installs Tsuba's bridge into each game's prefix.

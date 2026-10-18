@@ -128,6 +128,12 @@ impl LibraryApi {
         crate::shortcuts::backend_name().to_string()
     }
 
+    /// How binding the shortcuts went: "none", "ready", "pending" (waiting for the desktop's
+    /// approval dialog) or "failed".
+    async fn shortcut_backend_state(&self) -> String {
+        crate::shortcuts::backend_state().to_string()
+    }
+
     /// The focused window changed (called by the KWin script): process id, class, name, title.
     async fn focus_changed(&self, pid: String, class: String, name: String, caption: String) -> fdo::Result<()> {
         let info = FocusInfo { pid: pid.trim().parse().unwrap_or(0), class, name, caption };

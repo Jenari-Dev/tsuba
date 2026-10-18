@@ -75,7 +75,7 @@ Rectangle {
     // that span them. While the canvas is being edited, `layers` is the canvas layer list.
     readonly property real stageW: 100
     readonly property real stageH: 50
-    property var placements: defaultPlacements()
+    property var placements: ({})
     property var canvasLayers: []
     property bool arranging: false
     property bool arranged: false      // the user moved something: save the placements
@@ -620,30 +620,27 @@ Rectangle {
     }
 
     // ---- Devices on the canvas
+    // Aspect (width / height) of the box round a device's LED centres: what a placement keeps.
+    function ledAspect(p) {
+        const v = p === "00aa" ? mouseView : kbView;
+        if (v && v.view) {
+            return Math.max(0.2, v.ledsPic.width / v.ledsPic.height);
+        }
+        return p === "00aa" ? 0.8 : 3.3;
+    }
+    readonly property real kbAspect: ledAspect(pid)
+    readonly property real mouseAspect: ledAspect("00aa")
+    // The pictures load after the page: lay the devices out again once their shapes are known.
+    onKbAspectChanged: if (!arranged) placements = defaultPlacements()
+    onMouseAspectChanged: if (!arranged) placements = defaultPlacements()
     function defaultPlacements() {
-        // Keyboard on the left, mouse to its right, bottoms level; sized from the pictures.
-        const aspect = (pk, kb) => {
-            const v = pk && pk.views && pk.views.top;
-            if (!v) {
-                return kb ? 2.2 : 0.7;
-            }
-            if (!kb) {
-                return Math.max(0.2, v.width / Math.max(1, v.height));
-            }
-            // The keyboard view spans the body, the wrist rest and every LED box (like LedKeyboard).
-            const b = v.body || [0, 0, v.width, v.height];
-            const ls = v.hotspots.filter(h => h.led !== null);
-            const x0 = Math.min(b[0], ...ls.map(h => h.rect[0])), x1 = Math.max(b[2], ...ls.map(h => h.rect[0] + h.rect[2]));
-            const y0 = Math.min(b[1], ...ls.map(h => h.rect[1]));
-            const y1 = Math.max(b[3], v.wrist ? v.wrist.rect[1] + v.wrist.rect[3] : 0, ...ls.map(h => h.rect[1] + h.rect[3]));
-            return Math.max(0.2, (x1 - x0) / Math.max(1, y1 - y0));
-        };
-        const ka = aspect(kbPack, true), ma = aspect(mousePack, false);
-        const gap = 4;
-        let mh = 42, mw = mh * ma;
+        // Keyboard on the left, mouse to its right, bottoms level; sized from the LED boxes.
+        const ka = ledAspect(pid), ma = ledAspect("00aa");
+        const gap = 6;
+        let mh = 36, mw = mh * ma;
         let kw = 92 - mw - gap, kh = kw / ka;
-        if (kh > 40) {
-            kh = 40;
+        if (kh > 30) {
+            kh = 30;
             kw = kh * ka;
         }
         const x0 = (stageW - (kw + gap + mw)) / 2, bottom = (stageH + Math.max(kh, mh)) / 2;
@@ -653,7 +650,7 @@ Rectangle {
         return m;
     }
     function placementOf(p) {
-        return placements[p] || defaultPlacements()[p] || { x: 0, y: 0, w: 40, h: 20 };
+        return placements[p] || { x: 0, y: 0, w: 40, h: 20 };
     }
     function movePlacement(p, x, y) {
         const pl = Object.assign({}, placementOf(p));
@@ -671,8 +668,10 @@ Rectangle {
     function scalePlacement(p, f) {
         const pl = Object.assign({}, placementOf(p));
         const cx = pl.x + pl.w / 2, cy = pl.y + pl.h / 2;
-        pl.w = Math.max(6, Math.min(stageW, pl.w * f));
-        pl.h = Math.max(3, Math.min(stageH, pl.h * f));
+        // One factor for both sides: a placement keeps the shape of the device's LED box.
+        f = Math.max(Math.max(6 / pl.w, 3 / pl.h), Math.min(f, stageW / pl.w, stageH / pl.h));
+        pl.w *= f;
+        pl.h *= f;
         pl.x = Math.max(0, Math.min(stageW - pl.w, cx - pl.w / 2));
         pl.y = Math.max(0, Math.min(stageH - pl.h, cy - pl.h / 2));
         const m = Object.assign({}, placements);
@@ -913,6 +912,7 @@ Rectangle {
     }
 
     Component.onCompleted: {
+        placements = defaultPlacements();
         load();
         if (backend.env_var("TSUBA_SYNAPSE") !== "") {   // headless UI check
             synapseDlg.open("lighting");
@@ -928,10 +928,11 @@ Rectangle {
             const fx = newEffect(backend.env_var("TSUBA_DEMO_EFFECT"));
             updateCurrent(l => l.effect = fx);
         }
-        if (backend.env_var("TSUBA_DEMO_CANVAS") === "1" && hasMouse) {   // headless UI check
+        if (backend.env_var("TSUBA_DEMO_CANVAS") !== "" && hasMouse) {   // headless UI check
             showCombined(true);
             addLayer("wave");
             updateCurrent(l => l.effect.colours = ["ff2020", "ffd200", "44d62c", "0080ff"]);
+            arranging = backend.env_var("TSUBA_DEMO_CANVAS") === "arrange";
         }
     }
 
@@ -1539,6 +1540,27 @@ Rectangle {
                         const pl = studio.placementOf(p);
                         return Qt.rect(sox + pl.x * sk, soy + pl.y * sk, pl.w * sk, pl.h * sk);
                     }
+                    // Where a device's drawing goes so that the box round its LEDs fills its placement
+                    // (what you see is what the canvas layers are laid out over).
+                    function viewRect(p) {
+                        const r = rectOf(p);
+                        if (!studio.combined) {
+                            return r;
+                        }
+                        const v = p === "00aa" ? mouseView : kbView;
+                        if (!v || !v.view) {
+                            return r;
+                        }
+                        // One scale for both axes (the LED box keeps its shape), centred in the placement.
+                        const lp = v.ledsPic, s = Math.min(r.width / lp.width, r.height / lp.height);
+                        const bx = r.x + (r.width - lp.width * s) / 2, by = r.y + (r.height - lp.height * s) / 2;
+                        if (p === "00aa") {
+                            const pad = v.framePad;
+                            return Qt.rect(bx - lp.x * s - pad, by - lp.y * s - pad, v.view.width * s + 2 * pad, v.view.height * s + 2 * pad);
+                        }
+                        const c = v.contentPic;
+                        return Qt.rect(bx - (lp.x - c.x) * s, by - (lp.y - c.y) * s, c.width * s, c.height * s);
+                    }
                     // Rubber band: forwarded to the device under the band's centre (canvas view)
                     // or to the one device shown.
                     function target(r) {
@@ -1546,8 +1568,8 @@ Rectangle {
                             return studio.editMouse ? mouseView : kbView;
                         }
                         const c = Qt.point(r.x + r.width / 2, r.y + r.height / 2);
-                        const m = rectOf("00aa");
-                        return (c.x >= m.x && c.x <= m.x + m.width && c.y >= m.y && c.y <= m.y + m.height) ? mouseView : kbView;
+                        const m = rectOf("00aa"), pad = m.width * 0.15;
+                        return (c.x >= m.x - pad && c.x <= m.x + m.width + pad && c.y >= m.y - pad && c.y <= m.y + m.height + pad) ? mouseView : kbView;
                     }
                     onBoxSelected: (r, add) => {
                         const t = target(r);
@@ -1572,10 +1594,10 @@ Rectangle {
                         id: kbView
                         objectName: "kbView"
                         visible: studio.combined || !studio.editMouse
-                        x: canvasHolder.rectOf(studio.pid).x
-                        y: canvasHolder.rectOf(studio.pid).y
-                        width: canvasHolder.rectOf(studio.pid).width
-                        height: canvasHolder.rectOf(studio.pid).height
+                        x: canvasHolder.viewRect(studio.pid).x
+                        y: canvasHolder.viewRect(studio.pid).y
+                        width: canvasHolder.viewRect(studio.pid).width
+                        height: canvasHolder.viewRect(studio.pid).height
                         interactive: false
                         view: studio.kbShown ? studio.kbShown.views.top : null
                         dir: studio.kbShown ? studio.kbShown.dir : ""
@@ -1586,10 +1608,10 @@ Rectangle {
                     Item {
                         id: mouseHolder
                         visible: studio.combined || studio.editMouse
-                        x: canvasHolder.rectOf("00aa").x
-                        y: canvasHolder.rectOf("00aa").y
-                        width: canvasHolder.rectOf("00aa").width
-                        height: canvasHolder.rectOf("00aa").height
+                        x: canvasHolder.viewRect("00aa").x
+                        y: canvasHolder.viewRect("00aa").y
+                        width: canvasHolder.viewRect("00aa").width
+                        height: canvasHolder.viewRect("00aa").height
                         MouseLeds {
                             id: mouseView
                             objectName: "mouseView"

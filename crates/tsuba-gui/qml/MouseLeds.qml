@@ -73,6 +73,15 @@ Item {
         return p;
     }
 
+    // Studio canvas: the box round the LED centres, in picture units (the frame is `view.width` × `view.height`).
+    readonly property rect ledsPic: {
+        const w = view ? view.width : 620, h = view ? view.height : 869;
+        const xs = points.map(p => p.x * w), ys = points.map(p => p.y * h);
+        const x0 = Math.min(...xs), y0 = Math.min(...ys);
+        return Qt.rect(x0, y0, Math.max(1, Math.max(...xs) - x0), Math.max(1, Math.max(...ys) - y0));
+    }
+    readonly property real framePad: 30
+
     // The drawing's frame fitted in the item (30 px margin); the picture sits at `imageRect` in it.
     readonly property real fs: view ? Math.min((width - 60) / view.width, (height - 60) / view.height) : 0
     readonly property real fw: view ? view.width * fs : 0

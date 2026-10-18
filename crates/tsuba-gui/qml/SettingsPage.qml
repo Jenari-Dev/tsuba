@@ -415,6 +415,12 @@ Rectangle {
                             onToggled: page.setNotif("battery_full", checked)
                         }
                         SynCheckBox {
+                            objectName: "notifyOsd"
+                            text: i18n("Show routine messages as an on-screen display (KDE Plasma)")
+                            checked: page.notif.osd === true
+                            onToggled: page.setNotif("osd", checked)
+                        }
+                        SynCheckBox {
                             text: i18n("Play the desktop's notification sound")
                             checked: page.notif.sound === true
                             onToggled: page.setNotif("sound", checked)

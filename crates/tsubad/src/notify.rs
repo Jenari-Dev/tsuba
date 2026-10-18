@@ -37,6 +37,9 @@ pub struct Settings {
     pub connection: bool,
     /// Ask the desktop to play its notification sound (audio prompt).
     pub sound: bool,
+    /// Plasma only: show routine messages as the on-screen display (like the volume pop-up) instead of a
+    /// notification. Warnings such as a low battery stay notifications. Falls back when Plasma's service is absent.
+    pub osd: bool,
 }
 
 impl Default for Settings {
@@ -52,6 +55,7 @@ impl Default for Settings {
             battery_threshold: 15,
             connection: true,
             sound: false,
+            osd: false,
         }
     }
 }
@@ -232,7 +236,7 @@ pub fn check_battery(mgr: &crate::manager::Manager, n: &Notifier, pid: &str) {
 
 /// Where popups go.
 pub trait Sink: Send + Sync {
-    fn send(&self, note: &Note, sound: bool);
+    fn send(&self, note: &Note, settings: &Settings);
 }
 
 /// The freedesktop notification service over D-Bus.
@@ -248,14 +252,27 @@ impl DBusSink {
 }
 
 impl Sink for DBusSink {
-    fn send(&self, note: &Note, sound: bool) {
+    fn send(&self, note: &Note, settings: &Settings) {
         use zbus::zvariant::Value;
+        let sound = settings.sound;
+        let osd = settings.osd && !note.critical;
         let conn = self.conn.clone();
         let replaces = self.replace.lock().unwrap().get(&note.key).copied().unwrap_or(0);
         let note = note.clone();
         let key = note.key.clone();
         let table = self.replace.clone();
         tokio::spawn(async move {
+            if osd {
+                // Plasma's on-screen display; if the service isn't there, show a notification instead.
+                let text = format!("{}: {}", note.title, note.body);
+                let shown = conn
+                    .call_method(Some("org.kde.plasmashell"), "/org/kde/osdService", Some("org.kde.osdService"), "showText", &(note.icon, text.as_str()))
+                    .await
+                    .is_ok();
+                if shown {
+                    return;
+                }
+            }
             let mut hints: HashMap<&str, Value> = HashMap::new();
             hints.insert("desktop-entry", Value::from("io.github.jenaridev.tsuba"));
             hints.insert("transient", Value::from(true));
@@ -314,7 +331,7 @@ impl Notifier {
         let s = self.settings();
         let note = decide(&s, &mut self.state.lock().unwrap(), Instant::now(), input);
         if let Some(n) = note {
-            self.sink.send(&n, s.sound);
+            self.sink.send(&n, &s);
         }
     }
 
@@ -323,7 +340,7 @@ impl Notifier {
         let s = self.settings();
         self.sink.send(
             &Note { key: "test".into(), title: "Tsuba".into(), body: "Notifications are working.".into(), icon: "io.github.jenaridev.tsuba", critical: false },
-            s.sound,
+            &s,
         );
     }
 }

@@ -69,6 +69,11 @@ Item {
             verify(!dpi.enabled);
         }
 
+        function test_osd_option_is_stored() {
+            mouseClick(findChild(page, "notifyOsd"));
+            compare(app.notif.osd, true);
+        }
+
         function test_battery_threshold() {
             const s = findChild(page, "batteryThreshold");
             s.value = 30;

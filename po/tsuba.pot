@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
 "Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 20:34+0900\n"
+"POT-Creation-Date: 2026-10-18 20:40+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,12 +50,12 @@ msgid "Documentation"
 msgstr ""
 
 #: crates/tsuba-gui/qml/AboutPage.qml:111 crates/tsuba-gui/qml/Main.qml:627
-#: crates/tsuba-gui/qml/SettingsPage.qml:455
+#: crates/tsuba-gui/qml/SettingsPage.qml:465
 msgid "Troubleshooting"
 msgstr ""
 
 #: crates/tsuba-gui/qml/AboutPage.qml:115 crates/tsuba-gui/qml/Main.qml:630
-#: crates/tsuba-gui/qml/SettingsPage.qml:473
+#: crates/tsuba-gui/qml/SettingsPage.qml:483
 msgid "Report a problem"
 msgstr ""
 
@@ -159,27 +159,27 @@ msgid "Check again"
 msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:150
-#: crates/tsuba-gui/qml/SettingsPage.qml:177
+#: crates/tsuba-gui/qml/SettingsPage.qml:181
 msgid "Theme"
 msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:181
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
 msgid "Automatic"
 msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:181
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
 msgid "Dark"
 msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:157
-#: crates/tsuba-gui/qml/SettingsPage.qml:181
+#: crates/tsuba-gui/qml/SettingsPage.qml:185
 msgid "Light"
 msgstr ""
 
 #: crates/tsuba-gui/qml/FirstRunPanel.qml:166
-#: crates/tsuba-gui/qml/SettingsPage.qml:290
+#: crates/tsuba-gui/qml/SettingsPage.qml:294
 msgid "Language"
 msgstr ""
 
@@ -424,7 +424,7 @@ msgstr ""
 msgid "Show the welcome"
 msgstr ""
 
-#: crates/tsuba-gui/qml/Main.qml:631 crates/tsuba-gui/qml/SettingsPage.qml:459
+#: crates/tsuba-gui/qml/Main.qml:631 crates/tsuba-gui/qml/SettingsPage.qml:469
 msgid "About Tsuba"
 msgstr ""
 
@@ -457,193 +457,197 @@ msgstr ""
 msgid "Tsuba was updated: close and reopen it to use the new version."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:52
+#: crates/tsuba-gui/qml/SettingsPage.qml:56
 msgid "Could not save: %1"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:52
+#: crates/tsuba-gui/qml/SettingsPage.qml:56
 msgid "Saved to %1"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:113
+#: crates/tsuba-gui/qml/SettingsPage.qml:117
 msgid "General"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:115
+#: crates/tsuba-gui/qml/SettingsPage.qml:119
 msgid "Launch Tsuba at login"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:116
+#: crates/tsuba-gui/qml/SettingsPage.qml:120
 msgid ""
 "Starts minimised in the system tray, so notifications and the tray menu are "
 "ready."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:127
+#: crates/tsuba-gui/qml/SettingsPage.qml:131
 msgid "Start the background service at login"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:128
+#: crates/tsuba-gui/qml/SettingsPage.qml:132
 msgid ""
 "The Tsuba service (tsubad) applies your settings to your devices. Keep this "
 "on."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:139
+#: crates/tsuba-gui/qml/SettingsPage.qml:143
 msgid "When Tsuba opens, show"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:142
+#: crates/tsuba-gui/qml/SettingsPage.qml:146
 msgid "Home"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:142
+#: crates/tsuba-gui/qml/SettingsPage.qml:146
 msgid "Last page"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:148
+#: crates/tsuba-gui/qml/SettingsPage.qml:152
 msgid "Closing the window keeps Tsuba in the tray"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:149
+#: crates/tsuba-gui/qml/SettingsPage.qml:153
 msgid ""
 "No system tray found on this desktop, so closing the window quits Tsuba."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:149
+#: crates/tsuba-gui/qml/SettingsPage.qml:153
 msgid "Quit from the tray icon's menu."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:158
+#: crates/tsuba-gui/qml/SettingsPage.qml:162
 msgid "Show tips on the Home page"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:165
+#: crates/tsuba-gui/qml/SettingsPage.qml:169
 msgid "Show the welcome again"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:175
+#: crates/tsuba-gui/qml/SettingsPage.qml:179
 msgid "Appearance"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:178
+#: crates/tsuba-gui/qml/SettingsPage.qml:182
 msgid "Automatic follows your desktop's light or dark setting."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:187
-#: crates/tsuba-gui/qml/SettingsPage.qml:278
+#: crates/tsuba-gui/qml/SettingsPage.qml:191
+#: crates/tsuba-gui/qml/SettingsPage.qml:282
 msgid "Accent colour"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:231
+#: crates/tsuba-gui/qml/SettingsPage.qml:235
 msgid "Reset to Tsuba default"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:240
+#: crates/tsuba-gui/qml/SettingsPage.qml:244
 msgid "Device pictures"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:246
+#: crates/tsuba-gui/qml/SettingsPage.qml:250
 msgid "My picture pack"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:246
+#: crates/tsuba-gui/qml/SettingsPage.qml:250
 msgid "Tsuba drawings"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:253
+#: crates/tsuba-gui/qml/SettingsPage.qml:257
 msgid "Takes effect when you reopen a device tab."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:261
+#: crates/tsuba-gui/qml/SettingsPage.qml:265
 msgid "My own pictures"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:292
+#: crates/tsuba-gui/qml/SettingsPage.qml:296
 msgid "System default"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:297
+#: crates/tsuba-gui/qml/SettingsPage.qml:301
 msgid "Language of the app"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:298
+#: crates/tsuba-gui/qml/SettingsPage.qml:302
 msgid ""
 "Only the app's own text changes. Messages from the Tsuba service and the "
 "command-line tool stay in English."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:317
+#: crates/tsuba-gui/qml/SettingsPage.qml:321
 msgid "Restart Tsuba to use the new language."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:326
+#: crates/tsuba-gui/qml/SettingsPage.qml:330
 msgid "Restart now"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:341
+#: crates/tsuba-gui/qml/SettingsPage.qml:345
 msgid "Notifications"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:342
+#: crates/tsuba-gui/qml/SettingsPage.qml:346
 msgid ""
 "Short pop-ups when something changes on a device. They come from the Tsuba "
 "service, so they also appear when this window is closed."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:342
+#: crates/tsuba-gui/qml/SettingsPage.qml:346
 msgid "Start the Tsuba service to change these."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:355
+#: crates/tsuba-gui/qml/SettingsPage.qml:359
 msgid "Sensitivity (DPI) stage changes"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:360
+#: crates/tsuba-gui/qml/SettingsPage.qml:364
 msgid "Profile changes from the device's profile button"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:365
+#: crates/tsuba-gui/qml/SettingsPage.qml:369
 msgid "Dial changes"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:370
+#: crates/tsuba-gui/qml/SettingsPage.qml:374
 msgid "Scroll wheel mode (free-spin or tactile)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:375
+#: crates/tsuba-gui/qml/SettingsPage.qml:379
 msgid "A device connects or disconnects"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:381
+#: crates/tsuba-gui/qml/SettingsPage.qml:385
 msgid "Low battery"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:391
+#: crates/tsuba-gui/qml/SettingsPage.qml:395
 msgid "Warn at"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:409
+#: crates/tsuba-gui/qml/SettingsPage.qml:413
 msgid "Battery full"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:414
-msgid "Play the desktop's notification sound"
+#: crates/tsuba-gui/qml/SettingsPage.qml:419
+msgid "Show routine messages as an on-screen display (KDE Plasma)"
 msgstr ""
 
 #: crates/tsuba-gui/qml/SettingsPage.qml:424
+msgid "Play the desktop's notification sound"
+msgstr ""
+
+#: crates/tsuba-gui/qml/SettingsPage.qml:434
 msgid "Send a test notification"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:425
+#: crates/tsuba-gui/qml/SettingsPage.qml:435
 msgid "The service didn't answer."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:442
+#: crates/tsuba-gui/qml/SettingsPage.qml:452
 msgid "Help and diagnostics"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:443
+#: crates/tsuba-gui/qml/SettingsPage.qml:453
 msgid ""
 "If something doesn't work, export diagnostics and attach the file to an "
 "issue. It lists the Razer devices the system sees, your Linux and desktop "
@@ -652,27 +656,27 @@ msgid ""
 "paths."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:448
+#: crates/tsuba-gui/qml/SettingsPage.qml:458
 msgid "Export diagnostics…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:474
+#: crates/tsuba-gui/qml/SettingsPage.qml:484
 msgid "Opens the issue page in your browser."
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:476
+#: crates/tsuba-gui/qml/SettingsPage.qml:486
 msgid "Open"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:492
+#: crates/tsuba-gui/qml/SettingsPage.qml:502
 msgid "Save diagnostics"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:493
+#: crates/tsuba-gui/qml/SettingsPage.qml:503
 msgid "Zip archive (*.zip)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/SettingsPage.qml:496
+#: crates/tsuba-gui/qml/SettingsPage.qml:506
 msgid "Writing…"
 msgstr ""
 

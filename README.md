@@ -7,7 +7,8 @@ user daemon (`tsubad`) plus a Qt/QML app (`tsuba-app`) and a CLI (`tsuba`).
 
 Supported and tested: BlackWidow V4 Pro (1532:028d), Basilisk V3 Pro (1532:00aa, wired).
 
-**Install:** see [docs/INSTALL.md](docs/INSTALL.md). **Help test devices:** see [CONTRIBUTING.md](CONTRIBUTING.md).
+**Install:** see [docs/INSTALL.md](docs/INSTALL.md). **Something wrong?** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+**Remove it:** [docs/UNINSTALL.md](docs/UNINSTALL.md). **Help test devices:** see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Highlights: per-key and per-button remapping with a Shift layer and factory reset per key; macros
 (recorded, edited, stored on the PC or on the device); DPI stages, polling rate, scroll-wheel modes;
@@ -18,6 +19,12 @@ Steam / Lutris / Heroic / Bottles game scanner); power and idle settings; **Impo
 the profiles, macros and lighting effects of a Windows Synapse 4 install on a mounted drive);
 your own device pictures; and game lighting.
 
+Around the devices: a tray icon with quick profile switching, desktop notifications (DPI stage, profile,
+dial, scroll-wheel mode, low battery, connect / disconnect), launch at login, light, dark or automatic
+theme with a custom accent colour, a welcome tour, an English and 日本語 interface, and a diagnostics export that
+leaves out personal data. When no device shows up, Home explains why (service not running, missing permission,
+OpenRazer holding the device, unsupported model) and offers the fix.
+
 Recognised but untested: about 260 more Razer keyboards, laptop keyboards, keypads, mice, mouse mats,
 mouse docks, headset stands and other lighting accessories, listed in Tsuba's device database
 (`data/devicedb/*.toml`; `tsuba db [filter]` searches it). Untested devices are **read-only by default**:
@@ -26,6 +33,24 @@ Tsuba reads and shows them, but refuses to change any setting until you enable w
 `SetAllowUntestedWrites` D-Bus method, or `tsuba --allow-untested` for one CLI command). Their drawings are
 generic layouts marked approximate. Headsets are listed for reference only (not protocol-2.5 devices).
 Reports from owners of untested devices are welcome.
+
+## What Tsuba does not do, and why
+
+Tsuba aims to cover what Razer's own Windows software does for the devices it can verify. These are left out
+on purpose or can't be done on the tested hardware:
+
+| Not included | Why |
+|---|---|
+| Account, cloud sync, community sharing, macro and effect exchange, AI-generated macros, promotions, ratings | They need Razer's online services. Tsuba is offline-first: settings stay on your computer, and it makes no network connections of its own (the game-lighting server listens on the loopback address only). |
+| Synapse 3 migration, partner integrations (smart lights), Synapse Override | Other products and services. Importing from a Synapse 4 install on a mounted Windows drive is supported instead. |
+| Auto-update, module installer, "in development" device catalogue | Your distribution's package manager updates Tsuba; every module is built in. |
+| Firmware updates | Not offered yet. Tsuba never flashes firmware and shows the version the device reports. |
+| More keymaps than Standard and Shift, driver-mode macros, Fn+key combinations | The tested keyboard doesn't support extra keymaps, Tsuba keeps devices in normal mode, and the Fn layer is fixed in firmware. |
+| Analog switch features (Rapid Trigger, actuation points, gamepad emulation), adjustment mode, Copilot key, wheel tension / haptics, HyperPolling rates above 1000 Hz | The two tested devices don't have that hardware, so it can't be built or verified. Reports from owners of such devices are welcome. |
+| Separate backlight and underglow brightness | The tested keyboard exposes a single lighting region. |
+| Battery health limiter, laptop, GPU and fan power controls | Laptop and other product features. |
+| Bluetooth mode and dongle pairing | Not verified yet: Tsuba talks to devices over USB (cable or the wireless dongle). |
+| Windows-only features (OS notification reset, game-controller properties) | They don't exist on Linux; Tsuba links to the desktop's own settings where there is a counterpart. |
 
 ## Game lighting
 

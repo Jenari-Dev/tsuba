@@ -1059,6 +1059,12 @@ Rectangle {
                 Item {
                     Layout.fillWidth: true
                 }
+                LightingOwnerChip {
+                    objectName: "ownerChip"
+                    backend: page.backend
+                    pid: page.pid
+                    visible: !page.backend.readonly && typeof page.backend.studio_call === "function"
+                }
                 HelpButton {
                     size: 22
                     text: page.tabHelp[page.tabs[page.tabIndex]] || ""

@@ -53,7 +53,7 @@ fn main() {
                 "qml/SupportedDevicesPage.qml",
             ]),
     )
-    .files(["src/backend.rs", "src/i18n.rs"])
+    .files(["src/backend.rs", "src/app_backend.rs", "src/i18n.rs"])
     .include_dir("src")
     .cpp_file("src/i18n.cpp");
     // SAFETY: only adds an include path for the KF6 I18n headers.

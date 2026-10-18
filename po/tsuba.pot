@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tsuba\n"
 "Report-Msgid-Bugs-To: https://github.com/JenAriDev/tsuba/issues\n"
-"POT-Creation-Date: 2026-10-18 22:01+0900\n"
+"POT-Creation-Date: 2026-10-18 22:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: crates/tsuba-gui/qml/AboutPage.qml:21 crates/tsuba-gui/qml/HomePage.qml:451
+#: crates/tsuba-gui/qml/AboutPage.qml:21 crates/tsuba-gui/qml/HomePage.qml:472
 msgid ""
 "Tsuba is an independent open-source project, not affiliated with or endorsed "
 "by Razer Inc. Razer, Synapse, Chroma, HyperShift, BlackWidow and Basilisk "
@@ -188,13 +188,13 @@ msgstr ""
 #: crates/tsuba-gui/qml/BatteryLightingCard.qml:37
 #: crates/tsuba-gui/qml/CustomizeTab.qml:62
 #: crates/tsuba-gui/qml/CustomizeTab.qml:129
-#: crates/tsuba-gui/qml/DevicePage.qml:79
-#: crates/tsuba-gui/qml/DevicePage.qml:88
-#: crates/tsuba-gui/qml/DevicePage.qml:93
-#: crates/tsuba-gui/qml/DevicePage.qml:112
-#: crates/tsuba-gui/qml/DevicePage.qml:171
-#: crates/tsuba-gui/qml/DevicePage.qml:391
-#: crates/tsuba-gui/qml/DevicePage.qml:966
+#: crates/tsuba-gui/qml/DevicePage.qml:101
+#: crates/tsuba-gui/qml/DevicePage.qml:116
+#: crates/tsuba-gui/qml/DevicePage.qml:121
+#: crates/tsuba-gui/qml/DevicePage.qml:140
+#: crates/tsuba-gui/qml/DevicePage.qml:254
+#: crates/tsuba-gui/qml/DevicePage.qml:474
+#: crates/tsuba-gui/qml/DevicePage.qml:1049
 #: crates/tsuba-gui/qml/DeviceResetCard.qml:19
 #: crates/tsuba-gui/qml/DialEditor.qml:91
 #: crates/tsuba-gui/qml/DialEditor.qml:107
@@ -294,7 +294,7 @@ msgstr ""
 
 #: crates/tsuba-gui/qml/AssignmentPanel.qml:206
 #: crates/tsuba-gui/qml/AssignmentPanel.qml:737
-#: crates/tsuba-gui/qml/HomePage.qml:388 crates/tsuba-gui/qml/Main.qml:477
+#: crates/tsuba-gui/qml/HomePage.qml:409 crates/tsuba-gui/qml/Main.qml:477
 #: crates/tsuba-gui/qml/StudioPage.qml:174
 msgid "Macro"
 msgstr ""
@@ -1345,327 +1345,349 @@ msgstr ""
 msgid "Profile colour"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:75
+#: crates/tsuba-gui/qml/DevicePage.qml:97
 msgid "Imported %1 profile"
 msgid_plural "Imported %1 profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:77
+#: crates/tsuba-gui/qml/DevicePage.qml:99
 msgid "Imported %1 profile; %2"
 msgid_plural "Imported %1 profiles; %2"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:88
+#: crates/tsuba-gui/qml/DevicePage.qml:116
 msgid "Exported “%1”"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:93
+#: crates/tsuba-gui/qml/DevicePage.qml:121
 msgid "Exported %1 profile"
 msgid_plural "Exported %1 profiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:110
+#: crates/tsuba-gui/qml/DevicePage.qml:138
 msgid "“%1” no longer changes the lighting"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:110
+#: crates/tsuba-gui/qml/DevicePage.qml:138
 msgid "“%1” now keeps its own lighting"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:118
+#: crates/tsuba-gui/qml/DevicePage.qml:146
 msgid "Import profiles"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:120
-#: crates/tsuba-gui/qml/DevicePage.qml:128
+#: crates/tsuba-gui/qml/DevicePage.qml:148
+#: crates/tsuba-gui/qml/DevicePage.qml:211
 msgid "All files (*)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:120
+#: crates/tsuba-gui/qml/DevicePage.qml:148
 msgid "Tsuba profiles (*.tsuba-profile.json *.json)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:125
-msgid "Export profile"
+#: crates/tsuba-gui/qml/DevicePage.qml:160
+msgid "Run commands from “%1”?"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:128
-msgid "Tsuba profiles (*.tsuba-profile.json)"
+#: crates/tsuba-gui/qml/DevicePage.qml:166
+msgid ""
+"This profile file would run the following on your computer when its keys are "
+"pressed. Only keep them if you trust where the file came from."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:133
-msgid "Export the chosen profiles to a folder"
+#: crates/tsuba-gui/qml/DevicePage.qml:177
+msgid "Key %1: %2"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:142
-#: crates/tsuba-gui/qml/HomePage.qml:246
-msgid "On-board profile %1"
+#: crates/tsuba-gui/qml/DevicePage.qml:188
+msgid "Keep the commands"
 msgstr ""
 
 #: crates/tsuba-gui/qml/DevicePage.qml:196
+msgid "Import without them"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:208
+msgid "Export profile"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:211
+msgid "Tsuba profiles (*.tsuba-profile.json)"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:216
+msgid "Export the chosen profiles to a folder"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:225
+#: crates/tsuba-gui/qml/HomePage.qml:267
+msgid "On-board profile %1"
+msgstr ""
+
+#: crates/tsuba-gui/qml/DevicePage.qml:279
 msgid "Deleted “%1”"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:221
+#: crates/tsuba-gui/qml/DevicePage.qml:304
 msgid "What Tsuba knows about this model."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:222
+#: crates/tsuba-gui/qml/DevicePage.qml:305
 msgid ""
 "Click a key or button to see what it does and change it. Changes are saved "
 "in the active profile and written to the device's on-board memory, so they "
 "keep working without Tsuba. Remapped keys are shown in the accent colour."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:223
+#: crates/tsuba-gui/qml/DevicePage.qml:306
 msgid ""
 "Settings that change how the device behaves: sensitivity, polling rate, "
 "scrolling, Game Mode and similar. Most are stored on the device's current "
 "profile."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:224
+#: crates/tsuba-gui/qml/DevicePage.qml:307
 msgid ""
 "Pick a colour and effect for this device, set its brightness, or play a "
 "Lighting Studio profile across all your devices."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:225
+#: crates/tsuba-gui/qml/DevicePage.qml:308
 msgid ""
 "Battery level, charging state and power-saving options for this wireless "
 "device."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:246
+#: crates/tsuba-gui/qml/DevicePage.qml:329
 msgid "SLOT %1"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:292
+#: crates/tsuba-gui/qml/DevicePage.qml:375
 msgid "%1 GAMES"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:381
+#: crates/tsuba-gui/qml/DevicePage.qml:464
 msgid "The profile"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:386
-#: crates/tsuba-gui/qml/DevicePage.qml:409
+#: crates/tsuba-gui/qml/DevicePage.qml:469
+#: crates/tsuba-gui/qml/DevicePage.qml:492
 msgid "%1 is active"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:386
+#: crates/tsuba-gui/qml/DevicePage.qml:469
 msgid "%2 is active (%1 change written)"
 msgid_plural "%2 is active (%1 changes written)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:388
+#: crates/tsuba-gui/qml/DevicePage.qml:471
 msgid "%1 setting couldn't be written: %2"
 msgid_plural "%1 settings couldn't be written: %2"
 msgstr[0] ""
 msgstr[1] ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:389
+#: crates/tsuba-gui/qml/DevicePage.qml:472
 msgctxt "profile is active; followed by a warning"
 msgid "%1; %2"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:476
+#: crates/tsuba-gui/qml/DevicePage.qml:559
 msgid "Switching to %1…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:495
+#: crates/tsuba-gui/qml/DevicePage.qml:578
 msgid "ON-BOARD"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:581
+#: crates/tsuba-gui/qml/DevicePage.qml:664
 #: crates/tsuba-gui/qml/DialEditor.qml:289
 #: crates/tsuba-gui/qml/StudioPage.qml:1046
 msgid "ACTIVE"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:605
+#: crates/tsuba-gui/qml/DevicePage.qml:688
 msgid ""
 "The device runs on-board profile %1, which isn't in the library. Pick a "
 "profile to switch."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:615
+#: crates/tsuba-gui/qml/DevicePage.qml:698
 msgid "Tsuba may not change this device, so profiles can't be switched here."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:696
+#: crates/tsuba-gui/qml/DevicePage.qml:779
 msgctxt "menu item"
 msgid "Add"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:699
+#: crates/tsuba-gui/qml/DevicePage.qml:782
 msgid "Profile %1"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:706
+#: crates/tsuba-gui/qml/DevicePage.qml:789
 msgid "New from factory defaults"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:709
+#: crates/tsuba-gui/qml/DevicePage.qml:792
 msgid "Factory defaults"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:715
+#: crates/tsuba-gui/qml/DevicePage.qml:798
 msgctxt "menu item"
 msgid "Rename"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:724
+#: crates/tsuba-gui/qml/DevicePage.qml:807
 msgctxt "menu item"
 msgid "Duplicate"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:727
+#: crates/tsuba-gui/qml/DevicePage.qml:810
 #: crates/tsuba-gui/qml/MacroList.qml:133
 #: crates/tsuba-gui/qml/StudioPage.qml:386
 #: crates/tsuba-gui/qml/StudioPage.qml:1081
 msgid "%1 copy"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:734
+#: crates/tsuba-gui/qml/DevicePage.qml:817
 msgctxt "menu item"
 msgid "Delete"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:742
+#: crates/tsuba-gui/qml/DevicePage.qml:825
 msgid "Unpin from slot %1"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:743
+#: crates/tsuba-gui/qml/DevicePage.qml:826
 msgid "Pin to device (no free slot)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:743
+#: crates/tsuba-gui/qml/DevicePage.qml:826
 msgid "Pin to device (slot %1)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:748
+#: crates/tsuba-gui/qml/DevicePage.qml:831
 msgid "“%1” is no longer pinned"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:750
+#: crates/tsuba-gui/qml/DevicePage.qml:833
 msgid "Writing “%1” to the device…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:752
+#: crates/tsuba-gui/qml/DevicePage.qml:835
 msgid ""
 "“%1” pinned to on-board slot %2: the profile button reaches it without Tsuba"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:760
+#: crates/tsuba-gui/qml/DevicePage.qml:843
 msgid "Lighting follows this profile"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:760
+#: crates/tsuba-gui/qml/DevicePage.qml:843
 msgid "✓ Lighting follows this profile (%1)"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:772
+#: crates/tsuba-gui/qml/DevicePage.qml:855
 msgid "Import…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:782
-#: crates/tsuba-gui/qml/DevicePage.qml:864
+#: crates/tsuba-gui/qml/DevicePage.qml:865
+#: crates/tsuba-gui/qml/DevicePage.qml:947
 msgid "Export…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:793
+#: crates/tsuba-gui/qml/DevicePage.qml:876
 msgid "Export several…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:808
-#: crates/tsuba-gui/qml/HomePage.qml:393
+#: crates/tsuba-gui/qml/DevicePage.qml:891
+#: crates/tsuba-gui/qml/HomePage.qml:414
 #: crates/tsuba-gui/qml/LinkedGamesPage.qml:158
 #: crates/tsuba-gui/qml/Main.qml:122 crates/tsuba-gui/qml/Main.qml:483
 msgid "Linked games"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:816
+#: crates/tsuba-gui/qml/DevicePage.qml:899
 #: crates/tsuba-gui/qml/MacrosPage.qml:571
 #: crates/tsuba-gui/qml/StudioPage.qml:1098
 msgid "Import from Synapse…"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:830
+#: crates/tsuba-gui/qml/DevicePage.qml:913
 msgid "Export profiles"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:837
+#: crates/tsuba-gui/qml/DevicePage.qml:920
 #: crates/tsuba-gui/qml/GameScanDialog.qml:113
 msgid "Select all"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:858
-#: crates/tsuba-gui/qml/DevicePage.qml:908
-#: crates/tsuba-gui/qml/DevicePage.qml:945
+#: crates/tsuba-gui/qml/DevicePage.qml:941
+#: crates/tsuba-gui/qml/DevicePage.qml:991
+#: crates/tsuba-gui/qml/DevicePage.qml:1028
 #: crates/tsuba-gui/qml/UntestedBanner.qml:181
 msgctxt "button"
 msgid "Cancel"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:890
+#: crates/tsuba-gui/qml/DevicePage.qml:973
 #: crates/tsuba-gui/qml/MacroList.qml:473
 msgid "Delete “%1”?"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:893
+#: crates/tsuba-gui/qml/DevicePage.qml:976
 msgid "Tsuba switches to “%1” first."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:896
+#: crates/tsuba-gui/qml/DevicePage.qml:979
 msgid "Its on-board slot is freed."
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:898
+#: crates/tsuba-gui/qml/DevicePage.qml:981
 msgctxt "space between two sentences"
 msgid " "
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:914
+#: crates/tsuba-gui/qml/DevicePage.qml:997
 msgctxt "button"
 msgid "Delete"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "Duplicate as"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 #: crates/tsuba-gui/qml/StudioPage.qml:1062
 msgid "New profile"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "New profile with factory settings"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:931
+#: crates/tsuba-gui/qml/DevicePage.qml:1014
 msgid "Rename profile"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:952
+#: crates/tsuba-gui/qml/DevicePage.qml:1035
 msgctxt "button"
 msgid "Save"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:959
+#: crates/tsuba-gui/qml/DevicePage.qml:1042
 msgid "Renamed"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:962
+#: crates/tsuba-gui/qml/DevicePage.qml:1045
 msgid "Created “%1” with factory settings"
 msgstr ""
 
-#: crates/tsuba-gui/qml/DevicePage.qml:970
+#: crates/tsuba-gui/qml/DevicePage.qml:1053
 msgid "Created “%1”"
 msgstr ""
 
@@ -2291,88 +2313,88 @@ msgctxt "button: show help"
 msgid "Help"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:122
+#: crates/tsuba-gui/qml/HomePage.qml:143
 msgid "WIRED"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:122
+#: crates/tsuba-gui/qml/HomePage.qml:143
 msgid "WIRELESS"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:162
+#: crates/tsuba-gui/qml/HomePage.qml:183
 msgid "UNTESTED"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:288
+#: crates/tsuba-gui/qml/HomePage.qml:309
 msgid ""
 "Hold a button's Shift layer key to reach a second set of assignments on the "
 "same device."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:289
+#: crates/tsuba-gui/qml/HomePage.qml:310
 msgid ""
 "Linked games switches profiles for you when a game starts and puts them back "
 "when it closes."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:290
+#: crates/tsuba-gui/qml/HomePage.qml:311
 msgid ""
 "Lighting Studio can layer several effects on a keyboard, each on its own set "
 "of keys."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:291
+#: crates/tsuba-gui/qml/HomePage.qml:312
 msgid "Game lighting lets games that support Razer Chroma light your devices."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:292
+#: crates/tsuba-gui/qml/HomePage.qml:313
 msgid ""
 "With the tray icon you can switch a device's profile without opening Tsuba."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:293
+#: crates/tsuba-gui/qml/HomePage.qml:314
 msgid ""
 "If something doesn't work, Settings has a diagnostics export you can attach "
 "to a bug report."
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:310
+#: crates/tsuba-gui/qml/HomePage.qml:331
 #: crates/tsuba-gui/qml/StudioPage.qml:1878
 msgid "Devices"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:373
+#: crates/tsuba-gui/qml/HomePage.qml:394
 msgid "Modules"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:381
+#: crates/tsuba-gui/qml/HomePage.qml:402
 #: crates/tsuba-gui/qml/LightingOwnerChip.qml:20
 #: crates/tsuba-gui/qml/Main.qml:117
 msgid "Lighting Studio"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:382
+#: crates/tsuba-gui/qml/HomePage.qml:403
 msgid "Needs a per-LED device"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:399 crates/tsuba-gui/qml/Main.qml:126
+#: crates/tsuba-gui/qml/HomePage.qml:420 crates/tsuba-gui/qml/Main.qml:126
 msgid "Game lighting"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:400
+#: crates/tsuba-gui/qml/HomePage.qml:421
 msgid "Games light up your devices"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:406 crates/tsuba-gui/qml/Main.qml:130
+#: crates/tsuba-gui/qml/HomePage.qml:427 crates/tsuba-gui/qml/Main.qml:130
 #: crates/tsuba-gui/qml/Main.qml:635 crates/tsuba-gui/qml/SetupGuide.qml:155
 msgid "Supported devices"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:407
+#: crates/tsuba-gui/qml/HomePage.qml:428
 msgid "Browse every model Tsuba knows"
 msgstr ""
 
-#: crates/tsuba-gui/qml/HomePage.qml:429
+#: crates/tsuba-gui/qml/HomePage.qml:450
 msgid "Tip: %1"
 msgstr ""
 
@@ -6415,19 +6437,19 @@ msgstr ""
 msgid "Reset zoom and position"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:253
+#: crates/tsuba-gui/src/app_backend.rs:276
 msgid "Could not run tsubad: %1"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:380
+#: crates/tsuba-gui/src/app_backend.rs:403
 msgid "Started"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:391
+#: crates/tsuba-gui/src/app_backend.rs:414
 msgid "Started without the systemd service"
 msgstr ""
 
-#: crates/tsuba-gui/src/app_backend.rs:393
+#: crates/tsuba-gui/src/app_backend.rs:416
 msgid "Could not start tsubad: %1"
 msgstr ""
 

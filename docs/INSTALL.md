@@ -34,6 +34,11 @@ tsuba-handover
 It stops the OpenRazer daemon, blacklists its kernel modules, rebinds the devices to the generic HID driver
 and switches them to normal mode. Undo with `tsuba-handover-restore`. Nothing is uninstalled.
 
+## Debian, Ubuntu, Fedora (recipes, not yet tried)
+
+`contrib/deb/build-deb.sh` and `contrib/rpm/tsuba.spec` build a `.deb` / `.rpm` from a source checkout. They have
+not been run on those distributions yet; the dependency names may need adjusting. Reports are welcome.
+
 ## From source (any distribution)
 
 Requirements: Rust (stable, edition 2024), Qt 6 (base, declarative, svg), KDE Frameworks 6 I18n,

@@ -19,6 +19,8 @@ use crate::manager::Manager;
 pub struct LinkState {
     pub current: Option<String>,
     saved_profiles: BTreeMap<String, ProfileRef>,
+    /// Polling rate (Hz) each device had before the link changed it.
+    saved_polling: BTreeMap<String, u32>,
     chroma_applied: bool,
 }
 
@@ -41,6 +43,17 @@ impl Manager {
                 Err(e) => warn!("{pid}: linked profile {want:?}: {e:#}"),
             }
         }
+        st.saved_polling.clear();
+        for (pid, hz) in &link.polling_hz {
+            let Some(pid) = self.attached_twin(pid) else { continue };
+            match self.set_polling(&pid, *hz) {
+                Ok(Some(before)) => {
+                    st.saved_polling.insert(pid, before);
+                }
+                Ok(None) => {}
+                Err(e) => warn!("{pid}: linked polling rate {hz} Hz: {e:#}"),
+            }
+        }
         st.chroma_applied = false;
         if let Some(name) = &link.chroma {
             match self.chroma_live(name) {
@@ -57,12 +70,42 @@ impl Manager {
                 warn!("{pid}: restoring profile {before:?}: {e:#}");
             }
         }
+        for (pid, hz) in std::mem::take(&mut st.saved_polling) {
+            if let Err(e) = self.set_polling(&pid, hz) {
+                warn!("{pid}: restoring polling rate {hz} Hz: {e:#}");
+            }
+        }
         if std::mem::take(&mut st.chroma_applied) {
             let pids: Vec<String> = self.devices.lock().unwrap().keys().cloned().collect();
             for pid in pids {
                 self.restore_saved_lighting(&pid);
             }
         }
+    }
+
+    /// Set a device's polling rate; returns the rate it had before, or None when it already
+    /// had `hz`.
+    fn set_polling(&self, pid: &str, hz: u32) -> Result<Option<u32>> {
+        self.ensure_writable_for(pid)?;
+        self.with_device(pid, |dev, model| {
+            let cur = tsuba_core::performance::read(dev, model, 1)?.polling_hz.context("this device has no polling rate setting")?;
+            if cur == hz {
+                return Ok(None);
+            }
+            tsuba_core::performance::apply(dev, model, &tsuba_core::performance::Performance { polling_hz: Some(hz), ..Default::default() })?;
+            Ok(Some(cur))
+        })
+    }
+
+    /// The window with the keyboard focus changed (reported by the KWin script): links that
+    /// only apply while their game has the focus follow it at once.
+    pub fn focus_changed(self: &Arc<Self>, info: app_links::FocusInfo) {
+        *self.actions.focus.lock().unwrap() = Some(info);
+        if self.read_only {
+            return;
+        }
+        let m = self.clone();
+        std::thread::spawn(move || m.link_tick());
     }
 
     /// `pid` if attached, else its attached wired/wireless twin.
@@ -114,7 +157,8 @@ impl Manager {
         }
         let links = AppLinks::load(&app_links::path()).unwrap_or_default();
         let procs = app_links::processes();
-        let want = links.active(&procs).cloned();
+        let focus = self.actions.focus.lock().unwrap().clone();
+        let want = links.active_focused(&procs, focus.as_ref()).cloned();
         let key = want.as_ref().map(|l| if l.name.is_empty() { l.matches.clone() } else { l.name.clone() });
         // Only this watcher uses `link_state`, so holding it across the (slow) profile switch
         // blocks nobody; D-Bus readers see `link_active`, updated once the switch is done.

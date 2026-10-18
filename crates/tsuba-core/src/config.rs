@@ -111,10 +111,6 @@ pub struct GameModeConfig {
     /// None = all of them, through KDE's global block.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub blocked_combos: Option<Vec<String>>,
-    /// Shortcuts the per-combo block took away from the desktop, to give back afterwards:
-    /// (component, action, original key codes).
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub saved_shortcuts: Vec<(String, String, Vec<i32>)>,
 }
 
 /// Desktop shortcuts Game Mode can block one by one: (name, label, Qt key codes). Each name

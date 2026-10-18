@@ -379,6 +379,18 @@ pub fn upload(dev: &Device, mac: &Macro, reuse: Option<u16>) -> Result<u16> {
     Ok(id)
 }
 
+/// Rewrite the name block of on-board macro `id` (GUID, item count, name) without touching its
+/// events, so a renamed library macro shows its new name on the device too.
+pub fn write_name(dev: &Device, id: u16, mac: &Macro) -> Result<()> {
+    let guid = guid_bytes(&mac.guid)?;
+    let block = m::encode_name_block(&m::NameBlock { guid, items: mac.event_count() as u32, name: mac.name.clone() });
+    for (i, chunk) in block.chunks(m::NAME_CHUNK).enumerate() {
+        dev.query(m::set_name(chunk.len()), &m::encode_set_name(id, (i * m::NAME_CHUNK) as u16, chunk))?;
+    }
+    ensure!(read_name(dev, id)?.name == mac.name.chars().take(99).collect::<String>() || read_name(dev, id)?.guid == guid, "macro name read-back differs");
+    Ok(())
+}
+
 /// How a bound macro plays (Synapse's playback options).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

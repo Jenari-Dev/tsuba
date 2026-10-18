@@ -41,5 +41,6 @@ jobs:
 
       - name: Device drawings are up to date
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           python3 tools/gen-device-art.py
           git diff --exit-code -- data/devices

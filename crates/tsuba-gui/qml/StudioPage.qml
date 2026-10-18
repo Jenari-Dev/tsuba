@@ -15,9 +15,9 @@ Rectangle {
     property string editPid: pid
     readonly property bool editMouse: editPid === "00aa" && !combined
     readonly property var devicesHere: {
-        const d = [{ pid: pid, name: "Keyboard" }];
+        const d = [{ pid: pid, name: i18n("Keyboard") }];
         if (JSON.parse(backend.devices || "[]").some(x => x.pid === "00aa")) {
-            d.push({ pid: "00aa", name: "Mouse" });
+            d.push({ pid: "00aa", name: i18n("Mouse") });
         }
         return d;
     }
@@ -38,8 +38,8 @@ Rectangle {
     readonly property var kbShown: combined ? kbPack : (editPid === "00aa" ? null : pack)
     readonly property var mouseShown: combined ? mousePack : (editPid === "00aa" ? pack : null)
     property var liveByPid: ({})
-    readonly property var tabNames: devicesHere.map(d => d.name).concat(hasMouse ? ["All devices"] : [])
-    readonly property var mouseLeds: [{ led: [0, 0], name: "Logo" }, { led: [0, 1], name: "Scroll wheel" }].concat(Array.from({ length: 11 }, (_, i) => ({ led: [0, 2 + i], name: "Underglow" })))
+    readonly property var tabNames: devicesHere.map(d => d.name).concat(hasMouse ? [i18n("All devices")] : [])
+    readonly property var mouseLeds: [{ led: [0, 0], name: i18n("Logo") }, { led: [0, 1], name: i18n("Scroll wheel") }].concat(Array.from({ length: 11 }, (_, i) => ({ led: [0, 2 + i], name: i18n("Underglow") })))
     readonly property var kbLeds: kbPack ? kbPack.views.top.hotspots.filter(h => h.led !== null) : []
     readonly property var leds: ledsOf(editPid)
     function ledsOf(p) {
@@ -53,14 +53,14 @@ Rectangle {
     }
     // Underglow runs 2 (front-left) → 7 (back) → 12 (front-right).
     readonly property var mouseGroups: [
-        { label: "All", test: h => true },
-        { label: "Logo", test: h => h.led[1] === 0 },
-        { label: "Scroll wheel", test: h => h.led[1] === 1 },
-        { label: "All underglow", test: h => h.led[1] >= 2 },
-        { label: "Left side", test: h => h.led[1] >= 2 && h.led[1] <= 6 },
-        { label: "Back", test: h => h.led[1] >= 6 && h.led[1] <= 8 },
-        { label: "Right side", test: h => h.led[1] >= 8 },
-        { label: "Logo + wheel", test: h => h.led[1] <= 1 }
+        { key: "all", label: i18n("All"), test: h => true },
+        { key: "logo", label: i18n("Logo"), test: h => h.led[1] === 0 },
+        { key: "wheel", label: i18n("Scroll wheel"), test: h => h.led[1] === 1 },
+        { key: "underglow", label: i18n("All underglow"), test: h => h.led[1] >= 2 },
+        { key: "left", label: i18n("Left side"), test: h => h.led[1] >= 2 && h.led[1] <= 6 },
+        { key: "back", label: i18n("Back"), test: h => h.led[1] >= 6 && h.led[1] <= 8 },
+        { key: "right", label: i18n("Right side"), test: h => h.led[1] >= 8 },
+        { key: "logowheel", label: i18n("Logo + wheel"), test: h => h.led[1] <= 1 }
     ]
 
     // Named Chroma profiles.
@@ -69,6 +69,11 @@ Rectangle {
     property var profileNames: []
     property string activeName: ""
     property string status: ""
+    property bool statusBad: false
+    function say(text, bad) {
+        status = text;
+        statusBad = !!bad;
+    }
     property var liveColours: ({})
 
     // Canvas: where the devices sit (stage units: the stage is 100 wide, 50 tall) and the layers
@@ -139,49 +144,50 @@ Rectangle {
     //   colours: how many colour slots it starts with (0 = none); stops = any number of colours
     //   (a gradient); random = may pick colours at random / rainbow when it has none.
     readonly property var effects: [
-        { type: "static", label: "Static", group: "Colour", colours: 1 },
-        { type: "gradient", label: "Gradient", group: "Colour", colours: 2, stops: true },
-        { type: "breathing", label: "Breathing", group: "Colour", colours: 2, random: true, stops: true },
-        { type: "spectrum", label: "Spectrum Cycling", group: "Colour", colours: 0 },
-        { type: "wave", label: "Wave", group: "Motion", colours: 2, random: true, stops: true, directions: ["Left to right", "Right to left", "Top to bottom", "Bottom to top"] },
-        { type: "wheel", label: "Wheel", group: "Motion", colours: 0, random: true, stops: true, directions: ["Clockwise", "Counter-clockwise"] },
-        { type: "tidal", label: "Tidal", group: "Motion", colours: 0, random: true, stops: true, directions: ["Outward", "Inward"] },
-        { type: "starlight", label: "Starlight", group: "Motion", colours: 2, random: true, stops: true, density: true },
-        { type: "fire", label: "Fire", group: "Motion", colours: 0 },
-        { type: "audio_meter", label: "Audio Meter", group: "Live", colours: 0 },
-        { type: "ambient", label: "Ambient (screen)", group: "Live", colours: 0 },
-        { type: "battery", label: "Battery level", group: "Live", colours: 0 },
-        { type: "image", label: "Image", group: "Live", colours: 0 }
+        { type: "static", label: i18n("Static"), group: "colour", colours: 1 },
+        { type: "gradient", label: i18n("Gradient"), group: "colour", colours: 2, stops: true },
+        { type: "breathing", label: i18n("Breathing"), group: "colour", colours: 2, random: true, stops: true },
+        { type: "spectrum", label: i18n("Spectrum Cycling"), group: "colour", colours: 0 },
+        { type: "wave", label: i18n("Wave"), group: "motion", colours: 2, random: true, stops: true, directions: [i18n("Left to right"), i18n("Right to left"), i18n("Top to bottom"), i18n("Bottom to top")] },
+        { type: "wheel", label: i18n("Wheel"), group: "motion", colours: 0, random: true, stops: true, directions: [i18n("Clockwise"), i18n("Counter-clockwise")] },
+        { type: "tidal", label: i18n("Tidal"), group: "motion", colours: 0, random: true, stops: true, directions: [i18n("Outward"), i18n("Inward")] },
+        { type: "starlight", label: i18n("Starlight"), group: "motion", colours: 2, random: true, stops: true, density: true },
+        { type: "fire", label: i18n("Fire"), group: "motion", colours: 0 },
+        { type: "audio_meter", label: i18n("Audio Meter"), group: "live", colours: 0 },
+        { type: "ambient", label: i18n("Ambient (screen)"), group: "live", colours: 0 },
+        { type: "battery", label: i18n("Battery level"), group: "live", colours: 0 },
+        { type: "image", label: i18n("Image"), group: "live", colours: 0 }
     ]
-    readonly property var effectGroups: ["Colour", "Motion", "Live"]
+    readonly property var effectGroups: [{ key: "colour", title: i18n("Colour") }, { key: "motion", title: i18n("Motion") }, { key: "live", title: i18n("Live") }]
     readonly property var dirKeys: ({
         wave: ["left_to_right", "right_to_left", "top_to_bottom", "bottom_to_top"],
         wheel: ["clockwise", "counter_clockwise"]
     })
     readonly property var groups: [
-        { label: "All", test: h => true },
-        { label: "WASD", test: h => (h.group || "").indexOf("wasd") >= 0 },
-        { label: "Arrows", test: h => (h.group || "").indexOf("arrows") >= 0 },
-        { label: "Letters", test: h => (h.group || "").indexOf("alphabets") >= 0 },
-        { label: "Number row", test: h => (h.group || "").indexOf("numberRows") >= 0 },
-        { label: "F-keys", test: h => (h.group || "").indexOf("functions") >= 0 },
-        { label: "Numpad", test: h => (h.group || "").indexOf("numpad") >= 0 },
-        { label: "Macro", test: h => h.group === "macro" },
-        { label: "Media", test: h => (h.group || "").indexOf("multimedia") >= 0 },
-        { label: "Underglow", test: h => h.group === "underglow" }
+        { key: "all", label: i18n("All"), test: h => true },
+        { key: "wasd", label: i18n("WASD"), test: h => (h.group || "").indexOf("wasd") >= 0 },
+        { key: "arrows", label: i18n("Arrows"), test: h => (h.group || "").indexOf("arrows") >= 0 },
+        { key: "letters", label: i18n("Letters"), test: h => (h.group || "").indexOf("alphabets") >= 0 },
+        { key: "numbers", label: i18n("Number row"), test: h => (h.group || "").indexOf("numberRows") >= 0 },
+        { key: "fkeys", label: i18n("F-keys"), test: h => (h.group || "").indexOf("functions") >= 0 },
+        { key: "numpad", label: i18n("Numpad"), test: h => (h.group || "").indexOf("numpad") >= 0 },
+        { key: "macro", label: i18n("Macro"), test: h => h.group === "macro" },
+        { key: "media", label: i18n("Media"), test: h => (h.group || "").indexOf("multimedia") >= 0 },
+        { key: "underglow", label: i18n("Underglow"), test: h => h.group === "underglow" }
     ]
     function groupsFor(p) {
         return p === "00aa" ? mouseGroups : groups;
     }
     // Quick-select entries: the edited device's groups, or (canvas) whole devices and their groups.
-    readonly property var quickGroups: {
+    // `pid` "*" = every device; `key` = the group (see `groups`).
+    readonly property var quickEntries: {
         if (!combined) {
-            return groupsFor(editPid).map(g => g.label);
+            return groupsFor(editPid).map(g => ({ text: g.label, pid: editPid, key: g.key }));
         }
-        const out = ["All devices"];
+        const out = [{ text: i18n("All devices"), pid: "*", key: "all" }];
         devicesHere.forEach(d => {
-            out.push(d.name + ": all");
-            groupsFor(d.pid).filter(g => g.label !== "All").forEach(g => out.push(d.name + ": " + g.label));
+            out.push({ text: i18n("%1: all", d.name), pid: d.pid, key: "all" });
+            groupsFor(d.pid).filter(g => g.key !== "all").forEach(g => out.push({ text: i18n("%1: %2", d.name, g.label), pid: d.pid, key: g.key }));
         });
         return out;
     }
@@ -478,9 +484,9 @@ Rectangle {
     function coverText(l) {
         if (l.targets) {
             const names = Object.keys(l.targets).map(deviceName);
-            return names.length ? names.join(" + ") : "no device";
+            return names.length ? names.join(" + ") : i18n("no device");
         }
-        return l.leds.length ? l.leds.length + " LEDs" : "all LEDs";
+        return l.leds.length ? i18np("%1 LED", "%1 LEDs", l.leds.length) : i18n("all LEDs");
     }
 
     // ---- LED selection
@@ -527,36 +533,39 @@ Rectangle {
         }
         updateCurrent(l => l.leds = list);
     }
-    function applyGroup(g) {
+    // Choose LEDs by group: `key` of `groups` on the edited device, or (canvas) on `devPid`
+    // ("*" = every device, whole).
+    function applyGroup(key, devPid) {
         cleared = false;
         if (combined) {
             const t = {};
-            if (g === "All devices") {
+            if (devPid === "*") {
                 devicesHere.forEach(d => t[d.pid] = []);
             } else {
-                const d = devicesHere.find(x => g.startsWith(x.name + ": "));
-                if (!d) {
+                if (!devicesHere.some(d => d.pid === devPid)) {
                     return;
                 }
-                const name = g.substring(d.name.length + 2);
-                if (name === "all") {
-                    t[d.pid] = [];
+                if (key === "all") {
+                    t[devPid] = [];
                 } else {
-                    const grp = groupsFor(d.pid).find(x => x.label === name);
+                    const grp = groupsFor(devPid).find(x => x.key === key);
                     if (!grp) {
                         return;
                     }
-                    t[d.pid] = ledsOf(d.pid).filter(grp.test).map(h => h.led);
+                    t[devPid] = ledsOf(devPid).filter(grp.test).map(h => h.led);
                 }
             }
             updateCurrent(l => l.targets = t);
             return;
         }
-        const grp = groupsFor(editPid).find(x => x.label === g);
+        const grp = groupsFor(editPid).find(x => x.key === key);
         if (!grp) {
             return;
         }
-        updateCurrent(l => l.leds = g === "All" ? [] : leds.filter(grp.test).map(h => h.led));
+        updateCurrent(l => l.leds = key === "all" ? [] : leds.filter(grp.test).map(h => h.led));
+    }
+    function applyQuick(e) {
+        applyGroup(e.key, e.pid);
     }
     // Devices a canvas layer covers (toggle one on or off; at least one stays).
     function toggleTarget(devPid) {
@@ -761,7 +770,7 @@ Rectangle {
         const toSave = currentProfile();
         if (loadedName !== "" && loadedName !== profile.name && profileNames.indexOf(loadedName) >= 0) {
             if (!backend.rename_chroma_profile(loadedName, profile.name)) {
-                status = "Failed: " + backend.status;
+                say(i18n("Failed: %1", backend.status), true);
                 return;
             }
         }
@@ -769,9 +778,9 @@ Rectangle {
         if (backend.save_chroma_profile(JSON.stringify(toSave), apply)) {
             loadedName = profile.name;
             dirty = false;
-            status = apply ? "Saved and applied" : "Saved";
+            say(apply ? i18n("Saved and applied") : i18n("Saved"), false);
         } else {
-            status = "Failed: " + backend.status;
+            say(i18n("Failed: %1", backend.status), true);
         }
         loadProfiles();
         Theme.profilesRev++;
@@ -789,18 +798,22 @@ Rectangle {
     // Profile files (Tsuba's own JSON format).
     function exportProfile(url) {
         const r = JSON.parse(backend.studio_call("export", JSON.stringify({ path: url.toString(), profile: currentProfile() })));
-        status = r.ok ? "Exported to " + r.path : "Failed: " + r.error;
+        if (r.ok) {
+            say(i18n("Exported to %1", r.path), false);
+        } else {
+            say(i18n("Failed: %1", r.error), true);
+        }
     }
     function importProfile(url) {
         const r = JSON.parse(backend.studio_call("import", JSON.stringify({ path: url.toString(), taken: profileNames.concat([profile.name]) })));
         if (!r.ok) {
-            status = "Failed: " + r.error;
+            say(i18n("Failed: %1", r.error), true);
             return;
         }
         openProfile(r.profile);
         loadedName = "";
         dirty = true;
-        status = "Imported as " + r.profile.name + " (not saved yet)";
+        say(i18n("Imported as %1 (not saved yet)", r.profile.name), false);
     }
     function editedColour() {
         const l = current >= 0 ? layers[current] : null;
@@ -890,8 +903,8 @@ Rectangle {
         } else if (backend.env_var("TSUBA_DEMO") === "1") {
             const sel = g => leds.filter(g.test).map(h => h.led);
             layers = [
-                { name: "Wave", enabled: true, leds: [], effect: newEffect("wave"), brightness: 1, opacity: 1, speed: 1 },
-                { name: "Underglow stars", enabled: true, leds: sel(groups[9]), effect: { type: "starlight", colours: ["ffffff"], duration: "medium", density: 0.2 }, brightness: 1, opacity: 1, speed: 1 },
+                { name: i18n("Wave"), enabled: true, leds: [], effect: newEffect("wave"), brightness: 1, opacity: 1, speed: 1 },
+                { name: "Underglow stars", enabled: true, leds: sel(groups[groups.length - 1]), effect: { type: "starlight", colours: ["ffffff"], duration: "medium", density: 0.2 }, brightness: 1, opacity: 1, speed: 1 },
                 { name: "WASD", enabled: true, leds: sel(groups[1]), effect: { type: "static", colour: "ff2020" }, brightness: 1, opacity: 1, speed: 1 }
             ];
             current = 2;
@@ -981,7 +994,7 @@ Rectangle {
                 anchors.rightMargin: 24
                 spacing: 14
                 Text {
-                    text: "LIGHTING STUDIO"
+                    text: i18n("LIGHTING STUDIO")
                     color: Theme.accent
                     font.family: Theme.titleFont
                     font.pixelSize: 16
@@ -998,7 +1011,11 @@ Rectangle {
                             studio.openProfile(p);
                             // Picking a profile switches the devices to it (like Synapse).
                             if (!studio.backend.readonly) {
-                                studio.status = studio.backend.apply_chroma_profile(p.name) ? "Applied " + p.name : "Failed: " + studio.backend.status;
+                                if (studio.backend.apply_chroma_profile(p.name)) {
+                                    studio.say(i18n("Applied %1", p.name), false);
+                                } else {
+                                    studio.say(i18n("Failed: %1", studio.backend.status), true);
+                                }
                                 studio.loadProfiles();
                             }
                         }
@@ -1007,7 +1024,7 @@ Rectangle {
                 QQC2.TextField {
                     Layout.preferredWidth: 180
                     text: studio.profile.name
-                    placeholderText: "Profile name"
+                    placeholderText: i18n("Profile name")
                     onTextEdited: {
                         studio.profile = Object.assign({}, studio.profile, { name: text });
                         studio.dirty = true;
@@ -1015,7 +1032,7 @@ Rectangle {
                 }
                 Text {
                     visible: studio.loadedName !== "" && studio.loadedName === studio.activeName
-                    text: "ACTIVE"
+                    text: i18n("ACTIVE")
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: 10
@@ -1031,7 +1048,7 @@ Rectangle {
                         y: parent.height
                         QQC2.MenuItem {
                             objectName: "menuNew"
-                            text: "New profile"
+                            text: i18n("New profile")
                             onTriggered: {
                                 studio.profile = { name: studio.uniqueName("Profile"), devices: {} };
                                 studio.loadedName = "";
@@ -1047,7 +1064,7 @@ Rectangle {
                         }
                         QQC2.MenuItem {
                             objectName: "menuDuplicate"
-                            text: "Duplicate"
+                            text: i18n("Duplicate")
                             onTriggered: {
                                 const p = studio.currentProfile();
                                 studio.profile = Object.assign({}, p, { name: studio.uniqueName(studio.profile.name + " copy") });
@@ -1057,23 +1074,23 @@ Rectangle {
                         }
                         QQC2.MenuItem {
                             objectName: "menuExport"
-                            text: "Export to file…"
+                            text: i18n("Export to file…")
                             onTriggered: exportDlg.open()
                         }
                         QQC2.MenuItem {
                             objectName: "menuImport"
-                            text: "Import from file…"
+                            text: i18n("Import from file…")
                             onTriggered: importDlg.open()
                         }
                         QQC2.MenuItem {
                             objectName: "studioSynapseImport"
-                            text: "Import from Synapse…"
+                            text: i18n("Import from Synapse…")
                             onTriggered: synapseDlg.open("lighting")
                         }
                         QQC2.MenuSeparator {}
                         QQC2.MenuItem {
                             objectName: "menuDelete"
-                            text: "Delete profile"
+                            text: i18n("Delete profile")
                             enabled: studio.loadedName !== "" && !studio.backend.readonly
                             onTriggered: {
                                 studio.backend.delete_chroma_profile(studio.loadedName);
@@ -1096,14 +1113,14 @@ Rectangle {
                     Layout.fillWidth: true
                 }
                 Text {
-                    text: studio.status !== "" ? studio.status : (studio.backend.readonly ? "read-only daemon" : (studio.layers.length ? "LIVE ON DEVICE" : ""))
-                    color: studio.status.startsWith("Failed") || studio.backend.readonly ? Theme.warn : Theme.accent
+                    text: studio.status !== "" ? studio.status : (studio.backend.readonly ? i18n("read-only daemon") : (studio.layers.length ? i18n("LIVE ON DEVICE") : ""))
+                    color: studio.statusBad || studio.backend.readonly ? Theme.warn : Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.small
                     font.letterSpacing: 1
                 }
                 SynButton {
-                    text: "Save & apply"
+                    text: i18n("Save & apply")
                     primary: studio.dirty
                     enabled: !studio.backend.readonly && studio.profile.name.trim() !== ""
                     onClicked: studio.saveProfile(true)
@@ -1132,7 +1149,7 @@ Rectangle {
                     spacing: 10
                     RowLayout {
                         Text {
-                            text: "EFFECT LAYERS"
+                            text: i18n("EFFECT LAYERS")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -1141,7 +1158,7 @@ Rectangle {
                         HelpButton {
                             Layout.leftMargin: 8
                             size: 16
-                            text: "A Lighting Studio profile is a stack of effect layers drawn on your devices' LEDs, top layer first. Add layers with +, choose which LEDs each one covers, and use Blend to decide how it mixes with the layers below. Profiles play on all devices while Tsuba runs."
+                            text: i18n("A Lighting Studio profile is a stack of effect layers drawn on your devices' LEDs, top layer first. Add layers with +, choose which LEDs each one covers, and use Blend to decide how it mixes with the layers below. Profiles play on all devices while Tsuba runs.")
                         }
                         Item {
                             Layout.fillWidth: true
@@ -1275,7 +1292,7 @@ Rectangle {
                     Text {
                         visible: studio.combined
                         Layout.fillWidth: true
-                        text: "Canvas layers span devices: one effect laid out over the keyboard and mouse placed together. They draw above each device's own layers."
+                        text: i18n("Canvas layers span devices: one effect laid out over the keyboard and mouse placed together. They draw above each device's own layers.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -1285,7 +1302,7 @@ Rectangle {
                         visible: !studio.combined && studio.canvasLayers.length > 0
                         objectName: "canvasNote"
                         Layout.fillWidth: true
-                        text: studio.canvasLayers.length + (studio.canvasLayers.length === 1 ? " canvas layer also lights" : " canvas layers also light") + " this device (see All devices)."
+                        text: i18np("%1 canvas layer also lights this device (see All devices).", "%1 canvas layers also light this device (see All devices).", studio.canvasLayers.length)
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -1294,7 +1311,7 @@ Rectangle {
                     Text {
                         visible: studio.layers.length === 0
                         Layout.fillWidth: true
-                        text: "Add a layer to start. Upper layers draw over lower ones."
+                        text: i18n("Add a layer to start. Upper layers draw over lower ones.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1302,7 +1319,7 @@ Rectangle {
                     }
                     Text {
                         Layout.topMargin: 6
-                        text: "ADD EFFECT"
+                        text: i18n("ADD EFFECT")
                         color: Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1323,11 +1340,12 @@ Rectangle {
                             Repeater {
                                 model: studio.effectGroups
                                 delegate: Column {
-                                    required property string modelData
+                                    required property var modelData
+                                    readonly property string groupKey: modelData.key
                                     width: addCol.width
                                     spacing: 6
                                     Text {
-                                        text: modelData.toUpperCase()
+                                        text: modelData.title.toUpperCase()
                                         color: Theme.textMuted
                                         font.family: Theme.font
                                         font.pixelSize: 10
@@ -1338,7 +1356,7 @@ Rectangle {
                                         rowSpacing: 6
                                         width: parent.width
                                         Repeater {
-                                            model: studio.effects.filter(e => e.group === modelData)
+                                            model: studio.effects.filter(e => e.group === groupKey)
                                             delegate: Item {
                                                 required property var modelData
                                                 width: addCol.width / 3
@@ -1415,7 +1433,7 @@ Rectangle {
                     spacing: 8
                     enabled: studio.current >= 0
                     Text {
-                        text: "Quick select"
+                        text: i18n("Quick select")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1424,24 +1442,24 @@ Rectangle {
                         objectName: "quickSelect"
                         implicitWidth: 190
                         implicitHeight: 30
-                        model: studio.quickGroups
+                        model: studio.quickEntries.map(e => e.text)
                         currentIndex: -1
-                        displayText: "Choose group…"
+                        displayText: i18n("Choose group…")
                         onActivated: i => {
-                            studio.applyGroup(model[i]);
+                            studio.applyQuick(studio.quickEntries[i]);
                             currentIndex = -1;
                         }
                     }
                     ToolBtn {
                         objectName: "selectAll"
                         kind: "all"
-                        tip: "Select all LEDs"
-                        onClicked: studio.applyGroup(studio.combined ? "All devices" : "All")
+                        tip: i18n("Select all LEDs")
+                        onClicked: studio.applyQuick(studio.quickEntries[0])
                     }
                     ToolBtn {
                         objectName: "clearSelection"
                         kind: "clear"
-                        tip: "Clear selection"
+                        tip: i18n("Clear selection")
                         onClicked: studio.cleared = true
                     }
                     Item {
@@ -1451,7 +1469,7 @@ Rectangle {
                         objectName: "arrangeButton"
                         visible: studio.combined
                         enabled: true
-                        text: studio.arranging ? "Done" : "Arrange devices"
+                        text: studio.arranging ? i18n("Done") : i18n("Arrange devices")
                         primary: studio.arranging
                         implicitWidth: 150
                         implicitHeight: 28
@@ -1460,14 +1478,14 @@ Rectangle {
                     ToolBtn {
                         objectName: "undoBtn"
                         kind: "undo"
-                        tip: "Undo (Ctrl+Z)"
+                        tip: i18n("Undo (Ctrl+Z)")
                         enabled: studio.canUndo
                         onClicked: studio.undo()
                     }
                     ToolBtn {
                         objectName: "redoBtn"
                         kind: "redo"
-                        tip: "Redo (Ctrl+Shift+Z)"
+                        tip: i18n("Redo (Ctrl+Shift+Z)")
                         enabled: studio.canRedo
                         onClicked: studio.redo()
                     }
@@ -1478,7 +1496,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 8
                     Text {
-                        text: "Drag a device to move it."
+                        text: i18n("Drag a device to move it.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1497,20 +1515,20 @@ Rectangle {
                             ToolBtn {
                                 objectName: "shrink" + modelData.pid
                                 kind: "minus"
-                                tip: "Smaller"
+                                tip: i18n("Smaller")
                                 onClicked: studio.scalePlacement(modelData.pid, 1 / 1.1)
                             }
                             ToolBtn {
                                 objectName: "grow" + modelData.pid
                                 kind: "plus"
-                                tip: "Larger"
+                                tip: i18n("Larger")
                                 onClicked: studio.scalePlacement(modelData.pid, 1.1)
                             }
                         }
                     }
                     SynButton {
                         objectName: "resetLayout"
-                        text: "Reset layout"
+                        text: i18n("Reset layout")
                         implicitWidth: 120
                         implicitHeight: 26
                         onClicked: studio.resetPlacements()
@@ -1677,7 +1695,7 @@ Rectangle {
                     anchors.margins: 4
                     width: parent.width - 220
                     wrapMode: Text.Wrap
-                    text: studio.current >= 0 ? (studio.combined ? "Canvas layer: click LEDs on either device or drag a box around them. Shift or Ctrl adds to the selection." : "Click LEDs or drag a box around them to choose where this layer lights. Shift or Ctrl adds to the selection.") : "Add or pick a layer, then choose its LEDs here."
+                    text: studio.current >= 0 ? (studio.combined ? i18n("Canvas layer: click LEDs on either device or drag a box around them. Shift or Ctrl adds to the selection.") : i18n("Click LEDs or drag a box around them to choose where this layer lights. Shift or Ctrl adds to the selection.")) : i18n("Add or pick a layer, then choose its LEDs here.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -1691,7 +1709,7 @@ Rectangle {
                     enabled: studio.current >= 0
                     opacity: enabled ? 1 : 0.4
                     SectionLabel {
-                        caption: "Layer LEDs"
+                        caption: i18n("Layer LEDs")
                         width: 90
                         height: 28
                         verticalAlignment: Text.AlignVCenter
@@ -1716,7 +1734,7 @@ Rectangle {
                                 id: gh
                             }
                             TapHandler {
-                                onTapped: studio.applyGroup(modelData.label)
+                                onTapped: studio.applyGroup(modelData.key, studio.editPid)
                             }
                         }
                     }
@@ -1730,7 +1748,7 @@ Rectangle {
                     enabled: studio.current >= 0
                     opacity: enabled ? 1 : 0.4
                     SectionLabel {
-                        caption: "Layer devices"
+                        caption: i18n("Layer devices")
                         width: 110
                         height: 28
                         verticalAlignment: Text.AlignVCenter
@@ -1816,7 +1834,7 @@ Rectangle {
                             Layout.preferredWidth: 1
                             Layout.minimumWidth: 60
                             text: fx.cur ? fx.cur.name : ""
-                            placeholderText: "Layer name"
+                            placeholderText: i18n("Layer name")
                             maximumLength: 48
                             onEditingFinished: {
                                 const v = text;
@@ -1827,33 +1845,33 @@ Rectangle {
                         }
                         SynButton {
                             objectName: "duplicateLayer"
-                            text: "Copy"
+                            text: i18n("Copy")
                             implicitWidth: 64
                             implicitHeight: 30
                             onClicked: studio.duplicateLayer(studio.current)
                             QQC2.ToolTip.visible: hovered
-                            QQC2.ToolTip.text: "Duplicate this layer"
+                            QQC2.ToolTip.text: i18n("Duplicate this layer")
                         }
                         SynButton {
                             objectName: "resetEffect"
-                            text: "Reset"
+                            text: i18n("Reset")
                             implicitWidth: 64
                             implicitHeight: 30
                             onClicked: studio.resetEffect()
                             QQC2.ToolTip.visible: hovered
-                            QQC2.ToolTip.text: "Put this effect's options back to their defaults"
+                            QQC2.ToolTip.text: i18n("Put this effect's options back to their defaults")
                         }
                     }
                     // Device target
                     SectionLabel {
-                        caption: "Devices"
+                        caption: i18n("Devices")
                         visible: studio.hasMouse
                     }
                     Text {
                         visible: studio.hasMouse
                         Layout.fillWidth: true
                         objectName: "deviceTargetText"
-                        text: studio.combined ? "This layer spans: " + studio.coverText(fx.cur || { leds: [] }) + "." : "This layer lights the " + studio.deviceName(studio.editPid).toLowerCase() + " only."
+                        text: studio.combined ? i18n("This layer spans: %1.", studio.coverText(fx.cur || { leds: [] })) : i18n("This layer lights the %1 only.", studio.deviceName(studio.editPid).toLowerCase())
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1862,24 +1880,24 @@ Rectangle {
                     SynButton {
                         objectName: "spanLayer"
                         visible: studio.hasMouse && !studio.combined
-                        text: "Span across devices"
+                        text: i18n("Span across devices")
                         implicitWidth: 200
                         implicitHeight: 30
                         onClicked: studio.spanCurrent()
                         QQC2.ToolTip.visible: hovered
-                        QQC2.ToolTip.text: "Move this layer onto the shared canvas so one effect runs across the keyboard and the mouse"
+                        QQC2.ToolTip.text: i18n("Move this layer onto the shared canvas so one effect runs across the keyboard and the mouse")
                     }
                     SynButton {
                         objectName: "unspanLayer"
                         visible: studio.combined && !!fx.cur && !!fx.cur.targets && Object.keys(fx.cur.targets).length === 1
-                        text: "Move to the device's layers"
+                        text: i18n("Move to the device's layers")
                         implicitWidth: 240
                         implicitHeight: 30
                         onClicked: studio.unspanCurrent()
                     }
 
                     SectionLabel {
-                        caption: "Layer brightness"
+                        caption: i18n("Layer brightness")
                     }
                     RowLayout {
                         Layout.fillWidth: true
@@ -1904,7 +1922,7 @@ Rectangle {
                         }
                     }
                     SectionLabel {
-                        caption: "Opacity"
+                        caption: i18n("Opacity")
                     }
                     RowLayout {
                         Layout.fillWidth: true
@@ -1929,7 +1947,7 @@ Rectangle {
                         }
                     }
                     SectionLabel {
-                        caption: "Speed"
+                        caption: i18n("Speed")
                         visible: !fx.timeless || fx.isImage
                     }
                     RowLayout {
@@ -1957,7 +1975,7 @@ Rectangle {
                     RowLayout {
                         spacing: 10
                         Text {
-                            text: "Blend"
+                            text: i18n("Blend")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -1965,25 +1983,25 @@ Rectangle {
                         ModeTabs {
                             objectName: "blendTabs"
                             minTabWidth: 72
-                            model: ["Cover", "Add", "Lighten"]
+                            model: [i18n("Cover"), i18n("Add"), i18n("Lighten")]
                             currentIndex: fx.cur ? Math.max(0, ["cover", "add", "lighten"].indexOf(fx.cur.blend || "cover")) : 0
                             onActivated: i => studio.updateCurrent(l => l.blend = ["cover", "add", "lighten"][i])
                         }
                         HelpButton {
                             size: 16
-                            text: "Blend controls how this layer mixes with the layers below it. Cover replaces them on its LEDs, Add stacks the light, Lighten keeps whichever colour is brighter. Opacity fades the whole layer into what is below."
+                            text: i18n("Blend controls how this layer mixes with the layers below it. Cover replaces them on its LEDs, Add stacks the light, Lighten keeps whichever colour is brighter. Opacity fades the whole layer into what is below.")
                         }
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: "Cover hides the layers below on this layer's LEDs; Add mixes its light on top; Lighten keeps the brighter colour."
+                        text: i18n("Cover hides the layers below on this layer's LEDs; Add mixes its light on top; Lighten keeps the brighter colour.")
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 11
                         wrapMode: Text.Wrap
                     }
                     SectionLabel {
-                        caption: "Effect"
+                        caption: i18n("Effect")
                     }
                     Flow {
                         Layout.fillWidth: true
@@ -2017,7 +2035,7 @@ Rectangle {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: "Reactive and Ripple run in the keyboard itself: pick them on the device's LIGHTING tab."
+                        text: i18n("Reactive and Ripple run in the keyboard itself: pick them on the device's LIGHTING tab.")
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -2026,14 +2044,14 @@ Rectangle {
 
                     // Colours: random / rainbow, or any number of colours (a gradient)
                     SectionLabel {
-                        caption: fx.isGradient || (fx.info && fx.info.stops === true) ? "Colours" : "Colour"
+                        caption: fx.isGradient || (fx.info && fx.info.stops === true) ? i18n("Colours") : i18n("Colour")
                         visible: fx.hasColours
                     }
                     ModeTabs {
                         objectName: "colourMode"
                         visible: !!fx.info && fx.info.random === true
                         minTabWidth: 110
-                        model: [fx.randomIsRainbow ? "Rainbow" : "Random", "Colours"]
+                        model: [fx.randomIsRainbow ? i18n("Rainbow") : i18n("Random"), i18n("Colours")]
                         currentIndex: fx.cur ? ((fx.cur.effect.colours || []).length === 0 ? 0 : 1) : 0
                         onActivated: index => studio.updateCurrent(l => {
                             if (index === 0) {
@@ -2082,7 +2100,7 @@ Rectangle {
                             visible: fx.slots === 0 && fx.hasColours
                             height: 36
                             verticalAlignment: Text.AlignVCenter
-                            text: fx.randomIsRainbow ? "Rainbow" : "Random colours"
+                            text: fx.randomIsRainbow ? i18n("Rainbow") : i18n("Random colours")
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -2092,7 +2110,7 @@ Rectangle {
                             visible: !!fx.info && fx.info.stops === true && fx.slots > 0 && fx.slots < 8
                             y: 6
                             kind: "plus"
-                            tip: "Add a colour"
+                            tip: i18n("Add a colour")
                             onClicked: studio.addStop()
                         }
                         ToolBtn {
@@ -2100,7 +2118,7 @@ Rectangle {
                             visible: !!fx.info && fx.info.stops === true && fx.slots > (fx.isGradient ? 2 : 1)
                             y: 6
                             kind: "minus"
-                            tip: "Remove the selected colour"
+                            tip: i18n("Remove the selected colour")
                             onClicked: studio.removeStop()
                         }
                     }
@@ -2114,7 +2132,7 @@ Rectangle {
 
                     // Gradient angle / scrolling
                     SectionLabel {
-                        caption: "Angle"
+                        caption: i18n("Angle")
                         visible: fx.isGradient
                     }
                     RowLayout {
@@ -2143,7 +2161,7 @@ Rectangle {
                     SynCheckBox {
                         objectName: "gradientScroll"
                         visible: fx.isGradient
-                        text: "Scroll the gradient"
+                        text: i18n("Scroll the gradient")
                         checked: fx.isGradient && !!fx.cur.effect.scroll
                         onToggled: {
                             const v = checked;
@@ -2153,20 +2171,20 @@ Rectangle {
 
                     // Duration
                     SectionLabel {
-                        caption: "Duration"
+                        caption: i18n("Duration")
                         visible: !!fx.cur && !fx.timeless
                     }
                     ModeTabs {
                         visible: !!fx.cur && !fx.timeless
                         minTabWidth: 96
-                        model: ["Short", "Medium", "Long"]
+                        model: [i18n("Short"), i18n("Medium"), i18n("Long")]
                         currentIndex: fx.cur ? ["short", "medium", "long"].indexOf(fx.cur.effect.duration || "medium") : 1
                         onActivated: index => studio.updateCurrent(l => l.effect.duration = ["short", "medium", "long"][index])
                     }
 
                     // Direction
                     SectionLabel {
-                        caption: "Direction"
+                        caption: i18n("Direction")
                         visible: fx.info && fx.info.directions !== undefined
                     }
                     Column {
@@ -2205,7 +2223,7 @@ Rectangle {
 
                     // Wheel: hub position and how many colour cycles go round
                     SectionLabel {
-                        caption: "Rotation centre"
+                        caption: i18n("Rotation centre")
                         visible: fx.isWheel
                     }
                     SynDropdown {
@@ -2213,7 +2231,7 @@ Rectangle {
                         visible: fx.isWheel
                         Layout.fillWidth: true
                         readonly property var spots: [[0.5, 0.5], [0.1, 0.5], [0.9, 0.5], [0.5, 0.1], [0.5, 0.9]]
-                        model: ["Middle of the device", "Left edge", "Right edge", "Top edge", "Bottom edge"]
+                        model: [i18n("Middle of the device"), i18n("Left edge"), i18n("Right edge"), i18n("Top edge"), i18n("Bottom edge")]
                         currentIndex: {
                             if (!fx.isWheel) {
                                 return 0;
@@ -2225,7 +2243,7 @@ Rectangle {
                         onActivated: index => studio.updateCurrent(l => l.effect.centre = spots[index])
                     }
                     SectionLabel {
-                        caption: "Colour spread"
+                        caption: i18n("Colour spread")
                         visible: fx.isWheel
                     }
                     SynSlider {
@@ -2244,7 +2262,7 @@ Rectangle {
 
                     // Starlight density
                     SectionLabel {
-                        caption: "Density"
+                        caption: i18n("Density")
                         visible: fx.info && fx.info.density === true
                     }
                     SynSlider {
@@ -2261,7 +2279,7 @@ Rectangle {
 
                     // Audio Meter options
                     SectionLabel {
-                        caption: "Audio source"
+                        caption: i18n("Audio source")
                         visible: fx.isMeter
                     }
                     SynDropdown {
@@ -2269,7 +2287,7 @@ Rectangle {
                         visible: fx.isMeter
                         Layout.fillWidth: true
                         readonly property var names: fx.audioSources.map(s => s.name)
-                        model: ["What the PC is playing"].concat(fx.audioSources.map(s => (s.monitor ? "Output: " : "Input: ") + s.description))
+                        model: [i18n("What the PC is playing")].concat(fx.audioSources.map(s => s.monitor ? i18n("Output: %1", s.description) : i18n("Input: %1", s.description)))
                         currentIndex: {
                             if (!fx.isMeter || !fx.cur.effect.source) {
                                 return 0;
@@ -2286,21 +2304,21 @@ Rectangle {
                         })
                     }
                     SectionLabel {
-                        caption: "Display"
+                        caption: i18n("Display")
                         visible: fx.isMeter
                     }
                     ModeTabs {
                         objectName: "meterMode"
                         visible: fx.isMeter
                         minTabWidth: 110
-                        model: ["Bands", "Level"]
+                        model: [i18n("Bands"), i18n("Level")]
                         currentIndex: fx.isMeter && fx.cur.effect.mode === "level" ? 1 : 0
                         onActivated: index => studio.updateCurrent(l => l.effect.mode = index === 1 ? "level" : "spectrum")
                     }
                     SynCheckBox {
                         objectName: "peakHold"
                         visible: fx.isMeter
-                        text: "Hold peaks"
+                        text: i18n("Hold peaks")
                         checked: fx.isMeter && !!fx.cur.effect.peak_hold
                         onToggled: {
                             const v = checked;
@@ -2308,7 +2326,7 @@ Rectangle {
                         }
                     }
                     SectionLabel {
-                        caption: "Sensitivity"
+                        caption: i18n("Sensitivity")
                         visible: fx.isMeter
                     }
                     SynSlider {
@@ -2323,7 +2341,7 @@ Rectangle {
                         }
                     }
                     SectionLabel {
-                        caption: "Colour boost"
+                        caption: i18n("Colour boost")
                         visible: fx.isMeter
                     }
                     SynSlider {
@@ -2339,7 +2357,7 @@ Rectangle {
                     }
                     SynCheckBox {
                         visible: fx.isMeter
-                        text: "Flow (colours move across the bars)"
+                        text: i18n("Flow (colours move across the bars)")
                         checked: fx.isMeter && !!fx.cur.effect.flow
                         onToggled: {
                             const v = checked;
@@ -2349,7 +2367,7 @@ Rectangle {
 
                     // Ambient options
                     SectionLabel {
-                        caption: "Screen area"
+                        caption: i18n("Screen area")
                         visible: fx.isAmbient
                     }
                     AreaPicker {
@@ -2361,7 +2379,7 @@ Rectangle {
                         onAreaEdited: a => studio.updateCurrent(l => l.effect.area = a)
                     }
                     SectionLabel {
-                        caption: "Vividness"
+                        caption: i18n("Vividness")
                         visible: fx.isAmbient
                     }
                     SynSlider {
@@ -2378,7 +2396,7 @@ Rectangle {
 
                     // Image options
                     SectionLabel {
-                        caption: "Picture"
+                        caption: i18n("Picture")
                         visible: fx.isImage
                     }
                     PixThumb {
@@ -2393,7 +2411,7 @@ Rectangle {
                     SynButton {
                         objectName: "chooseImage"
                         visible: fx.isImage
-                        text: fx.isImage && fx.cur.effect.w > 0 ? "Choose another picture…" : "Choose a picture…"
+                        text: fx.isImage && fx.cur.effect.w > 0 ? i18n("Choose another picture…") : i18n("Choose a picture…")
                         implicitWidth: 220
                         implicitHeight: 30
                         onClicked: imageDlg.open()
@@ -2401,33 +2419,33 @@ Rectangle {
                     Text {
                         visible: fx.isImage
                         Layout.fillWidth: true
-                        text: fx.isImage && fx.cur.effect.w > 0 ? "A " + fx.cur.effect.w + "×" + fx.cur.effect.h + " copy of the picture is kept in the profile." : "The picture is shrunk to at most 64 pixels a side and stored in the profile, so exported profiles are self-contained."
+                        text: fx.isImage && fx.cur.effect.w > 0 ? i18n("A %1×%2 copy of the picture is kept in the profile.", fx.cur.effect.w, fx.cur.effect.h) : i18n("The picture is shrunk to at most 64 pixels a side and stored in the profile, so exported profiles are self-contained.")
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 11
                         wrapMode: Text.Wrap
                     }
                     SectionLabel {
-                        caption: "Fit"
+                        caption: i18n("Fit")
                         visible: fx.isImage
                     }
                     ModeTabs {
                         objectName: "imageFit"
                         visible: fx.isImage
                         minTabWidth: 84
-                        model: ["Stretch", "Fill", "Fit"]
+                        model: [i18n("Stretch"), i18n("Fill"), i18n("Fit")]
                         currentIndex: fx.isImage ? Math.max(0, ["stretch", "cover", "contain"].indexOf(fx.cur.effect.fit || "stretch")) : 0
                         onActivated: index => studio.updateCurrent(l => l.effect.fit = ["stretch", "cover", "contain"][index])
                     }
                     SectionLabel {
-                        caption: "Scroll"
+                        caption: i18n("Scroll")
                         visible: fx.isImage
                     }
                     ModeTabs {
                         objectName: "imageScroll"
                         visible: fx.isImage
                         minTabWidth: 56
-                        model: ["None", "←", "→", "↑", "↓"]
+                        model: [i18n("None"), "←", "→", "↑", "↓"]
                         currentIndex: fx.isImage ? Math.max(0, ["none", "left", "right", "up", "down"].indexOf(fx.cur.effect.scroll || "none")) : 0
                         onActivated: index => studio.updateCurrent(l => l.effect.scroll = ["none", "left", "right", "up", "down"][index])
                     }
@@ -2447,7 +2465,7 @@ Rectangle {
                     }
                     SynButton {
                         anchors.centerIn: parent
-                        text: "Save"
+                        text: i18n("Save")
                         primary: true
                         implicitWidth: 160
                         enabled: !studio.backend.readonly && studio.profile.name.trim() !== ""
@@ -2501,27 +2519,27 @@ Rectangle {
     FileDialog {
         id: imageDlg
         objectName: "imageDialog"
-        title: "Choose a picture"
+        title: i18n("Choose a picture")
         fileMode: FileDialog.OpenFile
-        nameFilters: ["Pictures (*.png *.jpg *.jpeg *.bmp *.gif *.webp)"]
+        nameFilters: [i18n("Pictures (*.png *.jpg *.jpeg *.bmp *.gif *.webp)")]
         onAccepted: pic.source = selectedFile
     }
 
     FileDialog {
         id: exportDlg
         objectName: "exportDialog"
-        title: "Export lighting profile"
+        title: i18n("Export lighting profile")
         fileMode: FileDialog.SaveFile
-        nameFilters: ["Tsuba lighting profile (*.json)"]
+        nameFilters: [i18n("Tsuba lighting profile (*.json)")]
         defaultSuffix: "json"
         onAccepted: studio.exportProfile(selectedFile)
     }
     FileDialog {
         id: importDlg
         objectName: "importDialog"
-        title: "Import lighting profile"
+        title: i18n("Import lighting profile")
         fileMode: FileDialog.OpenFile
-        nameFilters: ["Tsuba lighting profile (*.json)"]
+        nameFilters: [i18n("Tsuba lighting profile (*.json)")]
         onAccepted: studio.importProfile(selectedFile)
     }
 

@@ -15,6 +15,7 @@ fn main() {
                 "qml/GameScanDialog.qml",
                 "qml/SynapseImportDialog.qml",
                 "qml/MouseLeds.qml",
+                "qml/LightingOwnerChip.qml",
                 "qml/AreaPicker.qml",
                 "qml/AppGlyph.qml",
                 "qml/SynSlider.qml",

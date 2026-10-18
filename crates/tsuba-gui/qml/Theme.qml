@@ -93,6 +93,18 @@ QtObject {
     readonly property color accentTintStrong: Qt.rgba(accent.r, accent.g, accent.b, 0.20)
     readonly property color warn: dark ? "#fd8611" : "#b85a00"
     readonly property color danger: dark ? "#c8323c" : "#b3202b"
+    // Backdrops behind dialogs / overlays, and subtle surfaces (added by the light-theme sweep).
+    readonly property color scrim: dark ? "#b3000000" : "#80000000"
+    readonly property color scrimSoft: dark ? "#a0000000" : "#40000000"
+    readonly property color overlayPanel: dark ? "#e61a1a1a" : "#f2ffffff"
+    readonly property color pressedFill: dark ? "#3a3a3a" : "#d3d9dc"
+    readonly property color controlFill: dark ? "#2d2d2d" : "#e9edef"
+    readonly property color controlBorder: dark ? "#707070" : "#8d979c"
+    readonly property color controlBorderHover: dark ? "#8a8a8a" : "#5b666c"
+    readonly property color stripe: dark ? "#0affffff" : "#08000000"
+    readonly property color warnTint: dark ? "#22fd8611" : "#22b85a00"
+    readonly property color dangerTint: dark ? "#22c8323c" : "#22b3202b"
+    readonly property color okTint: dark ? "#1444d62c" : "#1a1f8a1c"
     readonly property color keyFace: dark ? "#1d1d1d" : "#eceff1"
     readonly property color keyEdge: dark ? "#3a3a3a" : "#b9c1c5"
 

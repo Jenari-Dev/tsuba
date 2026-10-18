@@ -20,7 +20,7 @@ use std::sync::OnceLock;
 use anyhow::{bail, ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::config::{Action, ActionConfig, DialSlotConfig};
+use crate::config::{Action, ActionConfig, DialSlotConfig, Lighting};
 use crate::macros::Playback;
 use crate::performance::Performance;
 use crate::state::AssignmentState;
@@ -88,6 +88,11 @@ pub struct LibraryProfile {
     /// Command dial modes (keyboards). None = leave as is.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dial: Option<Vec<DialSlotConfig>>,
+    /// Lighting that comes with the profile (effect, colours, brightness; a Lighting Studio
+    /// profile counts as an effect). Applied whenever the profile is activated. None = the
+    /// device keeps whatever lighting it has.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lighting: Option<Lighting>,
 }
 
 pub fn now_ms() -> u64 {
@@ -166,7 +171,37 @@ impl LibraryProfile {
             actions: Vec::new(),
             performance: None,
             dial: None,
+            lighting: None,
         }
+    }
+
+    /// A profile that puts the device back to its factory settings: factory keys (nothing
+    /// stored), the stock performance values and, on keyboards with a command dial, the stock
+    /// dial slot order. Lighting is left alone.
+    pub fn factory(pid: &str, name: &str) -> Self {
+        let mut p = Self::new(name);
+        let spec = u16::from_str_radix(pid, 16).ok().and_then(tsuba_hid::db::get);
+        if let Some(spec) = spec {
+            let mut perf = Performance { polling_hz: Some(1000), ..Default::default() };
+            if spec.features.dpi_stages {
+                perf.dpi_stages = Some(FACTORY_DPI_STAGES.to_vec());
+                perf.dpi_active_stage = Some(1);
+            }
+            if spec.features.scroll_modes {
+                perf.free_spin = Some(false);
+            }
+            if spec.features.scroll_acceleration {
+                perf.scroll_acceleration = Some(false);
+            }
+            if spec.features.smart_reel {
+                perf.smart_reel = Some(false);
+            }
+            p.performance = Some(perf);
+            if spec.features.dial {
+                p.dial = Some(factory_dial(None));
+            }
+        }
+        p
     }
 
     fn clear_key(&mut self, layer: u8, key: u8) {
@@ -268,6 +303,20 @@ impl LibraryProfile {
         }
         p
     }
+}
+
+/// The five stages a freshly reset on-board profile of a mouse holds.
+pub const FACTORY_DPI_STAGES: [[u16; 2]; 5] = [[400, 400], [800, 800], [1600, 1600], [3200, 3200], [6400, 6400]];
+
+/// The command dial's stock slot table: the eight modes in their id order, the first four on.
+/// `colours` (the slots' current colours, if known) are kept — the stock colours aren't known.
+pub fn factory_dial(colours: Option<&[DialSlotConfig]>) -> Vec<DialSlotConfig> {
+    const MODES: [&str; 8] = ["KeyboardBrightness", "WindowsZoom", "SwitchApplications", "TrackJogging", "TrackSelector", "VerticalScrolling", "HorizontalScrolling", "SwitchBrowserTabs"];
+    MODES
+        .iter()
+        .enumerate()
+        .map(|(i, f)| DialSlotConfig { function: (*f).to_string(), colour: colours.and_then(|c| c.get(i)).map_or_else(|| "44d62c".to_string(), |c| c.colour.clone()), enabled: i < 4 })
+        .collect()
 }
 
 // ---------------------------------------------------------------------------------------
@@ -669,6 +718,44 @@ mod tests {
         p.merge_performance(&Performance { profile: Some(3), dpi_stages: Some(vec![[400, 400], [800, 800]]), dpi_active_stage: Some(7), ..Default::default() });
         let perf = p.performance.as_ref().unwrap();
         assert_eq!((perf.profile, perf.dpi_active_stage), (None, Some(2)));
+    }
+
+    #[test]
+    fn factory_profiles_reset_what_the_model_has() {
+        let kb = LibraryProfile::factory("028d", "Stock");
+        assert!(kb.assignments.is_empty() && kb.lighting.is_none(), "keys follow the factory table, lighting is left alone");
+        let perf = kb.performance.as_ref().unwrap();
+        assert_eq!((perf.polling_hz, perf.dpi_stages.is_some(), perf.free_spin), (Some(1000), false, None));
+        let dial = kb.dial.as_ref().unwrap();
+        assert_eq!(dial.len(), 8);
+        assert_eq!(dial.iter().filter(|d| d.enabled).count(), 4);
+        assert_eq!(dial[3].function, "TrackJogging");
+        let mouse = LibraryProfile::factory("00aa", "Stock");
+        let perf = mouse.performance.as_ref().unwrap();
+        assert_eq!(perf.dpi_stages.as_deref(), Some(&FACTORY_DPI_STAGES[..]));
+        assert_eq!(perf.free_spin, Some(false));
+        assert!(mouse.dial.is_none());
+        // The dial slots keep the colours they had.
+        let mut cur = factory_dial(None);
+        cur[2].colour = "ff0000".into();
+        assert_eq!(factory_dial(Some(&cur))[2].colour, "ff0000");
+        // Every dial function name is one apply_dial accepts.
+        assert!(dial.iter().all(|d| (0..=7u8).any(|i| format!("{:?}", tsuba_proto::decode::KnobFunction::from(i)) == d.function)));
+    }
+
+    #[test]
+    fn lighting_travels_with_the_profile_and_stays_out_of_old_files() {
+        let mut p = LibraryProfile::new("Night");
+        p.lighting = Some(Lighting { effect: crate::config::EffectConfig::Static { colour: "112233".into() }, brightness: Some(30) });
+        let s = serde_json::to_string(&p).unwrap();
+        let back: LibraryProfile = serde_json::from_str(&s).unwrap();
+        assert_eq!(back.lighting, p.lighting);
+        let old: LibraryProfile = serde_json::from_str(r#"{"id": "00000000000000000000000000000000", "name": "Old"}"#).unwrap();
+        assert!(old.lighting.is_none());
+        assert!(!serde_json::to_string(&old).unwrap().contains("lighting"));
+        // A duplicate keeps the lighting; an export carries it.
+        assert_eq!(p.duplicate("Copy").lighting, p.lighting);
+        assert_eq!(import("028d", &export("028d", &p).unwrap()).unwrap().lighting, p.lighting);
     }
 
     #[test]

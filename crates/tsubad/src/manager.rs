@@ -564,7 +564,7 @@ impl Manager {
         let on = self.with_device(pid, |dev, _| tsuba_core::macros::read_macro(dev, id))?;
         let path = tsuba_core::macros::library_path();
         let mut lib = tsuba_core::macros::Library::load(&path)?;
-        let guid = lib.upsert(tsuba_core::macros::Macro { guid: on.guid, name: on.name, events: on.events })?;
+        let guid = lib.upsert(tsuba_core::macros::Macro { guid: on.guid, name: on.name, events: on.events, ..Default::default() })?;
         lib.save(&path)?;
         Ok(guid)
     }

@@ -1571,7 +1571,7 @@ mod tests {
         let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
         let (mgr, sim) = rig("00aa", 1);
         mgr.library_migrate("00aa").unwrap();
-        let guid = mgr.save_macro(Macro { guid: String::new(), name: "M1".into(), events: vec![MacroEvent::Key { hid: 4, down: true }, MacroEvent::Key { hid: 4, down: false }] }).unwrap();
+        let guid = mgr.save_macro(Macro { name: "M1".into(), events: vec![MacroEvent::Key { hid: 4, down: true }, MacroEvent::Key { hid: 4, down: false }], ..Default::default() }).unwrap();
         let key = *lib::factory_table("00aa", 0).keys().nth(2).unwrap();
         let a = mgr.library_create("00aa", "A", "").unwrap();
         {

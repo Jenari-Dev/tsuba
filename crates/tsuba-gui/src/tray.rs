@@ -378,7 +378,10 @@ static CONN: OnceLock<Connection> = OnceLock::new();
 /// reachable this returns `true`: better two windows than none.
 pub fn claim_instance() -> bool {
     let build = || -> zbus::Result<Connection> {
-        zbus::blocking::connection::Builder::session()?.name(APP_ID)?.serve_at(APP_PATH, Application)?.build()
+        let c = zbus::blocking::connection::Builder::session()?.serve_at(APP_PATH, Application)?.build()?;
+        // Not through Builder::name(): that asks to replace an existing owner, which would steal the running instance's name.
+        c.request_name_with_flags(APP_ID, zbus::fdo::RequestNameFlags::DoNotQueue.into())?;
+        Ok(c)
     };
     match build() {
         Ok(c) => {

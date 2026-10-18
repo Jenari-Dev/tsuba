@@ -17,6 +17,8 @@ Rectangle {
     signal openAbout()
     signal showWelcome()
     signal openUrl(string url)
+    // Close the whole app (restart after a language change); Main knows how to do that past the tray.
+    signal quitRequested()
 
     color: Theme.bg
 
@@ -330,7 +332,7 @@ Rectangle {
                             text: i18n("Restart now")
                             onClicked: {
                                 if (page.app.restart_app()) {
-                                    Qt.quit();
+                                    page.quitRequested();
                                 }
                             }
                         }

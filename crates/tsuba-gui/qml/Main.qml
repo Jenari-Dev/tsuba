@@ -246,9 +246,16 @@ QQC2.ApplicationWindow {
         });
         app.tray_update(JSON.stringify(devs), JSON.stringify({ open: i18n("Open Tsuba"), settings: i18n("Settings"), quit: i18n("Quit"), profiles: i18n("Profiles") }), i18n("Tsuba"));
     }
+    // Qt.quit() first closes every window; the tray's close-to-hide must not veto it.
+    property bool quitting: false
+    function quitApp() {
+        root.quitting = true;
+        Qt.quit();
+    }
+
     onClosing: close => {
         // With a tray icon the window just hides; the tray menu quits.
-        if (Theme.app.closeToTray && app.tray_available) {
+        if (Theme.app.closeToTray && app.tray_available && !root.quitting) {
             close.accepted = false;
             root.hide();
         }
@@ -271,7 +278,7 @@ QQC2.ApplicationWindow {
             if (kind === "activate") {
                 root.showWindow();
             } else if (kind === "quit") {
-                Qt.quit();
+                root.quitApp();
             } else if (kind === "profile") {
                 backend.activate_library_profile(a, b);
             } else if (kind === "page") {
@@ -792,6 +799,9 @@ QQC2.ApplicationWindow {
                         }
                         if (item && item.openUrl) {
                             item.openUrl.connect(root.openUrl);
+                        }
+                        if (item && item.quitRequested) {
+                            item.quitRequested.connect(root.quitApp);
                         }
                     }
                 }

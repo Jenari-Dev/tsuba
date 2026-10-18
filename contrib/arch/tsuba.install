@@ -4,6 +4,8 @@ post_install() {
     cat <<MSG
 ==> Start the Tsuba daemon for your user (and at every login):
       systemctl --user enable --now tsubad
+==> Open Tsuba from the application menu. In Settings you can launch it at login (it then
+    starts in the tray) and choose notifications. If no device shows up, Home explains why.
 ==> If openrazer is installed, hand the devices over to Tsuba (reversible):
       tsuba-handover          (undo: tsuba-handover-restore)
 MSG
@@ -16,4 +18,5 @@ post_upgrade() {
 
 post_remove() {
     udevadm control --reload-rules 2>/dev/null
+    echo "==> Your settings stay in ~/.config/tsuba (see docs/UNINSTALL.md to remove them)."
 }

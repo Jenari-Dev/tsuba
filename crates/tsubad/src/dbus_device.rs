@@ -130,7 +130,7 @@ impl Manager {
         Ok(msg)
     }
 
-    fn edit_device_config(&self, pid: &str, f: impl FnOnce(&mut tsuba_core::DeviceConfig)) -> Result<()> {
+    pub(crate) fn edit_device_config(&self, pid: &str, f: impl FnOnce(&mut tsuba_core::DeviceConfig)) -> Result<()> {
         let mut cfg = self.config.lock().unwrap().clone();
         let mut dc = cfg.device(pid).cloned().unwrap_or_else(|| tsuba_core::DeviceConfig { pid: pid.into(), ..Default::default() });
         f(&mut dc);
@@ -156,6 +156,11 @@ impl Manager {
         self.edit_device_config(pid, |dc| {
             dc.zones.insert(region.to_string(), l);
         })?;
+        // A game took the device meanwhile (or before): the saved lighting, zones included,
+        // comes back when it lets go — not whatever it held before.
+        if self.game_holds(pid) && !self.game_defer(pid, crate::manager::GameRestore::Saved) {
+            self.restore_saved_lighting(pid);
+        }
         Ok(log)
     }
 
@@ -211,6 +216,7 @@ impl Manager {
                 dc.lighting = Some(l.clone());
                 dc.zones.clear();
             })?;
+            self.mirror_lighting(&pid, &l);
         }
         Ok(log)
     }
@@ -241,6 +247,9 @@ impl Manager {
                         }
                         dc.zones.values_mut().for_each(|z| z.brightness = Some(percent));
                     })?;
+                    if let Some(l) = self.config.lock().unwrap().device(&pid).and_then(|d| d.lighting.clone()) {
+                        self.mirror_lighting(&pid, &l);
+                    }
                 }
                 Err(e) => log.push(format!("{pid}: failed ({e:#})")),
             }
@@ -257,22 +266,6 @@ impl Manager {
         // Re-evaluate at the next battery check.
         ON_BATTERY.lock().unwrap().get_or_insert_with(HashMap::new).remove(pid);
         Ok(())
-    }
-
-    /// The saved lighting and zones back on the device (after battery lighting).
-    fn restore_lighting_with_zones(&self, pid: &str) {
-        self.restore_saved_lighting(pid);
-        let dc = self.config.lock().unwrap().device(pid).cloned();
-        let Some(dc) = dc else { return };
-        if dc.lighting.as_ref().is_some_and(|l| matches!(l.effect, EffectConfig::Studio { .. } | EffectConfig::Custom { .. })) || self.game_holds(pid) {
-            return;
-        }
-        for (id, z) in &dc.zones {
-            let Ok(id) = id.parse::<u8>() else { continue };
-            if let Err(e) = self.with_device(pid, |dev, _| apply::apply_region(dev, id, z)) {
-                warn!("{pid}: restoring zone {id}: {e:#}");
-            }
-        }
     }
 
     /// One battery check: devices with a battery lighting switch to it when they leave the
@@ -302,7 +295,7 @@ impl Manager {
                 }
             } else {
                 info!("{}: charging — saved lighting", dc.pid);
-                self.restore_lighting_with_zones(&dc.pid);
+                self.restore_saved_lighting(&dc.pid);
             }
         }
     }

@@ -10,6 +10,7 @@ use tracing::{info, warn};
 use tsuba_core::app_links::{self, AppLink, AppLinks, ProfileRef};
 use tsuba_core::chroma_profiles as cp;
 use tsuba_core::library::{self, DeviceLibrary};
+use tsuba_core::config::Lighting;
 use tsuba_core::{apply, config::EffectConfig};
 
 use crate::manager::Manager;
@@ -21,15 +22,20 @@ pub struct LinkState {
     saved_profiles: BTreeMap<String, ProfileRef>,
     /// Polling rate (Hz) each device had before the link changed it.
     saved_polling: BTreeMap<String, u32>,
+    /// Saved lighting and zones each device had before the link switched its profile: the
+    /// new profile's lighting is only the game's, it must not outlive it.
+    saved_lighting: BTreeMap<String, (Option<Lighting>, BTreeMap<String, Lighting>)>,
     chroma_applied: bool,
 }
 
 impl Manager {
     fn link_apply(&self, link: &AppLink, st: &mut LinkState) {
         st.saved_profiles.clear();
+        st.saved_lighting.clear();
         for (pid, want) in &link.device_profiles {
             // The link may name the wired or the wireless twin of the attached device.
             let Some(pid) = self.attached_twin(pid) else { continue };
+            let lighting = self.config.lock().unwrap().device(&pid).map(|d| (d.lighting.clone(), d.zones.clone())).unwrap_or_default();
             let r = self.library_current(&pid).and_then(|before| {
                 if before != *want {
                     self.library_switch(&pid, want)?;
@@ -38,6 +44,7 @@ impl Manager {
             });
             match r {
                 Ok(before) => {
+                    st.saved_lighting.insert(pid.clone(), lighting);
                     st.saved_profiles.insert(pid.clone(), before);
                 }
                 Err(e) => warn!("{pid}: linked profile {want:?}: {e:#}"),
@@ -69,6 +76,19 @@ impl Manager {
             if let Err(e) = r {
                 warn!("{pid}: restoring profile {before:?}: {e:#}");
             }
+        }
+        // The profile's lighting was the game's: the lighting the device had before comes back
+        // (config and device), after the old profile has been put back.
+        for (pid, (lighting, zones)) in std::mem::take(&mut st.saved_lighting) {
+            let now = self.config.lock().unwrap().device(&pid).map(|d| (d.lighting.clone(), d.zones.clone())).unwrap_or_default();
+            if now == (lighting.clone(), zones.clone()) {
+                continue;
+            }
+            if let Err(e) = self.set_saved_lighting(&pid, lighting, zones) {
+                warn!("{pid}: restoring lighting: {e:#}");
+                continue;
+            }
+            self.restore_saved_lighting(&pid);
         }
         for (pid, hz) in std::mem::take(&mut st.saved_polling) {
             if let Err(e) = self.set_polling(&pid, hz) {
@@ -130,22 +150,49 @@ impl Manager {
         Ok(())
     }
 
-    /// Put a device back on its saved (startup) lighting.
+    /// Put the saved lighting and zones of the config back in its place (config only).
+    fn set_saved_lighting(&self, pid: &str, lighting: Option<Lighting>, zones: BTreeMap<String, Lighting>) -> Result<()> {
+        self.edit_device_config(pid, |dc| {
+            dc.lighting = lighting;
+            dc.zones = zones;
+        })
+    }
+
+    /// Put a device back on its saved (startup) lighting and per-zone effects.
     pub fn restore_saved_lighting(&self, pid: &str) {
-        let lighting = self.config.lock().unwrap().device(pid).and_then(|d| d.lighting.clone());
-        let Some(l) = lighting else { return };
+        let dc = self.config.lock().unwrap().device(pid).cloned();
+        let Some(dc) = dc else { return };
+        if dc.lighting.is_none() && dc.zones.is_empty() {
+            return;
+        }
         // A game is lighting the device: restore this once it lets go.
         if self.game_defer(pid, crate::manager::GameRestore::Saved) {
             return;
         }
-        if let EffectConfig::Studio { studio } = l.effect.clone() {
-            if let Err(e) = self.start_studio(pid, studio) {
-                warn!("{pid}: restoring lighting: {e:#}");
+        let mut zones_apply = true;
+        if let Some(l) = dc.lighting {
+            if let EffectConfig::Studio { studio } = l.effect.clone() {
+                zones_apply = false;
+                if let Err(e) = self.start_studio(pid, studio) {
+                    warn!("{pid}: restoring lighting: {e:#}");
+                }
+            } else {
+                zones_apply = !matches!(l.effect, EffectConfig::Custom { .. });
+                self.stop_studio(pid);
+                if let Err(e) = self.with_device(pid, |dev, _| apply::apply_lighting(dev, &l)) {
+                    warn!("{pid}: restoring lighting: {e:#}");
+                }
             }
         } else {
             self.stop_studio(pid);
-            if let Err(e) = self.with_device(pid, |dev, _| apply::apply_lighting(dev, &l)) {
-                warn!("{pid}: restoring lighting: {e:#}");
+        }
+        if !zones_apply {
+            return;
+        }
+        for (id, z) in &dc.zones {
+            let Ok(id) = id.parse::<u8>() else { continue };
+            if let Err(e) = self.with_device(pid, |dev, _| apply::apply_region(dev, id, z)) {
+                warn!("{pid}: restoring zone {id}: {e:#}");
             }
         }
     }

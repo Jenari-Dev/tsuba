@@ -27,6 +27,8 @@ mod dbus_lighting;
 mod studio_runner;
 #[cfg(test)]
 mod wpc_tests;
+#[cfg(test)]
+mod fix_tests;
 
 use std::path::PathBuf;
 use std::sync::Arc;

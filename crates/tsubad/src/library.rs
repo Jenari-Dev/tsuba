@@ -804,7 +804,12 @@ impl Manager {
         if saved.as_ref() == Some(light) {
             return Ok(false);
         }
-        self.store_lighting(pid, light.clone())?;
+        // The profile's lighting covers every zone: per-zone effects from before would
+        // otherwise come back over it at the next restore.
+        self.edit_device_config(pid, |dc| {
+            dc.lighting = Some(light.clone());
+            dc.zones.clear();
+        })?;
         // A game is lighting the device: this is what to put back afterwards.
         if self.game_defer(pid, crate::manager::GameRestore::Lighting(light.clone())) {
             return Ok(true);

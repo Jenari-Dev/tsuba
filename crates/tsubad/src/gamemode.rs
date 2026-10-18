@@ -301,6 +301,7 @@ impl Manager {
             return Err(e.context("giving back the keys Game Mode turned off"));
         }
         want.saved.clear();
+        let was = self.merged_block();
         let mut err = None;
         if want.active {
             let (saved, r) = self.gm_take_away(pid, &want);
@@ -308,7 +309,8 @@ impl Manager {
             err = r.err();
         }
         self.store_game_mode(pid, &want)?;
-        let (was, now) = (block_of(&cur), block_of(&want));
+        // KDE's block is global: it follows the merge over every device, not this device alone.
+        let now = self.merged_block();
         if was != now {
             desktop_apply(&now);
         }
@@ -317,6 +319,11 @@ impl Manager {
         }
         info!("{pid}: game mode {}", if want.active { "on" } else { "off" });
         Ok(want)
+    }
+
+    /// What every device's Game Mode together wants blocked on the desktop.
+    pub(crate) fn merged_block(&self) -> Block {
+        merge(self.config.lock().unwrap().devices.iter().filter_map(|d| d.game_mode.as_ref()).map(block_of))
     }
 
     pub fn toggle_game_mode(&self, pid: &str) {
@@ -386,8 +393,7 @@ impl Manager {
 
     /// At startup: KDE's shortcut block is global state, so make it match the saved setting.
     pub fn restore_shortcut_block(&self) {
-        let want = merge(self.config.lock().unwrap().devices.iter().filter_map(|d| d.game_mode.as_ref()).map(block_of));
-        desktop_apply(&want);
+        desktop_apply(&self.merged_block());
     }
 }
 

@@ -200,7 +200,7 @@ Rectangle {
                         spacing: 8
                         Repeater {
                             // Tsuba jade first; the rest are plain choices (any colour works).
-                            model: ["#1fc9a7", "#44d62c", "#2d9cff", "#ff8a1f", "#ff4fa3", "#b07cff", "#e8e8e8"]
+                            model: ["#1fc9a7", "#44d62c", "#2d9cff", "#ff8a1f", "#ff4fa3", "#b07cff", "#e8e8e8"]   // colour picker: intentional
                             delegate: Rectangle {
                                 required property string modelData
                                 width: 28
@@ -296,8 +296,8 @@ Rectangle {
                     title: i18n("Language")
                     readonly property var langs: [
                         { code: "system", text: i18n("System default") },
-                        { code: "en", text: "English" },
-                        { code: "ja", text: "日本語" }
+                        { code: "en", text: "English" },   // i18n-ok: language endonym
+                        { code: "ja", text: "日本語" }   // i18n-ok: language endonym
                     ]
                     SettingRow {
                         label: i18n("Language of the app")

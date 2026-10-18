@@ -62,15 +62,22 @@ Rectangle {
     property int fixedDelay: 50
     property double lastTime: 0
     property string result: ""
+    // True when `result` reports a failure (set together with the text, never derived from it).
+    property bool resultFailed: false
+    function setResult(text, failed) {
+        resultFailed = failed;
+        result = text;
+    }
 
-    readonly property var buttonNames: ["", "Left click", "Right click", "Middle click", "Button 4", "Button 5"]
+    // Display names of the mouse buttons, indexed by the event's button number (0 = none).
+    readonly property var buttonNames: ["", i18n("Left click"), i18n("Right click"), i18n("Middle click"), i18n("Button 4"), i18n("Button 5")]
 
     color: Theme.bg
 
     function load() {
         const s = backend.macros();
         if (s === "") {
-            result = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
             return;
         }
         const j = JSON.parse(s);
@@ -101,7 +108,7 @@ Rectangle {
         dirty = false;
         editing = true;
         resetEvHist();
-        result = "";
+        setResult("", false);
     }
 
     // Show an on-board-only macro read-only, with an "Import to library" button.
@@ -116,33 +123,33 @@ Rectangle {
         dirty = false;
         editing = true;
         resetEvHist();
-        result = "";
+        setResult("", false);
     }
 
     function newMacro() {
         stopRecording();
         devView = null;
         guid = "";
-        macroName = "Macro " + (lib.length + 1);
+        macroName = i18n("Macro %1", lib.length + 1);
         macroGroup = "";
         events = [];
         sel = -1;
         dirty = true;
         editing = true;
         resetEvHist();
-        result = "";
+        setResult("", false);
     }
 
     function save() {
         stopRecording();
         const g = backend.save_macro(JSON.stringify({ guid: guid, name: macroName, group: macroGroup, events: events }));
         if (g === "") {
-            result = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
             return;
         }
         guid = g;
         dirty = false;
-        result = "Saved";
+        setResult(i18n("Saved"), false);
         load();
     }
 
@@ -153,17 +160,17 @@ Rectangle {
         }
         if (backend.delete_macro(guid)) {
             editing = false;
-            result = "";
+            setResult("", false);
             load();
         } else {
-            result = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
         }
     }
 
     function importMacro(pid, id) {
         const g = backend.import_macro(pid, id);
         if (g === "") {
-            result = "Import failed: " + (backend.status !== "" ? backend.status : "the daemon returned no macro");
+            setResult(i18n("Import failed: %1", backend.status !== "" ? backend.status : i18n("the daemon returned no macro")), true);
             return;
         }
         const name = macroName;
@@ -171,9 +178,9 @@ Rectangle {
         const m = lib.find(x => x.guid === g);
         if (m) {
             openMacro(m);
-            result = "Imported \u201c" + m.name + "\u201d to the library";
+            setResult(i18n("Imported “%1” to the library", m.name), false);
         } else {
-            result = "Imported \u201c" + name + "\u201d, but it isn't in the library list yet";
+            setResult(i18n("Imported “%1”, but it isn't in the library list yet", name), false);
         }
     }
 
@@ -205,21 +212,21 @@ Rectangle {
         case "key":
             return KeyNames.hidName(e.hid);
         case "button":
-            return buttonNames[e.button] || ("Button " + e.button);
+            return buttonNames[e.button] || i18n("Button %1", e.button);
         case "scroll":
-            return e.up ? "Scroll up" : "Scroll down";
+            return e.up ? i18n("Scroll up") : i18n("Scroll down");
         case "delay":
-            return e.ms >= 1000 ? (e.ms / 1000).toFixed(3) + " s" : e.ms + " ms";
+            return fmtMs(e.ms);
         case "cursor":
             return i18n("Move cursor to %1, %2", e.x, e.y);
         case "media":
-            return (KeyNames.media[e.usage] || ("Media key 0x" + e.usage.toString(16)));
+            return (KeyNames.media[e.usage] || i18n("Media key 0x%1", e.usage.toString(16)));
         case "power":
-            return KeyNames.powerKeys[e.code] || ("System key " + e.code);
+            return KeyNames.powerKeys[e.code] || i18n("System key %1", e.code);
         case "run":
             return e.command.trim() === "" ? i18n("Run command (not set)") : i18n("Run: %1", e.command);
         default:
-            return "Event 0x" + e.op.toString(16);
+            return i18n("Event 0x%1", e.op.toString(16));
         }
     }
 
@@ -245,7 +252,8 @@ Rectangle {
         marked = ({});
     }
     function fmtMs(ms) {
-        return ms >= 1000 ? (ms / 1000).toFixed(3) + " s" : ms + " ms";
+        return ms >= 1000 ? i18nc("duration in seconds", "%1 s", (ms / 1000).toFixed(3)) : i18nc("duration in milliseconds", "%1 ms", ms);
+
     }
     function setEvents(list, newSel) {
         events = list;
@@ -426,7 +434,7 @@ Rectangle {
         signal clicked
         implicitWidth: tl.implicitWidth + 20
         implicitHeight: 28
-        color: ph.hovered && enabled ? "#1affffff" : "transparent"
+        color: ph.hovered && enabled ? Theme.hoverTint : "transparent"
         border.color: ph.hovered && enabled ? Theme.accent : Theme.border
         opacity: enabled ? 1 : 0.4
         Text {
@@ -544,27 +552,27 @@ Rectangle {
                 RowLayout {
                     Layout.fillWidth: true
                     SectionLabel {
-                        caption: "Macros"
+                        caption: i18n("Macros")
                     }
                     HelpButton {
                         Layout.leftMargin: 6
                         size: 16
-                        text: "Macros are recorded key, click and scroll sequences with delays. Press Record, then type or click in this window; edit or reorder events afterwards and click Save. Bind a macro to a key from a device's Customize tab. Macros are stored on this PC and copied to the device when bound."
+                        text: i18n("Macros are recorded key, click and scroll sequences with delays. Press Record, then type or click in this window; edit or reorder events afterwards and click Save. Bind a macro to a key from a device's Customize tab. Macros are stored on this PC and copied to the device when bound.")
                     }
                     Item {
                         Layout.fillWidth: true
                     }
                     SynButton {
                         objectName: "macroSynapseImport"
-                        text: "Import"
-                        implicitWidth: 80
+                        text: i18nc("button: import macros", "Import")
+                        Layout.minimumWidth: 80
                         onClicked: synapseDlg.open("macros")
                         QQC2.ToolTip.visible: hovered
-                        QQC2.ToolTip.text: "Import from Synapse…"
+                        QQC2.ToolTip.text: i18n("Import from Synapse…")
                     }
                     SynButton {
-                        text: "+ New"
-                        implicitWidth: 80
+                        text: i18nc("button: create a new macro", "+ New")
+                        Layout.minimumWidth: 80
                         enabled: !page.backend.readonly
                         onClicked: page.newMacro()
                     }
@@ -612,7 +620,7 @@ Rectangle {
                     visible: page.result !== "" && !page.editing
                     Layout.fillWidth: true
                     text: page.result
-                    color: page.result.indexOf("failed") >= 0 || page.result.startsWith("Failed") ? Theme.warn : Theme.accent
+                    color: page.resultFailed ? Theme.warn : Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.small
                     wrapMode: Text.Wrap
@@ -625,7 +633,7 @@ Rectangle {
                         required property string modelData
                         readonly property var d: page.devs[modelData]
                         Layout.fillWidth: true
-                        text: `${page.deviceNames[modelData] || modelData}: ${d.macros.length} on board · ${Math.round(d.available / 1024)} KB free`
+                        text: i18n("%1: %2 on board · %3 KB free", page.deviceNames[modelData] || modelData, d.macros.length, Math.round(d.available / 1024))
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -646,7 +654,7 @@ Rectangle {
                 spacing: 12
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "MACROS"
+                    text: i18n("MACROS")
                     color: Theme.text
                     font.family: Theme.font
                     font.pixelSize: Theme.heading
@@ -654,9 +662,9 @@ Rectangle {
                 }
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 460
+                    width: Math.min(460, page.width - 380)
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Record keystrokes, mouse clicks and delays, then bind a macro to any key or button from a device's CUSTOMIZE tab."
+                    text: i18n("Record keystrokes, mouse clicks and delays, then bind a macro to any key or button from a device's CUSTOMIZE tab.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -664,7 +672,7 @@ Rectangle {
                 }
                 SynButton {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "+ New macro"
+                    text: i18n("+ New macro")
                     primary: true
                     enabled: !page.backend.readonly
                     onClicked: page.newMacro()
@@ -684,15 +692,15 @@ Rectangle {
                     Layout.fillWidth: false
                     Layout.preferredWidth: 180
                     Layout.alignment: Qt.AlignTop
-                    title: "Add"
+                    title: i18nc("heading of the list of items that can be added to a macro", "Add")
                     showHelp: false
                     padding: 16
                     Repeater {
                         model: [
-                            { kind: "delay", label: "Delay" },
-                            { kind: "key", label: "Keyboard key" },
-                            { kind: "button", label: "Mouse button" },
-                            { kind: "scroll", label: "Scroll wheel" },
+                            { kind: "delay", label: i18nc("macro event", "Delay") },
+                            { kind: "key", label: i18n("Keyboard key") },
+                            { kind: "button", label: i18n("Mouse button") },
+                            { kind: "scroll", label: i18n("Scroll wheel") },
                             { kind: "media", label: i18n("Media key") },
                             { kind: "power", label: i18n("System key") },
                             { kind: "cursor", label: i18n("Cursor move") },
@@ -702,7 +710,7 @@ Rectangle {
                             required property var modelData
                             Layout.fillWidth: true
                             Layout.preferredHeight: 40
-                            color: ah.hovered ? "#1affffff" : "transparent"
+                            color: ah.hovered ? Theme.hoverTint : "transparent"
                             border.color: ah.hovered ? Theme.accent : Theme.borderSoft
                             Row {
                                 anchors.verticalCenter: parent.verticalCenter
@@ -733,7 +741,7 @@ Rectangle {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: "New items go after the selected row, or at the end."
+                        text: i18n("New items go after the selected row, or at the end.")
                         color: Theme.textMuted
                         font.family: Theme.font
                         font.pixelSize: 11
@@ -770,7 +778,7 @@ Rectangle {
                             Text {
                                 visible: page.readOnly
                                 objectName: "onDeviceTag"
-                                text: "ON DEVICE ONLY \u00b7 READ-ONLY"
+                                text: i18n("ON DEVICE ONLY · READ-ONLY")
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -780,7 +788,7 @@ Rectangle {
                                 visible: !page.readOnly
                                 Layout.preferredWidth: 320
                                 text: page.macroName
-                                placeholderText: "Macro name"
+                                placeholderText: i18n("Macro name")
                                 font.family: Theme.font
                                 font.pixelSize: Theme.heading
                                 onTextEdited: {
@@ -790,7 +798,7 @@ Rectangle {
                             }
                             Text {
                                 visible: page.dirty
-                                text: "UNSAVED"
+                                text: i18n("UNSAVED")
                                 color: Theme.warn
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -801,16 +809,16 @@ Rectangle {
                             }
                             SynButton {
                                 visible: !page.readOnly
-                                text: "Delete"
+                                text: i18nc("button: delete the macro", "Delete")
                                 enabled: !page.backend.readonly
                                 onClicked: page.removeMacro()
                             }
                             SynButton {
                                 objectName: "importButton"
                                 visible: page.readOnly
-                                text: "Import to library"
+                                text: i18n("Import to library")
                                 primary: true
-                                implicitWidth: 160
+                                Layout.minimumWidth: 160
                                 onClicked: page.importMacro(page.devView.pid, page.devView.id)
                             }
                         }
@@ -822,7 +830,7 @@ Rectangle {
                             visible: !page.readOnly
                             Layout.fillWidth: true
                             Layout.preferredHeight: 52
-                            color: page.recording ? "#22c8323c" : Theme.bg
+                            color: page.recording ? Theme.dangerTint : Theme.bg
                             border.color: page.recording ? Theme.danger : (activeFocus ? Theme.accent : Theme.borderSoft)
                             focus: page.recording
 
@@ -840,21 +848,21 @@ Rectangle {
                                 }
                                 Text {
                                     objectName: "totalDuration"
-                                    text: "Total  " + page.fmtMs(page.totalMs)
+                                    text: i18n("Total  %1", page.fmtMs(page.totalMs))
                                     color: Theme.text
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
                                 }
                                 Text {
                                     visible: page.markedCount > 0
-                                    text: page.markedCount + " selected"
+                                    text: i18n("%1 selected", page.markedCount)
                                     color: Theme.accent
                                     font.family: Theme.font
                                     font.pixelSize: Theme.small
                                 }
                                 ToolPill {
                                     visible: page.markedCount > 0
-                                    label: "Remove selected"
+                                    label: i18n("Remove selected")
                                     onClicked: page.removeMarked()
                                 }
                                 Item {
@@ -862,13 +870,13 @@ Rectangle {
                                 }
                                 ToolPill {
                                     objectName: "macroUndo"
-                                    label: "Undo"
+                                    label: i18n("Undo")
                                     enabled: page.evPos > 0
                                     onClicked: page.undoEv()
                                 }
                                 ToolPill {
                                     objectName: "macroRedo"
-                                    label: "Redo"
+                                    label: i18n("Redo")
                                     enabled: page.evPos >= 0 && page.evPos < page.evHist.length - 1
                                     onClicked: page.redoEv()
                                 }
@@ -878,8 +886,8 @@ Rectangle {
                                     SynButton {
                                         id: recordButton
                                         objectName: "recordBtn"
-                                        text: page.recording ? "Stop" : "Record"
-                                        implicitWidth: 122
+                                        text: page.recording ? i18nc("button: stop recording", "Stop") : i18nc("button: start recording", "Record")
+                                        minWidth: 122
                                         enabled: !page.backend.readonly
                                         focusPolicy: Qt.NoFocus
                                         onClicked: page.recording ? page.stopRecording() : page.startRecording()
@@ -913,21 +921,21 @@ Rectangle {
                                             contentItem: ColumnLayout {
                                                 spacing: 10
                                                 Text {
-                                                    text: "RECORD OPTIONS"
+                                                    text: i18n("RECORD OPTIONS")
                                                     color: Theme.textDim
                                                     font.family: Theme.font
                                                     font.pixelSize: 11
                                                     font.letterSpacing: 1
                                                 }
                                                 Text {
-                                                    text: "Delays between events"
+                                                    text: i18n("Delays between events")
                                                     color: Theme.text
                                                     font.family: Theme.font
                                                     font.pixelSize: Theme.small
                                                 }
                                                 ModeTabs {
                                                     minTabWidth: 86
-                                                    model: ["Recorded", "Fixed", "None"]
+                                                    model: [i18nc("delay mode: use the recorded timing", "Recorded"), i18nc("delay mode: fixed delay", "Fixed"), i18nc("delay mode: no delays", "None")]
                                                     currentIndex: page.delayMode
                                                     onActivated: i => page.delayMode = i
                                                 }
@@ -955,7 +963,7 @@ Rectangle {
                                                     visible: page.delayMode === 1
                                                     spacing: 10
                                                     Text {
-                                                        text: "Fixed delay (ms)"
+                                                        text: i18n("Fixed delay (ms)")
                                                         color: Theme.text
                                                         font.family: Theme.font
                                                         font.pixelSize: Theme.small
@@ -974,9 +982,9 @@ Rectangle {
                                 }
                                 SynButton {
                                     objectName: "macroSave"
-                                    text: "Save"
+                                    text: i18n("Save")
                                     primary: true
-                                    implicitWidth: 90
+                                    Layout.minimumWidth: 90
                                     enabled: page.dirty && page.events.length > 0 && !page.backend.readonly && !page.hasEmptyCommand
                                     onClicked: page.save()
                                 }
@@ -1009,7 +1017,7 @@ Rectangle {
                             visible: page.readOnly
                             objectName: "deviceNote"
                             Layout.fillWidth: true
-                            text: page.events.length + " events, " + page.fmtMs(page.totalMs) + " in total. Import it to keep a copy in the library, where you can edit it."
+                            text: i18np("%1 event, %2 in total. Import it to keep a copy in the library, where you can edit it.", "%1 events, %2 in total. Import it to keep a copy in the library, where you can edit it.", page.events.length, page.fmtMs(page.totalMs))
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -1019,7 +1027,7 @@ Rectangle {
                             visible: page.looksIncomplete
                             objectName: "truncatedNote"
                             Layout.fillWidth: true
-                            text: "This event list may be incomplete: the device returns long keyboard macros cut short, so the end may be missing. Importing saves only what was read."
+                            text: i18n("This event list may be incomplete: the device returns long keyboard macros cut short, so the end may be missing. Importing saves only what was read.")
                             color: Theme.warn
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -1028,7 +1036,7 @@ Rectangle {
                         Text {
                             visible: !page.readOnly
                             Layout.fillWidth: true
-                            text: page.recording ? "Recording: type, click and scroll anywhere in this window. Click Stop when done." : "Recorded events are added after the selected row (or at the end)."
+                            text: page.recording ? i18n("Recording: type, click and scroll anywhere in this window. Click Stop when done.") : i18n("Recorded events are added after the selected row (or at the end).")
                             color: page.recording ? Theme.textBright : Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -1057,7 +1065,7 @@ Rectangle {
                                     readonly property bool isDelay: modelData.type === "delay"
                                     width: eventList.width
                                     height: 36
-                                    color: selected ? Theme.accentTint : (index % 2 ? "#0affffff" : "transparent")
+                                    color: selected ? Theme.accentTint : (index % 2 ? Theme.stripe : "transparent")
                                     border.color: selected ? Theme.accent : "transparent"
                                     RowLayout {
                                         anchors.fill: parent
@@ -1105,7 +1113,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 visible: page.events.length === 0
-                                text: "Press Record, or add items from the list on the left."
+                                text: i18n("Press Record, or add items from the list on the left.")
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
@@ -1122,12 +1130,12 @@ Rectangle {
                     spacing: 10
 
                     SectionLabel {
-                        caption: page.sel >= 0 ? "Event " + (page.sel + 1) : "Selected event"
+                        caption: page.sel >= 0 ? i18n("Event %1", page.sel + 1) : i18n("Selected event")
                     }
                     Text {
                         visible: page.sel < 0 && !page.readOnly
                         Layout.fillWidth: true
-                        text: "Select an event in the list to edit, move or delete it."
+                        text: i18n("Select an event in the list to edit, move or delete it.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1156,7 +1164,7 @@ Rectangle {
                             onClicked: page.move(1)
                         }
                         SynButton {
-                            text: "Remove"
+                            text: i18nc("button: remove the selected event", "Remove")
                             onClicked: page.removeEvent()
                         }
                     }
@@ -1166,7 +1174,7 @@ Rectangle {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: page.readOnly ? "This macro is only on " + (page.deviceNames[page.devView.pid] || page.devView.pid) + ". Importing copies it to this PC; the device keeps its copy." : page.guid !== "" && page.placesOf(page.guid).length ? "On board: " + page.placesOf(page.guid).join(", ") + ". Saving updates those copies." : "Bind it to a key from a device's CUSTOMIZE tab → Macro."
+                        text: page.readOnly ? i18n("This macro is only on %1. Importing copies it to this PC; the device keeps its copy.", page.deviceNames[page.devView.pid] || page.devView.pid) : page.guid !== "" && page.placesOf(page.guid).length ? i18n("On board: %1. Saving updates those copies.", page.placesOf(page.guid).join(i18nc("list separator", ", "))) : i18n("Bind it to a key from a device's CUSTOMIZE tab → Macro.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -1176,7 +1184,7 @@ Rectangle {
                         visible: page.result !== ""
                         Layout.fillWidth: true
                         text: page.result
-                        color: page.result.startsWith("Failed") || page.result.indexOf("failed") >= 0 ? Theme.warn : Theme.accent
+                        color: page.resultFailed ? Theme.warn : Theme.accent
                         font.family: Theme.font
                         font.pixelSize: Theme.small
                         wrapMode: Text.Wrap
@@ -1233,7 +1241,7 @@ Rectangle {
         RowLayout {
             spacing: 10
             Text {
-                text: "Delay (ms)"
+                text: i18n("Delay (ms)")
                 color: Theme.text
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -1261,7 +1269,7 @@ Rectangle {
                 border.color: activeFocus ? Theme.accent : Theme.border
                 Text {
                     anchors.centerIn: parent
-                    text: keyCapture.activeFocus ? "Press the new key…" : (editor.ev ? KeyNames.hidName(editor.ev.hid) + "  (click to change)" : "")
+                    text: keyCapture.activeFocus ? i18n("Press the new key…") : (editor.ev ? i18n("%1  (click to change)", KeyNames.hidName(editor.ev.hid)) : "")
                     color: keyCapture.activeFocus ? Theme.textDim : Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -1280,7 +1288,7 @@ Rectangle {
             }
             ModeTabs {
                 minTabWidth: 90
-                model: ["Press", "Release"]
+                model: [i18nc("key or button action", "Press"), i18nc("key or button action", "Release")]
                 currentIndex: editor.ev && editor.ev.down ? 0 : 1
                 onActivated: i => page.update(page.sel, { type: "key", hid: editor.ev.hid, down: i === 0 })
             }
@@ -1299,7 +1307,7 @@ Rectangle {
             }
             ModeTabs {
                 minTabWidth: 90
-                model: ["Press", "Release"]
+                model: [i18nc("key or button action", "Press"), i18nc("key or button action", "Release")]
                 currentIndex: editor.ev && editor.ev.down ? 0 : 1
                 onActivated: i => page.update(page.sel, { type: "button", button: editor.ev.button, down: i === 0 })
             }
@@ -1310,7 +1318,7 @@ Rectangle {
         id: scrollEditor
         ModeTabs {
             minTabWidth: 90
-            model: ["Up", "Down"]
+            model: [i18nc("scroll direction", "Up"), i18nc("scroll direction", "Down")]
             currentIndex: editor.ev && editor.ev.up ? 0 : 1
             onActivated: i => page.update(page.sel, { type: "scroll", up: i === 0 })
         }
@@ -1330,7 +1338,7 @@ Rectangle {
             }
             ModeTabs {
                 minTabWidth: 90
-                model: ["Press", "Release"]
+                model: [i18nc("key or button action", "Press"), i18nc("key or button action", "Release")]
                 currentIndex: editor.ev && editor.ev.down ? 0 : 1
                 onActivated: i => page.update(page.sel, { type: "media", usage: editor.ev.usage, down: i === 0 })
             }
@@ -1359,7 +1367,7 @@ Rectangle {
             }
             ModeTabs {
                 minTabWidth: 90
-                model: ["Press", "Release"]
+                model: [i18nc("key or button action", "Press"), i18nc("key or button action", "Release")]
                 currentIndex: editor.ev && editor.ev.down ? 0 : 1
                 onActivated: i => page.update(page.sel, { type: "power", code: editor.ev.code, down: i === 0 })
             }

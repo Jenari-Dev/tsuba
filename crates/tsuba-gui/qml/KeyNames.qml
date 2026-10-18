@@ -3,35 +3,40 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    // HID keyboard-page usage → short key legend.
-    readonly property var hid: ({
-        0x04: "A", 0x05: "B", 0x06: "C", 0x07: "D", 0x08: "E", 0x09: "F", 0x0a: "G", 0x0b: "H", 0x0c: "I",
-        0x0d: "J", 0x0e: "K", 0x0f: "L", 0x10: "M", 0x11: "N", 0x12: "O", 0x13: "P", 0x14: "Q", 0x15: "R",
-        0x16: "S", 0x17: "T", 0x18: "U", 0x19: "V", 0x1a: "W", 0x1b: "X", 0x1c: "Y", 0x1d: "Z",
-        0x1e: "1", 0x1f: "2", 0x20: "3", 0x21: "4", 0x22: "5", 0x23: "6", 0x24: "7", 0x25: "8", 0x26: "9", 0x27: "0",
-        0x28: "Enter", 0x29: "Esc", 0x2a: "Backspace", 0x2b: "Tab", 0x2c: "Space", 0x2d: "-", 0x2e: "=",
-        0x2f: "[", 0x30: "]", 0x31: "\\", 0x32: "#", 0x33: ";", 0x34: "'", 0x35: "`", 0x36: ",", 0x37: ".",
-        0x38: "/", 0x39: "Caps Lock",
-        0x3a: "F1", 0x3b: "F2", 0x3c: "F3", 0x3d: "F4", 0x3e: "F5", 0x3f: "F6", 0x40: "F7", 0x41: "F8",
-        0x42: "F9", 0x43: "F10", 0x44: "F11", 0x45: "F12",
-        0x46: "PrtSc", 0x47: "ScrLk", 0x48: "Pause", 0x49: "Ins", 0x4a: "Home", 0x4b: "PgUp", 0x4c: "Del",
-        0x4d: "End", 0x4e: "PgDn", 0x4f: "→", 0x50: "←", 0x51: "↓", 0x52: "↑",
-        0x53: "Num", 0x54: "/", 0x55: "*", 0x56: "-", 0x57: "+", 0x58: "Enter",
-        0x59: "1", 0x5a: "2", 0x5b: "3", 0x5c: "4", 0x5d: "5", 0x5e: "6", 0x5f: "7", 0x60: "8", 0x61: "9",
-        0x62: "0", 0x63: ".", 0x64: "\\", 0x65: "Menu",
-        0x68: "F13", 0x69: "F14", 0x6a: "F15", 0x6b: "F16", 0x6c: "F17", 0x6d: "F18", 0x6e: "F19",
-        0x6f: "F20", 0x70: "F21", 0x71: "F22", 0x72: "F23", 0x73: "F24",
-        0x46: "Print Screen", 0x47: "Scroll Lock", 0x48: "Pause", 0x49: "Insert", 0x4a: "Home", 0x4b: "Page Up",
-        0x4c: "Delete", 0x4d: "End", 0x4e: "Page Down", 0x4f: "Right", 0x50: "Left", 0x51: "Down", 0x52: "Up",
-        0x53: "Num Lock", 0x54: "Num /", 0x55: "Num *", 0x56: "Num -", 0x57: "Num +", 0x58: "Num Enter",
-        0x59: "Num 1", 0x5a: "Num 2", 0x5b: "Num 3", 0x5c: "Num 4", 0x5d: "Num 5", 0x5e: "Num 6", 0x5f: "Num 7",
-        0x60: "Num 8", 0x61: "Num 9", 0x62: "Num 0", 0x63: "Num .", 0x64: "\\|", 0x65: "Menu",
-        0xe0: "Ctrl", 0xe1: "Shift", 0xe2: "Alt", 0xe3: "Win", 0xe4: "Ctrl", 0xe5: "Shift", 0xe6: "Alt", 0xe7: "Win"
+    // HID keyboard-page usage -> key legend. Key-cap labels (A, F1, Esc, Ctrl...) are the same in every
+    // language; descriptive names (Space, Left, Num Lock...) are translated.
+    readonly property var hid: buildHid()
+    // i18n-ok-begin (key caps)
+    function buildHid() {
+        const t = {};
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach((c, i) => { t[0x04 + i] = c; });
+        "1234567890".split("").forEach((c, i) => { t[0x1e + i] = c; });
+        for (let i = 0; i < 12; i++) { t[0x3a + i] = "F" + (i + 1); }
+        for (let i = 0; i < 12; i++) { t[0x68 + i] = "F" + (i + 13); }
+        Object.assign(t, {
+            0x28: "Enter", 0x29: "Esc", 0x2a: "Backspace", 0x2b: "Tab", 0x2c: i18nc("key name", "Space"), 0x2d: "-", 0x2e: "=",
+            0x2f: "[", 0x30: "]", 0x31: "\\", 0x32: "#", 0x33: ";", 0x34: "'", 0x35: "`", 0x36: ",", 0x37: ".", 0x38: "/",
+            0x39: "Caps Lock", 0x46: "Print Screen", 0x47: "Scroll Lock", 0x48: "Pause", 0x49: "Insert", 0x4a: "Home",
+            0x4b: "Page Up", 0x4c: "Delete", 0x4d: "End", 0x4e: "Page Down",
+            0x4f: i18nc("arrow key", "Right"), 0x50: i18nc("arrow key", "Left"), 0x51: i18nc("arrow key", "Down"), 0x52: i18nc("arrow key", "Up"),
+            0x53: "Num Lock", 0x54: i18nc("numpad key", "Num /"), 0x55: i18nc("numpad key", "Num *"), 0x56: i18nc("numpad key", "Num -"),
+            0x57: i18nc("numpad key", "Num +"), 0x58: i18nc("numpad key", "Num Enter"),
+            0x63: i18nc("numpad key", "Num ."), 0x64: "\\|", 0x65: "Menu",
+            0xe0: "Ctrl", 0xe1: "Shift", 0xe2: "Alt", 0xe3: "Win", 0xe4: "Ctrl", 0xe5: "Shift", 0xe6: "Alt", 0xe7: "Win"
+        });
+        for (let i = 0; i < 10; i++) { t[0x59 + i] = i18nc("numpad key, %1 is a digit", "Num %1", (i + 1) % 10); }
+        return t;
+    }
+    // i18n-ok-end
+
+    // i18n-ok: key caps
+    readonly property var mods: [[0x01, "Ctrl"], [0x02, "Shift"], [0x04, "Alt"], [0x08, "Win"], [0x10, "RCtrl"], [0x20, "RShift"], [0x40, "AltGr"], [0x80, "RWin"]] // i18n-ok
+
+    readonly property var media: ({
+        0xe2: i18nc("media key", "Mute"), 0xb6: i18nc("media key", "Previous"), 0xb5: i18nc("media key", "Next"),
+        0xcd: i18nc("media key", "Play / Pause"), 0xe9: i18nc("media key", "Volume up"), 0xea: i18nc("media key", "Volume down"),
+        0xb7: i18nc("media key", "Stop")
     })
-
-    readonly property var mods: [[0x01, "Ctrl"], [0x02, "Shift"], [0x04, "Alt"], [0x08, "Win"], [0x10, "RCtrl"], [0x20, "RShift"], [0x40, "AltGr"], [0x80, "RWin"]]
-
-    readonly property var media: ({ 0xe2: "Mute", 0xb6: "Previous", 0xb5: "Next", 0xcd: "Play / Pause", 0xe9: "Volume up", 0xea: "Volume down", 0xb7: "Stop" })
 
     function modifierNames(m) {
         return mods.filter(p => (m & p[0]) !== 0).map(p => p[1]);
@@ -48,7 +53,7 @@ QtObject {
     // Long key name (left/right modifiers spelled out) for the macro editor.
     function hidName(h) {
         if (h >= 0xe0 && h <= 0xe7) {
-            return (h < 0xe4 ? "Left " : "Right ") + hid[h];
+            return h < 0xe4 ? i18nc("modifier key, left side", "Left %1", hid[h]) : i18nc("modifier key, right side", "Right %1", hid[h]);
         }
         return hid[h] || ("0x" + h.toString(16));
     }
@@ -65,16 +70,16 @@ QtObject {
 
     function macroLabel(a) {
         const id = (a.data[0] << 8) | a.data[1];
-        const name = macroNames[id] || ("macro 0x" + id.toString(16));
+        const name = macroNames[id] || i18n("macro 0x%1", id.toString(16));
         switch (a.function) {
         case 3:
-            return a.data[2] > 1 ? `${name} (×${a.data[2]})` : name;
+            return a.data[2] > 1 ? i18n("%1 (×%2)", name, a.data[2]) : name;
         case 4:
-            return name + " (while held)";
+            return i18n("%1 (while held)", name);
         case 5:
-            return name + " (toggle)";
+            return i18n("%1 (toggle)", name);
         default:
-            return name + " (sequence)";
+            return i18n("%1 (sequence)", name);
         }
     }
 
@@ -84,7 +89,7 @@ QtObject {
             return "";
         }
         if (a.key !== undefined && actionByKey[a.key] !== undefined && (a.function === 2 || a.function === 17)) {
-            return "App";
+            return i18nc("short key legend", "App");
         }
         switch (a.function) {
         case 0:
@@ -100,36 +105,40 @@ QtObject {
         case 4:
         case 5:
         case 15:
-            return "Macro";
+            return i18nc("short key legend", "Macro");
         case 6:
             return "DPI";
         case 12:
-            return "HS";
+            return i18nc("short key legend for the Shift layer key", "Shift");
         case 17:
-            return a.data[0] === 1 ? "Fn" : (a.data[0] >= 128 ? "App" : "");
+            return a.data[0] === 1 ? "Fn" : (a.data[0] >= 128 ? i18nc("short key legend", "App") : ""); // i18n-ok
         case 13:
         case 14:
-            return "Turbo";
+            return i18nc("short key legend", "Turbo");
         case 10:
-            return media[(a.data[0] << 8) | a.data[1]] || "Media";
+            return media[(a.data[0] << 8) | a.data[1]] || i18nc("short key legend", "Media");
         default:
             return "";
         }
     }
 
     // Mouse output codes used by mouse functions (firmware numbering).
-    readonly property var mouseOut: ({ 1: "Left click", 2: "Right click", 3: "Scroll click", 4: "Mouse button 4", 5: "Mouse button 5", 9: "Scroll up", 10: "Scroll down", 104: "Scroll left", 105: "Scroll right" })
-    readonly property var powerKeys: ({ 129: "Power", 130: "Sleep", 131: "Wake" })
+    readonly property var mouseOut: ({
+        1: i18nc("mouse output", "Left click"), 2: i18nc("mouse output", "Right click"), 3: i18nc("mouse output", "Scroll click"),
+        4: i18nc("mouse output", "Mouse button 4"), 5: i18nc("mouse output", "Mouse button 5"), 9: i18nc("mouse output", "Scroll up"),
+        10: i18nc("mouse output", "Scroll down"), 104: i18nc("mouse output", "Scroll left"), 105: i18nc("mouse output", "Scroll right")
+    })
+    readonly property var powerKeys: ({ 129: i18nc("system key", "Power"), 130: i18nc("system key", "Sleep"), 131: i18nc("system key", "Wake") })
 
     function rate(d) {
         const ms = d >= 1 ? d : 143;
-        return Math.round(1000 / ms) + "/s";
+        return i18nc("presses per second", "%1/s", Math.round(1000 / ms));
     }
 
     // Long description for the assignment panel.
     function describe(a) {
         if (!a) {
-            return "Not assignable";
+            return i18n("Not assignable");
         }
         if (a.key !== undefined && actionByKey[a.key] !== undefined && (a.function === 2 || a.function === 17)) {
             return actionByKey[a.key];
@@ -137,57 +146,57 @@ QtObject {
         const w = i => ((a.data[i] || 0) << 8) | (a.data[i + 1] || 0);
         switch (a.function) {
         case 0:
-            return "Disabled";
+            return i18n("Disabled");
         case 1:
-            return mouseOut[a.data[0]] || ("Mouse button " + a.data[0]);
+            return mouseOut[a.data[0]] || i18n("Mouse button %1", a.data[0]);
         case 2:
-            return "Keyboard: " + legend(a);
+            return i18n("Keyboard: %1", legend(a));
         case 3:
         case 4:
         case 5:
         case 15:
-            return "Macro: " + macroLabel(a);
+            return i18n("Macro: %1", macroLabel(a));
         case 6:
             switch (a.data[0]) {
             case 1:
-                return "Sensitivity: stage up";
+                return i18n("Sensitivity: stage up");
             case 2:
-                return "Sensitivity: stage down";
+                return i18n("Sensitivity: stage down");
             case 3:
-                return "Sensitivity: stage " + a.data[1];
+                return i18n("Sensitivity: stage %1", a.data[1]);
             case 5:
-                return w(1) === 0 ? "Sensitivity clutch" : `Sensitivity: clutch ${w(1)} x ${w(3)}`;
+                return w(1) === 0 ? i18n("Sensitivity clutch") : i18n("Sensitivity: clutch %1 x %2", w(1), w(3));
             case 6:
-                return "Sensitivity: cycle up";
+                return i18n("Sensitivity: cycle up");
             case 7:
-                return "Sensitivity: cycle down";
+                return i18n("Sensitivity: cycle down");
             default:
                 return a.label;
             }
         case 7:
-            return ({ 1: "Profile up", 2: "Profile down", 3: "Switch to profile " + a.data[1], 4: "Profile cycle up", 5: "Profile cycle down" })[a.data[0]] || "Switch profile";
+            return ({ 1: i18n("Profile up"), 2: i18n("Profile down"), 3: i18n("Switch to profile %1", a.data[1]), 4: i18n("Profile cycle up"), 5: i18n("Profile cycle down") })[a.data[0]] || i18n("Switch profile");
         case 9:
-            return "System: " + (powerKeys[a.data[0]] || a.data[0]);
+            return i18n("System: %1", powerKeys[a.data[0]] || a.data[0]);
         case 10:
-            return "Multimedia: " + (media[w(0)] || a.label);
+            return i18n("Multimedia: %1", media[w(0)] || a.label);
         case 11:
-            return "Double click";
+            return i18n("Double click");
         case 12:
-            return "Shift layer";
+            return i18n("Shift layer");
         case 13:
-            return `Turbo: ${legend({ function: 2, data: a.data })} (${rate(w(2))})`;
+            return i18n("Turbo: %1 (%2)", legend({ function: 2, data: a.data }), rate(w(2)));
         case 14:
             // The wheel tilts' factory setting is a repeating scroll (0x68 left / 0x69 right).
             if (a.data[0] === 0x68 || a.data[0] === 0x69)
-                return a.data[0] === 0x68 ? "Repeat scroll left" : "Repeat scroll right";
-            return `Turbo: ${mouseOut[a.data[0]] || "button " + a.data[0]} (${rate(w(1))})`;
+                return a.data[0] === 0x68 ? i18n("Repeat scroll left") : i18n("Repeat scroll right");
+            return i18n("Turbo: %1 (%2)", mouseOut[a.data[0]] || i18n("button %1", a.data[0]), rate(w(1)));
         case 17:
             if (a.data[0] >= 128 && a.data[0] <= 207) {
-                return actionLabels[currentPid + ":" + a.data[0]] || "Software action";
+                return actionLabels[currentPid + ":" + a.data[0]] || i18n("Software action");
             }
-            return a.data[0] === 1 ? "Fn (shift-layer key)" : "Device key " + a.data[0];
+            return a.data[0] === 1 ? i18n("Fn (shift-layer key)") : i18n("Device key %1", a.data[0]);
         case 18:
-            return ({ 1: "Scroll mode toggle", 2: "Scroll stage up", 3: "Scroll stage down", 4: "Scroll stage cycle up", 5: "Scroll stage cycle down" })[a.data[0]] || "Scroll mode";
+            return ({ 1: i18n("Scroll mode toggle"), 2: i18n("Scroll stage up"), 3: i18n("Scroll stage down"), 4: i18n("Scroll stage cycle up"), 5: i18n("Scroll stage cycle down") })[a.data[0]] || i18n("Scroll mode");
         default:
             return a.label;
         }
@@ -248,12 +257,12 @@ QtObject {
 
     // Common shortcuts (Linux / KDE): [label, modifier bits, HID usage].
     readonly property var shortcuts: [
-        ["Copy", 0x01, 0x06], ["Cut", 0x01, 0x1b], ["Paste", 0x01, 0x19], ["Undo", 0x01, 0x1d], ["Redo", 0x03, 0x1d],
-        ["Select all", 0x01, 0x04], ["Save", 0x01, 0x16], ["Find", 0x01, 0x09], ["New tab", 0x01, 0x17], ["Close tab", 0x01, 0x1a],
-        ["Reopen closed tab", 0x03, 0x17], ["Next tab", 0x01, 0x2b], ["Previous tab", 0x03, 0x2b], ["Switch window (Alt+Tab)", 0x04, 0x2b],
-        ["Close window (Alt+F4)", 0x04, 0x3d], ["Show desktop (Meta+D)", 0x08, 0x07], ["Application launcher (Meta)", 0x08, 0],
-        ["Lock screen (Meta+L)", 0x08, 0x0f], ["Screenshot (Print)", 0x00, 0x46], ["Task manager (Ctrl+Esc)", 0x01, 0x29],
-        ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Refresh (F5)", 0x00, 0x3e], ["Fullscreen (F11)", 0x00, 0x44]
+        [i18nc("keyboard shortcut", "Copy"), 0x01, 0x06], [i18nc("keyboard shortcut", "Cut"), 0x01, 0x1b], [i18nc("keyboard shortcut", "Paste"), 0x01, 0x19], [i18nc("keyboard shortcut", "Undo"), 0x01, 0x1d], [i18nc("keyboard shortcut", "Redo"), 0x03, 0x1d],
+        [i18nc("keyboard shortcut", "Select all"), 0x01, 0x04], [i18nc("keyboard shortcut", "Save"), 0x01, 0x16], [i18nc("keyboard shortcut", "Find"), 0x01, 0x09], [i18nc("keyboard shortcut", "New tab"), 0x01, 0x17], [i18nc("keyboard shortcut", "Close tab"), 0x01, 0x1a],
+        [i18nc("keyboard shortcut", "Reopen closed tab"), 0x03, 0x17], [i18nc("keyboard shortcut", "Next tab"), 0x01, 0x2b], [i18nc("keyboard shortcut", "Previous tab"), 0x03, 0x2b], [i18nc("keyboard shortcut", "Switch window (Alt+Tab)"), 0x04, 0x2b],
+        [i18nc("keyboard shortcut", "Close window (Alt+F4)"), 0x04, 0x3d], [i18nc("keyboard shortcut", "Show desktop (Meta+D)"), 0x08, 0x07], [i18nc("keyboard shortcut", "Application launcher (Meta)"), 0x08, 0],
+        [i18nc("keyboard shortcut", "Lock screen (Meta+L)"), 0x08, 0x0f], [i18nc("keyboard shortcut", "Screenshot (Print)"), 0x00, 0x46], [i18nc("keyboard shortcut", "Task manager (Ctrl+Esc)"), 0x01, 0x29],
+        [i18nc("keyboard shortcut", "Zoom in"), 0x01, 0x2e], [i18nc("keyboard shortcut", "Zoom out"), 0x01, 0x2d], [i18nc("keyboard shortcut", "Refresh (F5)"), 0x00, 0x3e], [i18nc("keyboard shortcut", "Fullscreen (F11)"), 0x00, 0x44]
     ]
 
     // ---- Key groups for the key picker: [title, [HID usages]].
@@ -265,14 +274,14 @@ QtObject {
         return r;
     }
     readonly property var keyGroups: [
-        ["Letters", range(0x04, 0x1d)],
-        ["Numbers", range(0x1e, 0x27)],
-        ["Function keys", range(0x3a, 0x45).concat(range(0x68, 0x73))],
-        ["Navigation", [0x52, 0x51, 0x50, 0x4f, 0x4a, 0x4d, 0x4b, 0x4e, 0x49, 0x4c]],
-        ["Editing and spacing", [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x39, 0x65, 0x46, 0x47, 0x48]],
-        ["Punctuation", [0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x32, 0x64]],
-        ["Numpad", range(0x53, 0x63)],
-        ["Modifiers", range(0xe0, 0xe7)]
+        [i18nc("key group", "Letters"), range(0x04, 0x1d)],
+        [i18nc("key group", "Numbers"), range(0x1e, 0x27)],
+        [i18nc("key group", "Function keys"), range(0x3a, 0x45).concat(range(0x68, 0x73))],
+        [i18nc("key group", "Navigation"), [0x52, 0x51, 0x50, 0x4f, 0x4a, 0x4d, 0x4b, 0x4e, 0x49, 0x4c]],
+        [i18nc("key group", "Editing and spacing"), [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x39, 0x65, 0x46, 0x47, 0x48]],
+        [i18nc("key group", "Punctuation"), [0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x32, 0x64]],
+        [i18nc("key group", "Numpad"), range(0x53, 0x63)],
+        [i18nc("key group", "Modifiers"), range(0xe0, 0xe7)]
     ]
     // Keyboard-function data [modifier bits, usage] for a picked key (modifier keys are a bit, no usage).
     function pickedData(h, mods) {
@@ -286,45 +295,45 @@ QtObject {
     // ---- Shortcut catalogue: [category id, title, [[label, modifier bits, HID usage], ...]].
     // Modifier bits: 1 Ctrl, 2 Shift, 4 Alt, 8 Meta (Windows key). Linux / KDE defaults.
     readonly property var shortcutCatalogue: [
-        ["system", "System", [
-            ["Switch window (Alt+Tab)", 0x04, 0x2b], ["Close window (Alt+F4)", 0x04, 0x3d], ["Show desktop (Meta+D)", 0x08, 0x07],
-            ["Application launcher (Meta)", 0x08, 0], ["Overview (Meta+W)", 0x08, 0x1a], ["Lock screen (Meta+L)", 0x08, 0x0f],
-            ["Run command (Alt+Space)", 0x04, 0x2c], ["Screenshot (Print)", 0x00, 0x46], ["Task manager (Ctrl+Esc)", 0x01, 0x29],
-            ["Maximise window (Meta+Up)", 0x08, 0x52], ["Minimise window (Meta+Down)", 0x08, 0x51], ["Emoji picker (Meta+.)", 0x08, 0x37],
-            ["Clipboard history (Meta+V)", 0x08, 0x19], ["Next desktop (Ctrl+Meta+Right)", 0x09, 0x4f], ["Previous desktop (Ctrl+Meta+Left)", 0x09, 0x50]
+        ["system", i18nc("shortcut category", "System"), [
+            [i18nc("keyboard shortcut", "Switch window (Alt+Tab)"), 0x04, 0x2b], [i18nc("keyboard shortcut", "Close window (Alt+F4)"), 0x04, 0x3d], [i18nc("keyboard shortcut", "Show desktop (Meta+D)"), 0x08, 0x07],
+            [i18nc("keyboard shortcut", "Application launcher (Meta)"), 0x08, 0], [i18nc("keyboard shortcut", "Overview (Meta+W)"), 0x08, 0x1a], [i18nc("keyboard shortcut", "Lock screen (Meta+L)"), 0x08, 0x0f],
+            [i18nc("keyboard shortcut", "Run command (Alt+Space)"), 0x04, 0x2c], [i18nc("keyboard shortcut", "Screenshot (Print)"), 0x00, 0x46], [i18nc("keyboard shortcut", "Task manager (Ctrl+Esc)"), 0x01, 0x29],
+            [i18nc("keyboard shortcut", "Maximise window (Meta+Up)"), 0x08, 0x52], [i18nc("keyboard shortcut", "Minimise window (Meta+Down)"), 0x08, 0x51], [i18nc("keyboard shortcut", "Emoji picker (Meta+.)"), 0x08, 0x37],
+            [i18nc("keyboard shortcut", "Clipboard history (Meta+V)"), 0x08, 0x19], [i18nc("keyboard shortcut", "Next desktop (Ctrl+Meta+Right)"), 0x09, 0x4f], [i18nc("keyboard shortcut", "Previous desktop (Ctrl+Meta+Left)"), 0x09, 0x50]
         ]],
-        ["editing", "Editing", [
-            ["Copy", 0x01, 0x06], ["Cut", 0x01, 0x1b], ["Paste", 0x01, 0x19], ["Paste without formatting", 0x03, 0x19],
-            ["Undo", 0x01, 0x1d], ["Redo", 0x03, 0x1d], ["Select all", 0x01, 0x04], ["Find", 0x01, 0x09], ["Replace", 0x01, 0x0b],
-            ["Save", 0x01, 0x16], ["Save as", 0x03, 0x16], ["Open", 0x01, 0x12], ["New", 0x01, 0x11], ["Print", 0x01, 0x13]
+        ["editing", i18nc("shortcut category", "Editing"), [
+            [i18nc("keyboard shortcut", "Copy"), 0x01, 0x06], [i18nc("keyboard shortcut", "Cut"), 0x01, 0x1b], [i18nc("keyboard shortcut", "Paste"), 0x01, 0x19], [i18nc("keyboard shortcut", "Paste without formatting"), 0x03, 0x19],
+            [i18nc("keyboard shortcut", "Undo"), 0x01, 0x1d], [i18nc("keyboard shortcut", "Redo"), 0x03, 0x1d], [i18nc("keyboard shortcut", "Select all"), 0x01, 0x04], [i18nc("keyboard shortcut", "Find"), 0x01, 0x09], [i18nc("keyboard shortcut", "Replace"), 0x01, 0x0b],
+            [i18nc("keyboard shortcut", "Save"), 0x01, 0x16], [i18nc("keyboard shortcut", "Save as"), 0x03, 0x16], [i18nc("keyboard shortcut", "Open"), 0x01, 0x12], [i18nc("keyboard shortcut", "New"), 0x01, 0x11], [i18nc("keyboard shortcut", "Print"), 0x01, 0x13]
         ]],
-        ["browser", "Browser", [
-            ["New tab", 0x01, 0x17], ["Close tab", 0x01, 0x1a], ["Reopen closed tab", 0x03, 0x17], ["Next tab", 0x01, 0x2b],
-            ["Previous tab", 0x03, 0x2b], ["Address bar", 0x01, 0x0f], ["Refresh", 0x00, 0x3e], ["Refresh without cache", 0x03, 0x15],
-            ["Back", 0x04, 0x50], ["Forward", 0x04, 0x4f], ["Home page", 0x04, 0x4a], ["Bookmark page", 0x01, 0x07],
-            ["Developer tools", 0x00, 0x45], ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Reset zoom", 0x01, 0x27], ["Full screen", 0x00, 0x44]
+        ["browser", i18nc("shortcut category", "Browser"), [
+            [i18nc("keyboard shortcut", "New tab"), 0x01, 0x17], [i18nc("keyboard shortcut", "Close tab"), 0x01, 0x1a], [i18nc("keyboard shortcut", "Reopen closed tab"), 0x03, 0x17], [i18nc("keyboard shortcut", "Next tab"), 0x01, 0x2b],
+            [i18nc("keyboard shortcut", "Previous tab"), 0x03, 0x2b], [i18nc("keyboard shortcut", "Address bar"), 0x01, 0x0f], [i18nc("keyboard shortcut", "Refresh"), 0x00, 0x3e], [i18nc("keyboard shortcut", "Refresh without cache"), 0x03, 0x15],
+            [i18nc("keyboard shortcut", "Back"), 0x04, 0x50], [i18nc("keyboard shortcut", "Forward"), 0x04, 0x4f], [i18nc("keyboard shortcut", "Home page"), 0x04, 0x4a], [i18nc("keyboard shortcut", "Bookmark page"), 0x01, 0x07],
+            [i18nc("keyboard shortcut", "Developer tools"), 0x00, 0x45], [i18nc("keyboard shortcut", "Zoom in"), 0x01, 0x2e], [i18nc("keyboard shortcut", "Zoom out"), 0x01, 0x2d], [i18nc("keyboard shortcut", "Reset zoom"), 0x01, 0x27], [i18nc("keyboard shortcut", "Full screen"), 0x00, 0x44]
         ]],
-        ["office", "Office", [
-            ["Bold", 0x01, 0x05], ["Italic", 0x01, 0x0c], ["Underline", 0x01, 0x18], ["Align left", 0x01, 0x0f], ["Align centre", 0x01, 0x08],
-            ["Align right", 0x01, 0x15], ["Insert link", 0x01, 0x0e], ["Find and replace", 0x01, 0x0b], ["Go to line / page", 0x01, 0x0a],
-            ["Spell check", 0x00, 0x40], ["Select all", 0x01, 0x04], ["Save", 0x01, 0x16], ["Print", 0x01, 0x13]
+        ["office", i18nc("shortcut category", "Office"), [
+            [i18nc("keyboard shortcut", "Bold"), 0x01, 0x05], [i18nc("keyboard shortcut", "Italic"), 0x01, 0x0c], [i18nc("keyboard shortcut", "Underline"), 0x01, 0x18], [i18nc("keyboard shortcut", "Align left"), 0x01, 0x0f], [i18nc("keyboard shortcut", "Align centre"), 0x01, 0x08],
+            [i18nc("keyboard shortcut", "Align right"), 0x01, 0x15], [i18nc("keyboard shortcut", "Insert link"), 0x01, 0x0e], [i18nc("keyboard shortcut", "Find and replace"), 0x01, 0x0b], [i18nc("keyboard shortcut", "Go to line / page"), 0x01, 0x0a],
+            [i18nc("keyboard shortcut", "Spell check"), 0x00, 0x40], [i18nc("keyboard shortcut", "Select all"), 0x01, 0x04], [i18nc("keyboard shortcut", "Save"), 0x01, 0x16], [i18nc("keyboard shortcut", "Print"), 0x01, 0x13]
         ]],
-        ["creative", "Creative apps", [
-            ["Undo", 0x01, 0x1d], ["Redo", 0x03, 0x1d], ["Brush smaller ([)", 0x00, 0x2f], ["Brush bigger (])", 0x00, 0x30],
-            ["Zoom in", 0x01, 0x2e], ["Zoom out", 0x01, 0x2d], ["Fit on screen", 0x01, 0x27], ["Brush (B)", 0x00, 0x05], ["Eraser (E)", 0x00, 0x08],
-            ["Move (V)", 0x00, 0x19], ["Eyedropper (I)", 0x00, 0x0c], ["Deselect", 0x01, 0x07], ["Invert selection", 0x03, 0x0c],
-            ["Free transform", 0x01, 0x17], ["New layer", 0x03, 0x11], ["Merge layer down", 0x01, 0x08]
+        ["creative", i18nc("shortcut category", "Creative apps"), [
+            [i18nc("keyboard shortcut", "Undo"), 0x01, 0x1d], [i18nc("keyboard shortcut", "Redo"), 0x03, 0x1d], [i18nc("keyboard shortcut", "Brush smaller ([)"), 0x00, 0x2f], [i18nc("keyboard shortcut", "Brush bigger (])"), 0x00, 0x30],
+            [i18nc("keyboard shortcut", "Zoom in"), 0x01, 0x2e], [i18nc("keyboard shortcut", "Zoom out"), 0x01, 0x2d], [i18nc("keyboard shortcut", "Fit on screen"), 0x01, 0x27], [i18nc("keyboard shortcut", "Brush (B)"), 0x00, 0x05], [i18nc("keyboard shortcut", "Eraser (E)"), 0x00, 0x08],
+            [i18nc("keyboard shortcut", "Move (V)"), 0x00, 0x19], [i18nc("keyboard shortcut", "Eyedropper (I)"), 0x00, 0x0c], [i18nc("keyboard shortcut", "Deselect"), 0x01, 0x07], [i18nc("keyboard shortcut", "Invert selection"), 0x03, 0x0c],
+            [i18nc("keyboard shortcut", "Free transform"), 0x01, 0x17], [i18nc("keyboard shortcut", "New layer"), 0x03, 0x11], [i18nc("keyboard shortcut", "Merge layer down"), 0x01, 0x08]
         ]],
-        ["video", "Video", [
-            ["Play / pause (Space)", 0x00, 0x2c], ["Back 5 seconds", 0x00, 0x50], ["Forward 5 seconds", 0x00, 0x4f], ["Back 10 seconds (J)", 0x00, 0x0d],
-            ["Pause (K)", 0x00, 0x0e], ["Forward 10 seconds (L)", 0x00, 0x0f], ["Previous frame (,)", 0x00, 0x36], ["Next frame (.)", 0x00, 0x37],
-            ["Mark in (I)", 0x00, 0x0c], ["Mark out (O)", 0x00, 0x12], ["Split clip (S)", 0x00, 0x16], ["Full screen (F)", 0x00, 0x09], ["Mute (M)", 0x00, 0x10]
+        ["video", i18nc("shortcut category", "Video"), [
+            [i18nc("keyboard shortcut", "Play / pause (Space)"), 0x00, 0x2c], [i18nc("keyboard shortcut", "Back 5 seconds"), 0x00, 0x50], [i18nc("keyboard shortcut", "Forward 5 seconds"), 0x00, 0x4f], [i18nc("keyboard shortcut", "Back 10 seconds (J)"), 0x00, 0x0d],
+            [i18nc("keyboard shortcut", "Pause (K)"), 0x00, 0x0e], [i18nc("keyboard shortcut", "Forward 10 seconds (L)"), 0x00, 0x0f], [i18nc("keyboard shortcut", "Previous frame (,)"), 0x00, 0x36], [i18nc("keyboard shortcut", "Next frame (.)"), 0x00, 0x37],
+            [i18nc("keyboard shortcut", "Mark in (I)"), 0x00, 0x0c], [i18nc("keyboard shortcut", "Mark out (O)"), 0x00, 0x12], [i18nc("keyboard shortcut", "Split clip (S)"), 0x00, 0x16], [i18nc("keyboard shortcut", "Full screen (F)"), 0x00, 0x09], [i18nc("keyboard shortcut", "Mute (M)"), 0x00, 0x10]
         ]],
-        ["meeting", "Meetings", [
-            ["Mute / unmute (Zoom)", 0x04, 0x04], ["Camera on / off (Zoom)", 0x04, 0x19], ["Raise hand (Zoom)", 0x04, 0x1c], ["Share screen (Zoom)", 0x04, 0x16],
-            ["Mute / unmute (Meet)", 0x01, 0x07], ["Camera on / off (Meet)", 0x01, 0x08], ["Mute / unmute (Teams)", 0x03, 0x10],
-            ["Camera on / off (Teams)", 0x03, 0x12], ["Raise hand (Teams)", 0x03, 0x0e], ["Leave meeting (Teams)", 0x03, 0x0b],
-            ["Mute microphone (Discord)", 0x03, 0x10], ["Deafen (Discord)", 0x03, 0x07]
+        ["meeting", i18nc("shortcut category", "Meetings"), [
+            [i18nc("keyboard shortcut", "Mute / unmute (Zoom)"), 0x04, 0x04], [i18nc("keyboard shortcut", "Camera on / off (Zoom)"), 0x04, 0x19], [i18nc("keyboard shortcut", "Raise hand (Zoom)"), 0x04, 0x1c], [i18nc("keyboard shortcut", "Share screen (Zoom)"), 0x04, 0x16],
+            [i18nc("keyboard shortcut", "Mute / unmute (Meet)"), 0x01, 0x07], [i18nc("keyboard shortcut", "Camera on / off (Meet)"), 0x01, 0x08], [i18nc("keyboard shortcut", "Mute / unmute (Teams)"), 0x03, 0x10],
+            [i18nc("keyboard shortcut", "Camera on / off (Teams)"), 0x03, 0x12], [i18nc("keyboard shortcut", "Raise hand (Teams)"), 0x03, 0x0e], [i18nc("keyboard shortcut", "Leave meeting (Teams)"), 0x03, 0x0b],
+            [i18nc("keyboard shortcut", "Mute microphone (Discord)"), 0x03, 0x10], [i18nc("keyboard shortcut", "Deafen (Discord)"), 0x03, 0x07]
         ]]
     ]
     // The flat list the first version had (kept for callers that still read it).
@@ -334,7 +343,8 @@ QtObject {
     readonly property var appCategories: [
         ["browser", ["firefox", "chrome", "chromium", "brave", "vivaldi", "opera", "edge", "zen", "librewolf", "browser"]],
         ["office", ["libreoffice", "writer", "calc", "impress", "word", "excel", "powerpoint", "onlyoffice", "soffice", "obsidian", "notion", "thunderbird"]],
-        ["creative", ["photoshop", "gimp", "krita", "blender", "inkscape", "aseprite", "darktable", "figma", "illustrator", "affinity", "clip studio", "paint"]],
+        // i18n-ok: app name matching
+        ["creative", ["photoshop", "gimp", "krita", "blender", "inkscape", "aseprite", "darktable", "figma", "illustrator", "affinity", "clip studio", "paint"]], // i18n-ok
         ["video", ["vlc", "mpv", "kdenlive", "davinci", "resolve", "premiere", "shotcut", "olive", "handbrake", "obs", "youtube", "netflix", "plex", "jellyfin"]],
         ["meeting", ["zoom", "teams", "discord", "slack", "skype", "meet", "jitsi", "webex", "telegram"]]
     ]
@@ -348,6 +358,7 @@ QtObject {
         return "";
     }
     // Text of a shortcut chip: "Ctrl+Shift+K".
+    // i18n-ok-begin (key caps)
     function chord(mods, usage) {
         const parts = [mods & 1 ? "Ctrl" : "", mods & 2 ? "Shift" : "", mods & 4 ? "Alt" : "", mods & 8 ? "Meta" : ""].filter(x => x !== "");
         if (usage) {
@@ -355,6 +366,7 @@ QtObject {
         }
         return parts.join("+");
     }
+    // i18n-ok-end
 
     // Linux evdev keycode -> HID keyboard usage; modifier keys -> modifier bit.
     readonly property var evdevHid: ({ 1: 0x29, 2: 0x1e, 3: 0x1f, 4: 0x20, 5: 0x21, 6: 0x22, 7: 0x23, 8: 0x24, 9: 0x25, 10: 0x26, 11: 0x27, 12: 0x2d, 13: 0x2e, 14: 0x2a, 15: 0x2b, 16: 0x14, 17: 0x1a, 18: 0x08, 19: 0x15, 20: 0x17, 21: 0x1c, 22: 0x18, 23: 0x0c, 24: 0x12, 25: 0x13, 26: 0x2f, 27: 0x30, 28: 0x28, 30: 0x04, 31: 0x16, 32: 0x07, 33: 0x09, 34: 0x0a, 35: 0x0b, 36: 0x0d, 37: 0x0e, 38: 0x0f, 39: 0x33, 40: 0x34, 41: 0x35, 43: 0x31, 44: 0x1d, 45: 0x1b, 46: 0x06, 47: 0x19, 48: 0x05, 49: 0x11, 50: 0x10, 51: 0x36, 52: 0x37, 53: 0x38, 55: 0x55, 57: 0x2c, 58: 0x39, 59: 0x3a, 60: 0x3b, 61: 0x3c, 62: 0x3d, 63: 0x3e, 64: 0x3f, 65: 0x40, 66: 0x41, 67: 0x42, 68: 0x43, 69: 0x53, 70: 0x47, 71: 0x5f, 72: 0x60, 73: 0x61, 74: 0x56, 75: 0x5c, 76: 0x5d, 77: 0x5e, 78: 0x57, 79: 0x59, 80: 0x5a, 81: 0x5b, 82: 0x62, 83: 0x63, 87: 0x44, 88: 0x45, 96: 0x58, 98: 0x54, 99: 0x46, 102: 0x4a, 103: 0x52, 104: 0x4b, 105: 0x50, 106: 0x4f, 107: 0x4d, 108: 0x51, 109: 0x4e, 110: 0x49, 111: 0x4c, 119: 0x48, 127: 0x65, 183: 0x68, 184: 0x69, 185: 0x6a, 186: 0x6b, 187: 0x6c, 188: 0x6d, 189: 0x6e, 190: 0x6f, 191: 0x70, 192: 0x71, 193: 0x72, 194: 0x73 })
@@ -442,7 +454,7 @@ QtObject {
         const d = (layer === 1 ? kbDefaultsShift : kbDefaults)[pos];
         return d ? { function: d[0], data: d[1] } : null;
     }
-    readonly property string defaultUnknownTip: "Factory default not known for this key yet"
+    readonly property string defaultUnknownTip: i18n("Factory default not known for this key yet")
 
     // Keyboard-function data [modifier, usage] from a QML key event (uses the X/Wayland
     // scancode = evdev code + 8), or null if the key isn't mappable.

@@ -10,11 +10,25 @@ Item {
     property int selected: -1
     signal picked(int pos, string name)
 
-    readonly property var names: ({
-        1: "Left Click", 2: "Right Click", 3: "Scroll Click", 4: "Mouse Button 4", 5: "Mouse Button 5",
-        9: "Scroll Up", 10: "Scroll Down", 14: "Profile Button", 15: "Sensitivity Clutch",
-        52: "Scroll Left", 53: "Scroll Right", 96: "Sensitivity Stage Up", 106: "Scroll Mode Toggle"
-    })
+    // Display name for a firmware button id.
+    function buttonName(pos) {
+        switch (pos) {
+        case 1: return i18n("Left Click");
+        case 2: return i18n("Right Click");
+        case 3: return i18n("Scroll Click");
+        case 4: return i18n("Mouse Button 4");
+        case 5: return i18n("Mouse Button 5");
+        case 9: return i18n("Scroll Up");
+        case 10: return i18n("Scroll Down");
+        case 14: return i18n("Profile Button");
+        case 15: return i18n("Sensitivity Clutch");
+        case 52: return i18n("Scroll Left");
+        case 53: return i18n("Scroll Right");
+        case 96: return i18n("Sensitivity Stage Up");
+        case 106: return i18n("Scroll Mode Toggle");
+        default: return i18n("Button %1", pos);
+        }
+    }
 
     readonly property var leftSide: [4, 5, 15, 14, 52]
     readonly property var rightSide: [1, 2, 3, 9, 10, 53, 96, 106]
@@ -27,7 +41,7 @@ Item {
         implicitWidth: 250
         implicitHeight: 52
         visible: a !== undefined
-        color: hov.hovered ? "#1affffff" : Theme.panel
+        color: hov.hovered ? Theme.hoverTint : Theme.panel
         border.color: isSel ? Theme.accent : Theme.borderSoft
         border.width: isSel ? 2 : 1
         Column {
@@ -35,7 +49,7 @@ Item {
             anchors.margins: 8
             spacing: 2
             Text {
-                text: (root.names[c.pos] || ("Button " + c.pos)).toUpperCase()
+                text: root.buttonName(c.pos).toUpperCase()
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: 11
@@ -57,7 +71,7 @@ Item {
         }
         TapHandler {
             onTapped: {
-                root.picked(c.pos, root.names[c.pos] || ("Button " + c.pos));
+                root.picked(c.pos, root.buttonName(c.pos));
             }
         }
     }
@@ -84,7 +98,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: 85
-                color: "#141414"
+                color: "#141414"   // device drawing: intentional
                 border.color: Theme.border
                 border.width: 2
             }
@@ -109,7 +123,7 @@ Item {
                 width: 18
                 height: 46
                 radius: 8
-                color: root.selected === 3 || root.selected === 9 || root.selected === 10 ? Theme.accent : "#2a2a2a"
+                color: root.selected === 3 || root.selected === 9 || root.selected === 10 ? Theme.accent : "#2a2a2a"   // device drawing: intentional
                 border.color: Theme.border
             }
             Rectangle {
@@ -118,7 +132,7 @@ Item {
                 width: 14
                 height: 10
                 radius: 3
-                color: root.selected === 106 ? Theme.accent : "#2a2a2a"
+                color: root.selected === 106 ? Theme.accent : "#2a2a2a"   // device drawing: intentional
                 border.color: Theme.border
             }
             Rectangle {
@@ -127,7 +141,7 @@ Item {
                 width: 14
                 height: 18
                 radius: 3
-                color: root.selected === 96 ? Theme.accent : "#2a2a2a"
+                color: root.selected === 96 ? Theme.accent : "#2a2a2a"   // device drawing: intentional
                 border.color: Theme.border
             }
             Rectangle {
@@ -137,7 +151,7 @@ Item {
                 width: 8
                 height: 70
                 radius: 4
-                color: root.selected === 4 || root.selected === 5 ? Theme.accent : "#2a2a2a"
+                color: root.selected === 4 || root.selected === 5 ? Theme.accent : "#2a2a2a"   // device drawing: intentional
                 border.color: Theme.border
             }
             Text {
@@ -145,7 +159,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 40
                 text: "TSUBA"
-                color: "#2f2f2f"
+                color: "#2f2f2f"   // device drawing: intentional
                 font.family: Theme.font
                 font.pixelSize: 16
                 font.bold: true

@@ -33,6 +33,9 @@ Item {
                 border.width: active ? 2 : 1
                 Text {
                     anchors.centerIn: parent
+                    width: Math.min(implicitWidth, parent.width - 6)
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     text: modelData
                     color: active ? Theme.accent : Theme.text
                     font.family: Theme.font

@@ -7,10 +7,6 @@ SynCard {
     id: card
 
     required property var host
-    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
-    function tr(translated, plain) {
-        return typeof i18n === "function" ? translated() : plain;
-    }
     readonly property var st: host.feat.smart_tracking || ({ asymmetric: false, distance_mm: 2, lift_mm: 3, landing_mm: 2 })
     readonly property bool saved: !!host.feat.smart_tracking_saved
 
@@ -48,7 +44,7 @@ SynCard {
             enabled: !card.host.readOnly
             buttonSize: 56
             Layout.preferredWidth: 3 * 66
-            model: ["1 mm", "2 mm", "3 mm"]
+            model: [1, 2, 3].map(n => i18nc("distance in millimetres", "%1 mm", n))
             currentIndex: card.saved ? card.st.distance_mm - 1 : -1
             onActivated: i => card.send({ distance_mm: i + 1 })
         }
@@ -67,7 +63,7 @@ SynCard {
             enabled: !card.host.readOnly
             buttonSize: 56
             Layout.preferredWidth: 2 * 66
-            model: ["2 mm", "3 mm"]
+            model: [2, 3].map(n => i18nc("distance in millimetres", "%1 mm", n))
             currentIndex: card.saved ? card.st.lift_mm - 2 : -1
             onActivated: i => card.send({ lift_mm: i + 2 })
         }
@@ -82,13 +78,13 @@ SynCard {
             enabled: !card.host.readOnly
             buttonSize: 56
             Layout.preferredWidth: 2 * 66
-            model: ["1 mm", "2 mm"]
+            model: [1, 2].map(n => i18nc("distance in millimetres", "%1 mm", n))
             currentIndex: card.saved ? card.st.landing_mm - 1 : -1
             onActivated: i => {
                 if (i + 1 < card.st.lift_mm) {
                     card.send({ landing_mm: i + 1 });
                 } else {
-                    card.host.result = card.tr(() => i18n("Failed: landing must be lower than lift-off"), "Failed: landing must be lower than lift-off");
+                    card.host.setResult(i18n("Failed: landing must be lower than lift-off"), true);
                 }
             }
         }

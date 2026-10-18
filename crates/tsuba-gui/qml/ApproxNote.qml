@@ -10,7 +10,7 @@ RowLayout {
     spacing: 8
 
     Text {
-        text: "Approximate drawing — key positions may differ on your model."
+        text: i18n("Approximate drawing — key positions may differ on your model.")
         color: Theme.textDim
         font.family: Theme.font
         font.pixelSize: Theme.small
@@ -18,7 +18,7 @@ RowLayout {
     Text {
         objectName: "useOwnLink"
         visible: !!note.backend
-        text: "Use my own picture…"
+        text: i18n("Use my own picture…")
         color: Theme.accent
         font.family: Theme.font
         font.pixelSize: Theme.small

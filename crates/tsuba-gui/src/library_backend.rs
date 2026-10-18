@@ -41,6 +41,7 @@ pub mod qobject {
     }
 }
 
+use crate::i18n::tr;
 use std::pin::Pin;
 
 use cxx_qt::CxxQtType;
@@ -113,7 +114,7 @@ impl qobject::LibraryBackend {
             Err(e) => return out(serde_json::json!({ "ok": false, "error": format!("bad arguments: {e}") })),
         };
         if fake_mode() && !reads_only(&name) {
-            return out(serde_json::json!({ "ok": false, "error": "Demo device: nothing is written in this mode" }));
+            return out(serde_json::json!({ "ok": false, "error": tr("Demo device: nothing is written in this mode") }));
         }
         let conn = match self.conn() {
             Ok(c) => c,

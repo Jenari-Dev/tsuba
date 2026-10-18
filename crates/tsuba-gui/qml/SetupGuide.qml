@@ -26,7 +26,7 @@ Rectangle {
         return d === "ok" ? "listed_none" : d;
     }
     readonly property bool ruleInstalled: !!(report.udev && report.udev.rule_installed)
-    readonly property string ruleCommand: "sudo install -Dm644 contrib/70-tsuba.rules /etc/udev/rules.d/70-tsuba.rules && sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=hidraw"
+    readonly property string ruleCommand: "sudo install -Dm644 contrib/70-tsuba.rules /etc/udev/rules.d/70-tsuba.rules && sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=hidraw" // i18n-ok: shell command
     readonly property var unsupportedNames: (report.usb || []).filter(u => !u.name).map(u => u.pid)
 
     color: Theme.card
@@ -107,7 +107,7 @@ Rectangle {
                 x: 12
                 y: 10
                 width: parent.width - 24
-                text: guide.state === "no_hidraw" ? "tsuba-handover" : guide.ruleCommand
+                text: guide.state === "no_hidraw" ? "tsuba-handover" : guide.ruleCommand // i18n-ok: command name
                 color: Theme.text
                 font.family: "monospace"
                 font.pixelSize: 12

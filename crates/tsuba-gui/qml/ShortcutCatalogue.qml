@@ -52,7 +52,8 @@ ColumnLayout {
         id: areaPick
         objectName: "shortcutArea"
         Layout.fillWidth: true
-        model: cat.areas.map(a => a[1] + (a[0] === cat.suggested ? i18n("  (suggested)") : ""))
+        model: cat.areas.map(a => a[0] === cat.suggested ? i18n("%1  (suggested)", a[1]) : a[1])
+
         currentIndex: cat.areaIdx
         onActivated: i => cat.areaIdx = i
     }

@@ -16,7 +16,7 @@ Rectangle {
     signal addSelected(var chosen)
     signal closed
 
-    color: "#b3000000"
+    color: Theme.scrim
     visible: false
 
     // What a link created from this game matches on (folder when known, else the exe name).
@@ -88,13 +88,13 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 12
                 Text {
-                    text: "SCAN FOR GAMES"
+                    text: i18n("SCAN FOR GAMES")
                     color: Theme.accent
                     font.family: Theme.titleFont
                     font.pixelSize: 16
                 }
                 Text {
-                    text: dlg.games.length + (dlg.games.length === 1 ? " game found" : " games found")
+                    text: i18np("%1 game found", "%1 games found", dlg.games.length)
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -106,12 +106,12 @@ Rectangle {
                     id: search
                     objectName: "gameSearch"
                     Layout.preferredWidth: 240
-                    placeholderText: "Search games"
+                    placeholderText: i18n("Search games")
                     onTextChanged: dlg.filter = text.trim()
                 }
                 SynButton {
-                    text: "Select all"
-                    implicitWidth: 100
+                    text: i18n("Select all")
+                    Layout.minimumWidth: 100
                     onClicked: dlg.selectAllShown()
                 }
             }
@@ -138,7 +138,7 @@ Rectangle {
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: 6
-                        color: cell.on ? Theme.accentTint : (ch.hovered && !cell.linked ? "#14ffffff" : Theme.bg)
+                        color: cell.on ? Theme.accentTint : (ch.hovered && !cell.linked ? Theme.hoverTint : Theme.bg)
                         border.color: cell.on ? Theme.accent : Theme.borderSoft
                         opacity: cell.linked ? 0.55 : 1
                         // Cover (2:3), or the first letter when no art is cached.
@@ -173,12 +173,12 @@ Rectangle {
                                 width: badge.implicitWidth + 12
                                 height: 18
                                 radius: 2
-                                color: "#cc000000"
+                                color: "#cc000000"   // device drawing: intentional (badge over cover art)
                                 Text {
                                     id: badge
                                     anchors.centerIn: parent
-                                    text: (cell.linked ? "LINKED" : modelData.source.toUpperCase())
-                                    color: cell.linked ? Theme.accent : Theme.text
+                                    text: (cell.linked ? i18n("LINKED") : modelData.source.toUpperCase())
+                                    color: cell.linked ? Theme.defaultAccent : "#ffffff"   // badge sits on dark scrim over art: intentional
                                     font.family: Theme.font
                                     font.pixelSize: 10
                                     font.letterSpacing: 1
@@ -227,7 +227,7 @@ Rectangle {
                     width: parent.width - 60
                     horizontalAlignment: Text.AlignHCenter
                     textFormat: Text.PlainText
-                    text: dlg.games.length === 0 ? "No installed games were found. Tsuba looks for Steam, Lutris, Heroic and Bottles; you can still add any game by hand." : "No game matches \"" + dlg.filter + "\"."
+                    text: dlg.games.length === 0 ? i18n("No installed games were found. Tsuba looks for Steam, Lutris, Heroic and Bottles; you can still add any game by hand.") : i18n("No game matches “%1”.", dlg.filter)
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -240,7 +240,7 @@ Rectangle {
                 spacing: 10
                 Text {
                     Layout.fillWidth: true
-                    text: dlg.pickedCount > 0 ? dlg.pickedCount + " selected" : "Pick the games to link. Each is recognised by its install folder while it runs."
+                    text: dlg.pickedCount > 0 ? i18np("%1 game selected", "%1 games selected", dlg.pickedCount) : i18n("Pick the games to link. Each is recognised by its install folder while it runs.")
                     color: dlg.pickedCount > 0 ? Theme.accent : Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -248,15 +248,16 @@ Rectangle {
                 }
                 SynButton {
                     objectName: "gameScanClose"
-                    text: "Close"
-                    implicitWidth: 90
+                    text: i18nc("button: close dialog", "Close")
+                    Layout.minimumWidth: 90
                     onClicked: dlg.closed()
                 }
                 SynButton {
                     objectName: "gameScanAdd"
-                    text: "Add selected"
+                    text: i18n("Add selected")
                     primary: true
-                    implicitWidth: 130
+                    Layout.minimumWidth: 130
+
                     enabled: dlg.pickedCount > 0
                     onClicked: dlg.addSelected(dlg.chosen())
                 }

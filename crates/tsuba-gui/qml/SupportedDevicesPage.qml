@@ -21,9 +21,9 @@ Rectangle {
         const q = query.trim().toLowerCase();
         const order = DeviceKinds.groupOrder;
         return all.filter(d => q === "" || d.name.toLowerCase().indexOf(q) >= 0 || d.pid.indexOf(q) >= 0
-                || (DeviceKinds.groupLabels[d.kind] || "").toLowerCase().indexOf(q) >= 0
+                || DeviceKinds.groupLabel(d.kind).toLowerCase().indexOf(q) >= 0
                 || DeviceKinds.statusOf(d).toLowerCase().indexOf(q) >= 0)
-            .map(d => Object.assign({ group: DeviceKinds.groupLabels[d.kind] || "Other", rank: order.indexOf(d.kind) < 0 ? 99 : order.indexOf(d.kind) }, d))
+            .map(d => Object.assign({ group: DeviceKinds.groupLabel(d.kind), rank: order.indexOf(d.kind) < 0 ? 99 : order.indexOf(d.kind) }, d))
             .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
     }
 
@@ -60,17 +60,18 @@ Rectangle {
 
     component Badge: Rectangle {
         id: b
-        property string status: ""
+        property string status: ""   // "tested" / "untested" / "unsupported" (DeviceKinds.statusId)
         implicitWidth: bt.implicitWidth + 14
         implicitHeight: 18
         radius: 9
         color: "transparent"
-        border.color: status === "Tested" ? Theme.accent : Theme.borderSoft
+        border.color: status === "tested" ? Theme.accent : Theme.borderSoft
         Text {
             id: bt
             anchors.centerIn: parent
-            text: b.status.toUpperCase()
-            color: b.status === "Tested" ? Theme.accent : (b.status === "Untested" ? Theme.textDim : Theme.textMuted)
+            text: (b.status === "tested" ? i18nc("device support status", "Tested")
+                : (b.status === "untested" ? i18nc("device support status", "Untested") : i18nc("device support status", "Not supported"))).toUpperCase()
+            color: b.status === "tested" ? Theme.accent : (b.status === "untested" ? Theme.textDim : Theme.textMuted)
             font.family: Theme.font
             font.pixelSize: 9
             font.letterSpacing: 0.5
@@ -91,14 +92,14 @@ Rectangle {
             spacing: 12
 
             Text {
-                text: "SUPPORTED DEVICES"
+                text: i18nc("page heading", "SUPPORTED DEVICES")
                 color: Theme.accent
                 font.family: Theme.titleFont
                 font.pixelSize: Theme.fontSize
             }
             Text {
                 Layout.fillWidth: true
-                text: page.all.length + " models. Tested means checked on real hardware; the rest come from community sources and start out read-only."
+                text: i18np("%1 model. Tested means checked on real hardware; the rest come from community sources and start out read-only.", "%1 models. Tested means checked on real hardware; the rest come from community sources and start out read-only.", page.all.length)
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -108,7 +109,7 @@ Rectangle {
                 id: search
                 objectName: "searchField"
                 Layout.fillWidth: true
-                placeholderText: "Search by name, type or ID"
+                placeholderText: i18n("Search by name, type or ID")
                 text: page.query
                 onTextChanged: page.query = text
             }
@@ -141,10 +142,10 @@ Rectangle {
                 delegate: Rectangle {
                     id: row
                     required property var modelData
-                    readonly property string status: DeviceKinds.statusOf(modelData)
+                    readonly property string status: DeviceKinds.statusId(modelData)
                     width: ListView.view.width - 10
                     height: 52
-                    color: page.selectedPid === modelData.pid ? Theme.accentTint : (rh.hovered ? "#14ffffff" : Theme.panel)
+                    color: page.selectedPid === modelData.pid ? Theme.accentTint : (rh.hovered ? Theme.hoverTint : Theme.panel)
                     border.color: page.selectedPid === modelData.pid ? Theme.accent : "transparent"
                     Image {
                         id: thumb
@@ -190,7 +191,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     visible: page.rows.length === 0
-                    text: page.all.length === 0 ? "The device list isn't available (is tsubad running?)." : "No models match."
+                    text: page.all.length === 0 ? i18n("The device list isn't available (is tsubad running?).") : i18n("No models match.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize
@@ -209,7 +210,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 visible: page.selectedPid === ""
-                text: "Pick a model to see what Tsuba knows about it."
+                text: i18n("Pick a model to see what Tsuba knows about it.")
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -246,10 +247,10 @@ Rectangle {
                                 wrapMode: Text.WordWrap
                             }
                             Badge {
-                                status: DeviceKinds.statusOf(page.sel)
+                                status: DeviceKinds.statusId(page.sel)
                             }
                             Text {
-                                text: "Product ID " + page.selectedPid
+                                text: i18n("Product ID %1", page.selectedPid)
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
@@ -258,8 +259,8 @@ Rectangle {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: page.sel.supported === false ? "Tsuba can't control this device yet."
-                            : (page.sel.tested ? "Checked on real hardware." : "Not tested yet: when you plug it in, its settings are read-only until you allow changes.")
+                        text: page.sel.supported === false ? i18n("Tsuba can't control this device yet.")
+                            : (page.sel.tested ? i18n("Checked on real hardware.") : i18n("Not tested yet: when you plug it in, its settings are read-only until you allow changes."))
                         color: Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -268,7 +269,7 @@ Rectangle {
                     Text {
                         visible: !!page.selPack && !!page.selPack.approximate
                         Layout.fillWidth: true
-                        text: "The drawing is approximate — key positions may differ on the real device."
+                        text: i18n("The drawing is approximate — key positions may differ on the real device.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small

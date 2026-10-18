@@ -27,6 +27,7 @@ ColumnLayout {
     property string view: "top"
     property string pending: ""
     property string note: ""
+    property bool noteFailed: false   // the note is an error from the daemon
     property string label: ""         // compact inline layout: label, buttons and note on one row
 
     function chooseOwn() {
@@ -51,16 +52,20 @@ ColumnLayout {
         const ok = backend.set_custom_picture(pid, view, pending) && backend.set_picture_rect(pid, view, x, y, w, h);
         overlay.visible = false;
         if (!ok) {
+            noteFailed = true;
             note = backend.status;
             return;
         }
-        note = "Saved.";
+        noteFailed = false;
+        note = i18n("Saved.");
         // Custom pictures count as "My picture pack"; make sure it is the one shown.
         Theme.prefs.art = "auto";
         refresh.restart();
     }
     function remove() {
-        note = backend.remove_custom_picture(pid) ? "Back to Tsuba's drawing." : backend.status;
+        const ok = backend.remove_custom_picture(pid);
+        noteFailed = !ok;
+        note = ok ? i18n("Back to Tsuba's drawing.") : backend.status;
         refresh.restart();
     }
     // The app reads the art setting from its ini file, which QML's Settings writes a moment later.
@@ -97,14 +102,14 @@ ColumnLayout {
         }
         SynButton {
             objectName: "useOwnPicture"
-            text: "Use my own picture…"
+            text: i18n("Use my own picture…")
             enabled: !!ctl.builtin
             onClicked: ctl.chooseOwn()
         }
         SynButton {
             objectName: "useOwnUnderside"
             visible: ctl.hasBottom
-            text: "Underside picture…"
+            text: i18n("Underside picture…")
             onClicked: {
                 ctl.view = "bottom";
                 dlg.open();
@@ -112,7 +117,7 @@ ColumnLayout {
         }
         SynButton {
             objectName: "removeOwnPicture"
-            text: "Remove my picture"
+            text: i18n("Remove my picture")
             enabled: ctl.custom
             onClicked: ctl.remove()
         }
@@ -121,7 +126,7 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: ctl.note !== ""
         text: ctl.note
-        color: ctl.note === "Saved." || ctl.note.indexOf("Back") === 0 ? Theme.accent : Theme.warn
+        color: ctl.noteFailed ? Theme.warn : Theme.accent
         font.family: Theme.font
         font.pixelSize: 11
         wrapMode: Text.WordWrap
@@ -129,8 +134,8 @@ ColumnLayout {
 
     FileDialog {
         id: dlg
-        title: "Choose a picture"
-        nameFilters: ["Pictures (*.png *.jpg *.jpeg *.webp *.svg)"]
+        title: i18n("Choose a picture")
+        nameFilters: [i18n("Pictures (*.png *.jpg *.jpeg *.webp *.svg)")]
         onAccepted: ctl.beginAlign(ctl.view, selectedFile.toString())
     }
 
@@ -144,7 +149,7 @@ ColumnLayout {
         z: 1000
         Rectangle {
             anchors.fill: parent
-            color: "#cc000000"
+            color: Theme.scrim
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
@@ -156,7 +161,7 @@ ColumnLayout {
             anchors.centerIn: parent
             width: Math.min(parent.width - 80, 1000)
             height: Math.min(parent.height - 80, 760)
-            title: "Line up your picture" + (ctl.view === "bottom" ? " (underside)" : "")
+            title: ctl.view === "bottom" ? i18n("Line up your picture (underside)") : i18n("Line up your picture")
             onAccepted: (x, y, w, h) => ctl.save(x, y, w, h)
             onCancelled: overlay.visible = false
         }

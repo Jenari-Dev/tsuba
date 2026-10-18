@@ -84,7 +84,7 @@ ColumnLayout {
             label: modelData[0]
             on: !!ed.panel.assignment && (modelData[1] === -1 ? ed.panel.assignment.function === 11 : ([1, 14].indexOf(ed.panel.assignment.function) >= 0 && ed.panel.assignment.data[0] === modelData[1]))
             chosen: ed.panel.stagedId === "mouse:" + modelData[1]
-            onPicked: ed.pick("mouse:" + modelData[1], modelData[0], () => modelData[1] === -1 ? ed.panel.save(11, [1]) : ed.panel.save(1, [modelData[1]]), modelData[1] === -1 ? undefined : modelData[1])
+            onPicked: ed.pick("mouse:" + modelData[1], modelData[0], () => modelData[1] === -1 ? ed.panel.save(11, [1]) : ed.panel.save(1, [modelData[1]]), modelData[1] === -1 ? undefined : modelData[1])   // i18n-ok
         }
     }
 
@@ -97,7 +97,7 @@ ColumnLayout {
             label: modelData[0]
             on: !!ed.panel.assignment && [1, 14].indexOf(ed.panel.assignment.function) >= 0 && ed.panel.assignment.data[0] === modelData[1]
             chosen: ed.panel.stagedId === "mouse:" + modelData[1]
-            onPicked: ed.pick("mouse:" + modelData[1], ed.turbo ? i18n("%1 (repeating)", modelData[0]) : modelData[0], () => ed.panel.save(1, [modelData[1]]), modelData[1])
+            onPicked: ed.pick("mouse:" + modelData[1], ed.turbo ? i18n("%1 (repeating)", modelData[0]) : modelData[0], () => ed.panel.save(1, [modelData[1]]), modelData[1])   // i18n-ok
         }
     }
     RowLayout {
@@ -123,7 +123,7 @@ ColumnLayout {
             }
         }
         Text {
-            text: i18n(i18n("per second"))
+            text: i18n("per second")
             color: Theme.textDim
             font.family: Theme.font
             font.pixelSize: Theme.small

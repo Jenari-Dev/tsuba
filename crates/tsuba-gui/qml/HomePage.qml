@@ -302,7 +302,7 @@ Rectangle {
             (m[k] = m[k] || []).push(d);
         }
         return Object.keys(m).sort((x, y) => (order.indexOf(x) < 0 ? 99 : order.indexOf(x)) - (order.indexOf(y) < 0 ? 99 : order.indexOf(y)))
-            .map(k => ({ kind: k, label: DeviceKinds.groupLabels[k] || i18n("Other"), items: m[k] }));
+            .map(k => ({ kind: k, label: DeviceKinds.groupLabel(k), items: m[k] }));
     }
 
     readonly property var tips: [

@@ -121,7 +121,7 @@ Item {
         width: zrow.implicitWidth + 12
         height: 28
         radius: 3
-        color: "#cc1a1a1a"
+        color: Theme.overlayPanel
         border.color: Theme.borderSoft
         z: 6
         Row {
@@ -136,7 +136,7 @@ Item {
                 width: Math.max(24, bt.implicitWidth + 14)
                 height: 24
                 radius: 3
-                color: bh.hovered ? "#2d2d2d" : "transparent"
+                color: bh.hovered ? Theme.hoverFill : "transparent"
                 Text {
                     id: bt
                     anchors.centerIn: parent
@@ -156,7 +156,7 @@ Item {
             BarBtn {
                 objectName: "zoomOut"
                 caption: "−"
-                tip: "Zoom out"
+                tip: i18n("Zoom out")
                 onClicked: zc.zoomStep(-0.1)
             }
             Text {
@@ -173,13 +173,13 @@ Item {
             BarBtn {
                 objectName: "zoomIn"
                 caption: "+"
-                tip: "Zoom in"
+                tip: i18n("Zoom in")
                 onClicked: zc.zoomStep(0.1)
             }
             BarBtn {
                 objectName: "zoomFit"
-                caption: "Fit"
-                tip: "Reset zoom and position"
+                caption: i18nc("zoom bar button: fit the whole picture in view", "Fit")
+                tip: i18n("Reset zoom and position")
                 onClicked: zc.fit()
             }
         }

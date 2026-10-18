@@ -22,16 +22,16 @@ Item {
     property bool dirty: false
 
     readonly property var groups: [
-        { label: "All", test: h => true },
+        { label: i18nc("keyboard key group", "All"), test: h => true },
         { label: "WASD", test: h => (h.group || "").indexOf("wasd") >= 0 },
-        { label: "Arrows", test: h => (h.group || "").indexOf("arrows") >= 0 },
-        { label: "Letters", test: h => (h.group || "").indexOf("alphabets") >= 0 },
-        { label: "Number row", test: h => (h.group || "").indexOf("numberRows") >= 0 },
-        { label: "F-keys", test: h => (h.group || "").indexOf("functions") >= 0 },
-        { label: "Numpad", test: h => (h.group || "").indexOf("numpad") >= 0 },
-        { label: "Macro", test: h => h.group === "macro" },
-        { label: "Media", test: h => (h.group || "").indexOf("multimedia") >= 0 },
-        { label: "Underglow", test: h => h.group === "underglow" }
+        { label: i18nc("keyboard key group", "Arrows"), test: h => (h.group || "").indexOf("arrows") >= 0 },
+        { label: i18nc("keyboard key group", "Letters"), test: h => (h.group || "").indexOf("alphabets") >= 0 },
+        { label: i18nc("keyboard key group", "Number row"), test: h => (h.group || "").indexOf("numberRows") >= 0 },
+        { label: i18nc("keyboard key group", "F-keys"), test: h => (h.group || "").indexOf("functions") >= 0 },
+        { label: i18nc("keyboard key group", "Numpad"), test: h => (h.group || "").indexOf("numpad") >= 0 },
+        { label: i18nc("keyboard key group", "Macro"), test: h => h.group === "macro" },
+        { label: i18nc("keyboard key group", "Media"), test: h => (h.group || "").indexOf("multimedia") >= 0 },
+        { label: i18nc("keyboard key group", "Underglow"), test: h => h.group === "underglow" }
     ]
 
     function rows() {
@@ -91,7 +91,7 @@ Item {
 
     ColorDialog {
         id: picker
-        title: "Brush colour"
+        title: i18n("Brush colour")
         onAccepted: ed.brush = selectedColor.toString().replace("#", "").slice(-6)
     }
 
@@ -132,8 +132,8 @@ Item {
             Layout.fillWidth: true
             spacing: 6
             SectionLabel {
-                caption: "Select"
-                width: 70
+                caption: i18nc("verb: select keys by group", "Select")
+                width: Math.max(70, implicitWidth)
                 height: 28
                 verticalAlignment: Text.AlignVCenter
             }
@@ -143,7 +143,7 @@ Item {
                     required property var modelData
                     width: chip.implicitWidth + 22
                     height: 28
-                    color: hov.hovered ? "#1affffff" : Theme.panel
+                    color: hov.hovered ? Theme.hoverTint : Theme.panel
                     border.color: Theme.borderSoft
                     Text {
                         id: chip
@@ -170,7 +170,7 @@ Item {
                 Text {
                     id: clearSel
                     anchors.centerIn: parent
-                    text: "Clear selection"
+                    text: i18n("Clear selection")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -185,10 +185,10 @@ Item {
         RowLayout {
             spacing: 12
             SectionLabel {
-                caption: "Colour"
+                caption: i18n("Colour")
             }
             Repeater {
-                model: ["44d62c", "ff0000", "ff8000", "ffff00", "00ffff", "0060ff", "a000ff", "ff00a0", "ffffff"]
+                model: ["44d62c", "ff0000", "ff8000", "ffff00", "00ffff", "0060ff", "a000ff", "ff00a0", "ffffff"]   // LED colour: intentional
                 delegate: Rectangle {
                     required property string modelData
                     width: 26
@@ -225,13 +225,13 @@ Item {
                 Layout.preferredWidth: 12
             }
             SynButton {
-                text: "Paint"
+                text: i18nc("button: apply the brush colour to the selected keys", "Paint")
                 primary: true
                 enabled: !ed.readOnly && Object.keys(ed.selection).length > 0
                 onClicked: ed.paint(ed.brush)
             }
             SynButton {
-                text: "Turn off"
+                text: i18nc("button: switch the selected keys' lights off", "Turn off")
                 enabled: !ed.readOnly && Object.keys(ed.selection).length > 0
                 onClicked: ed.paint("000000")
             }
@@ -239,13 +239,14 @@ Item {
                 Layout.fillWidth: true
             }
             Text {
-                text: Object.keys(ed.selection).length + " selected"
+                text: i18np("%1 key selected", "%1 keys selected", Object.keys(ed.selection).length)
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.small
             }
             SynButton {
-                text: ed.dirty ? "Save" : "Saved"
+                text: ed.dirty ? i18n("Save") : i18n("Saved")
+
                 enabled: !ed.readOnly && ed.dirty
                 onClicked: if (ed.backend.save_lighting(ed.pid, ed.effectJson(), 255)) ed.dirty = false
             }

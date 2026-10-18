@@ -26,6 +26,7 @@ Item {
         const L = [];
         const H = (hid) => ({ mod: 0, hid: hid });
         const M = (mod) => ({ mod: mod, hid: 0 });
+        // i18n-ok-begin: key cap legends
         // Row 0
         k(L, 110, 0, 0, "Esc", H(0x29));
         ["F1", "F2", "F3", "F4"].forEach((t, i) => k(L, 112 + i, 2 + i, 0, t, H(0x3a + i)));
@@ -108,6 +109,7 @@ Item {
         k(L, 200, 21.5, -1.2, "🔇", null, 1, 0.8);
         k(L, 206, 16.25, -1.2, "Vol −", null, 1, 0.8);
         k(L, 204, 17.25, -1.2, "Vol +", null, 1, 0.8);
+        // i18n-ok-end
         return L;
     }
 
@@ -125,8 +127,8 @@ Item {
         width: (root.spanX - 0.75) * root.u
         height: (root.spanY - 0.05) * root.u
         radius: root.u * 0.35
-        color: "#0d0d0d"
-        border.color: "#262626"
+        color: "#0d0d0d"   // device drawing: intentional
+        border.color: "#262626"   // device drawing: intentional
         visible: root.u > 0
     }
 
@@ -145,7 +147,7 @@ Item {
             width: modelData.w * root.u - 4
             height: modelData.h * root.u - 4
             radius: modelData.shape === "dial" ? width / 2 : 3
-            color: hov.hovered ? "#262626" : Theme.keyFace
+            color: hov.hovered ? Theme.hoverFill : Theme.keyFace
             border.width: isSel ? 2 : 1
             border.color: isSel ? Theme.accent : (hov.hovered ? Theme.border : Theme.keyEdge)
             opacity: a || modelData.pos === 59 ? 1 : 0.55
@@ -189,7 +191,7 @@ Item {
             }
             TapHandler {
                 onTapped: {
-                    const n = keyRect.modelData.shape === "dial" ? "Command dial" : (keyRect.modelData.label || "Space");
+                    const n = keyRect.modelData.shape === "dial" ? i18n("Command dial") : (keyRect.modelData.label || i18n("Space"));
                     root.picked(keyRect.modelData.pos, n);
                 }
             }

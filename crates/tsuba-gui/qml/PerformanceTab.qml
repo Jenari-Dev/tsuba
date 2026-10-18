@@ -42,9 +42,11 @@ QQC2.ScrollView {
     // Device interface (null in the headless QML tests unless a test sets a fake).
     property var devb: null
     property var feat: ({})
-    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
-    function tr(translated, plain) {
-        return typeof i18n === "function" ? translated() : plain;
+    // Status line under the cards: the text and whether it reports a failure (never inferred from the wording).
+    property bool resultFailed: false
+    function setResult(text, failed) {
+        resultFailed = failed;
+        result = text;
     }
     function loadFeatures() {
         if (!devb) {
@@ -55,7 +57,7 @@ QQC2.ScrollView {
     }
     function setFeat(change) {
         const r = devb.set_features(pid, JSON.stringify(Object.assign({ profile: profile }, change)));
-        result = r === "" ? tr(() => i18n("Failed: %1", devb.status), "Failed: " + devb.status) : r.split("\n").join(" · ");
+        setResult(r === "" ? i18n("Failed: %1", devb.status) : r.split("\n").join(" · "), r === "");
         loadFeatures();
     }
     function makeDevb() {
@@ -88,7 +90,7 @@ QQC2.ScrollView {
     }
     function setPower(change) {
         const r = backend.set_power(pid, JSON.stringify(change));
-        result = r === "" ? "Failed: " + backend.status : r.split("\n").join(" · ");
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : r.split("\n").join(" · "), r === "");
         loadPower();
     }
 
@@ -103,7 +105,7 @@ QQC2.ScrollView {
         const want = Object.assign({}, gm, change);
         delete want.saved;
         const r = backend.set_game_mode(pid, JSON.stringify(want));
-        result = r === "" ? "Failed: " + backend.status : (JSON.parse(r).active ? "Game Mode on" : "Game Mode settings saved");
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : (JSON.parse(r).active ? i18n("Game Mode on") : i18n("Game Mode settings saved")), r === "");
         loadGameMode();
     }
     onStChanged: {
@@ -151,7 +153,7 @@ QQC2.ScrollView {
 
     function apply(settings) {
         const r = backend.set_performance(pid, JSON.stringify(Object.assign({ profile: profile }, settings)));
-        result = r === "" ? "Failed: " + backend.status : r.split("\n").join(" · ");
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : r.split("\n").join(" · "), r === "");
         load();
         changed();
     }
@@ -209,6 +211,8 @@ QQC2.ScrollView {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
             Text {
+                width: parent.width
+                wrapMode: Text.Wrap
                 text: tg.label
                 color: Theme.text
                 font.family: Theme.font
@@ -235,6 +239,8 @@ QQC2.ScrollView {
     }
 
     component Label14: Text {
+        Layout.maximumWidth: 480
+        elide: Text.ElideRight
         color: Theme.text
         font.family: Theme.font
         font.pixelSize: Theme.fontSize
@@ -262,15 +268,15 @@ QQC2.ScrollView {
                 // ---- Sensitivity (mice)
                 Panel {
                     visible: tab.perfMode && tab.hasDpi
-                    title: "Sensitivity"
-                    help: "Sensitivity (DPI) is how far the pointer moves for each centimetre you move the mouse. Set up to five stages and switch between them with the sensitivity buttons; the highlighted stage is the one in use. Very high values can feel jittery on some surfaces."
-                    description: "The number of dots-per-inch (DPI) of mouse movement. Click a stage's number to make it the active one; the stage buttons on the mouse cycle through them."
+                    title: i18n("Sensitivity")
+                    help: i18n("Sensitivity (DPI) is how far the pointer moves for each centimetre you move the mouse. Set up to five stages and switch between them with the sensitivity buttons; the highlighted stage is the one in use. Very high values can feel jittery on some surfaces.")
+                    description: i18n("The number of dots-per-inch (DPI) of mouse movement. Click a stage's number to make it the active one; the stage buttons on the mouse cycle through them.")
 
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 14
                         Label14 {
-                            text: "Sensitivity stages"
+                            text: i18n("Sensitivity stages")
                         }
                         SynPillTabs {
                             model: ["1", "2", "3", "4", "5"]
@@ -295,7 +301,7 @@ QQC2.ScrollView {
                         Layout.fillWidth: true
                         spacing: 12
                         Label14 {
-                            text: "Separate X / Y sensitivity"
+                            text: i18n("Separate X / Y sensitivity")
                         }
                         SynToggle {
                             checked: tab.xy
@@ -325,7 +331,7 @@ QQC2.ScrollView {
                                 Layout.preferredHeight: 32
                                 Layout.alignment: Qt.AlignTop
                                 radius: 16
-                                color: stageRow.active ? Theme.accent : (ch.hovered ? "#3a3a3a" : "#2d2d2d")
+                                color: stageRow.active ? Theme.accent : (ch.hovered ? Theme.pressedFill : Theme.controlFill)
                                 Text {
                                     anchors.centerIn: parent
                                     text: stageRow.index + 1
@@ -432,7 +438,7 @@ QQC2.ScrollView {
 
                     Text {
                         visible: !!tab.st.dpi && tab.isActiveProfile
-                        text: tab.st.dpi ? "Current sensitivity: " + tab.st.dpi.active[0] + (tab.st.dpi.active[0] !== tab.st.dpi.active[1] ? " / " + tab.st.dpi.active[1] : "") + " DPI" : ""
+                        text: !tab.st.dpi ? "" : (tab.st.dpi.active[0] !== tab.st.dpi.active[1] ? i18n("Current sensitivity: %1 / %2 DPI", tab.st.dpi.active[0], tab.st.dpi.active[1]) : i18n("Current sensitivity: %1 DPI", tab.st.dpi.active[0]))
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -452,12 +458,12 @@ QQC2.ScrollView {
 
                 Panel {
                     visible: !tab.perfMode && !!tab.pw && tab.pw.sleep_seconds !== undefined
-                    title: "Wireless power saving"
-                    help: "When the device is idle on battery it goes to sleep to save power. A short timeout saves more battery but the first movement afterwards wakes it with a brief delay. Does not apply when the cable is plugged in."
-                    description: tab.pw && tab.pw.battery_percent !== undefined ? ("Battery " + tab.pw.battery_percent + "%" + (tab.pw.charging ? " · charging" : "")) : "Put the device to sleep after it has been idle on battery."
+                    title: i18n("Wireless power saving")
+                    help: i18n("When the device is idle on battery it goes to sleep to save power. A short timeout saves more battery but the first movement afterwards wakes it with a brief delay. Does not apply when the cable is plugged in.")
+                    description: tab.pw && tab.pw.battery_percent !== undefined ? (tab.pw.charging ? i18n("Battery %1% · charging", tab.pw.battery_percent) : i18n("Battery %1%", tab.pw.battery_percent)) : i18n("Put the device to sleep after it has been idle on battery.")
 
                     Label14 {
-                        text: "Sleep after being idle for (minutes)"
+                        text: i18n("Sleep after being idle for (minutes)")
                     }
                     SynSlider {
                         id: sleepMins
@@ -474,9 +480,9 @@ QQC2.ScrollView {
                 }
                 Panel {
                     visible: !tab.perfMode && !!tab.pw && tab.pw.battery_led_percent !== undefined
-                    title: "Lighting on battery"
-                    help: "Caps the lighting brightness while the device runs on battery so it lasts longer. Set it to 0% to turn the lighting off on battery; it returns to normal when plugged in."
-                    description: "Lighting brightness is capped at this level while running on battery."
+                    title: i18n("Lighting on battery")
+                    help: i18n("Caps the lighting brightness while the device runs on battery so it lasts longer. Set it to 0% to turn the lighting off on battery; it returns to normal when plugged in.")
+                    description: i18n("Lighting brightness is capped at this level while running on battery.")
 
                     SynSlider {
                         id: batLed
@@ -496,25 +502,30 @@ QQC2.ScrollView {
                 // ---- Device info
                 Panel {
                     visible: tab.perfMode
-                    title: "Device"
-                    help: "Firmware version, operating mode and serial number as reported by the device. Tsuba only reads these; it never updates firmware."
+                    title: i18n("Device")
+                    help: i18n("Firmware version, operating mode and serial number as reported by the device. Tsuba only reads these; it never updates firmware.")
                     Label14 {
-                        text: `Firmware ${tab.st.firmware || "?"}   ·   Mode: ${tab.st.mode === "Driver" ? "driver (software control)" : (tab.st.mode || "?")}`
+                        Layout.fillWidth: true
+                        Layout.maximumWidth: Number.POSITIVE_INFINITY
+                        wrapMode: Text.Wrap
+                        text: i18n("Firmware %1   ·   Mode: %2", tab.st.firmware || "?", tab.st.mode === "Driver" ? i18n("driver (software control)") : (tab.st.mode || "?"))
                     }
                     Label14 {
                         objectName: "deviceModel"
+                        Layout.fillWidth: true
+                        Layout.maximumWidth: Number.POSITIVE_INFINITY
+                        wrapMode: Text.Wrap
                         visible: !!tab.feat.model
-                        text: i18n("Model: %1", tab.feat.model || "") + (tab.feat.connection ? "   ·   " + (tab.feat.connection === "wireless" ? i18n("Connection: wireless (HyperSpeed receiver)") : i18n("Connection: wired")) : "") + (tab.feat.dongle_quality !== undefined ? "   ·   " + i18n("Link quality %1", tab.feat.dongle_quality) : "")
+                        text: [i18n("Model: %1", tab.feat.model || ""), tab.feat.connection ? (tab.feat.connection === "wireless" ? i18n("Connection: wireless (HyperSpeed receiver)") : i18n("Connection: wired")) : "", tab.feat.dongle_quality !== undefined ? i18n("Link quality %1", tab.feat.dongle_quality) : ""].filter(p => p !== "").join("   ·   ")
                     }
                     RowLayout {
                         visible: !!tab.pw && !!tab.pw.serial
                         spacing: 10
                         Label14 {
-                            text: "Serial number  " + (tab.pw && tab.pw.serial ? tab.pw.serial : "")
+                            text: i18n("Serial number  %1", tab.pw && tab.pw.serial ? tab.pw.serial : "")
                         }
                         SynButton {
-                            text: "Copy"
-                            implicitWidth: 64
+                            text: i18nc("button: copy the serial number", "Copy")
                             onClicked: tab.backend.copy_text(tab.pw.serial)
                         }
                     }
@@ -553,9 +564,9 @@ QQC2.ScrollView {
                 // ---- Polling rate
                 Panel {
                     visible: tab.perfMode && !!tab.perf.polling_hz
-                    title: tab.st.kind === "mouse" ? "Wired polling rate" : "Polling rate"
-                    help: "How many times per second the device reports to the computer. Higher rates feel smoother and reduce input delay but use a little more CPU and, wirelessly, more battery. 1000 Hz is a good default."
-                    description: "The frequency (Hz) of data updates in a second. Higher rates lower latency but use more CPU, which can affect frame rates."
+                    title: tab.st.kind === "mouse" ? i18n("Wired polling rate") : i18n("Polling rate")
+                    help: i18n("How many times per second the device reports to the computer. Higher rates feel smoother and reduce input delay but use a little more CPU and, wirelessly, more battery. 1000 Hz is a good default.")
+                    description: i18n("The frequency (Hz) of data updates in a second. Higher rates lower latency but use more CPU, which can affect frame rates.")
 
                     SynSquareButtons {
                         Layout.fillWidth: true
@@ -569,33 +580,33 @@ QQC2.ScrollView {
                 // ---- Scrolling (mice)
                 Panel {
                     visible: tab.perfMode && tab.hasScroll
-                    title: "Scrolling"
-                    help: "Tactile gives the wheel distinct notches; Free-spin lets it turn without resistance. Auto free-spin switches between the two based on how fast you scroll, and scroll acceleration scrolls further the faster you spin."
+                    title: i18n("Scrolling")
+                    help: i18n("Tactile gives the wheel distinct notches; Free-spin lets it turn without resistance. Auto free-spin switches between the two based on how fast you scroll, and scroll acceleration scrolls further the faster you spin.")
 
                     RowLayout {
                         visible: tab.perf.free_spin !== undefined
                         spacing: 14
                         Label14 {
-                            text: "Scrolling mode"
+                            text: i18n("Scrolling mode")
                         }
                         SynPillTabs {
                             enabled: !tab.readOnly
-                            model: ["Tactile", "Free-spin"]
+                            model: [i18n("Tactile"), i18n("Free-spin")]
                             currentIndex: tab.perf.free_spin ? 1 : 0
                             onActivated: i => tab.apply({ free_spin: i === 1 })
                         }
                     }
                     Toggle {
                         visible: tab.perf.smart_reel !== undefined
-                        label: "Auto free-spin"
-                        hint: "Switches to free-spin automatically when you scroll fast, and back to tactile when you slow down (called Smart-Reel on Razer mice)."
+                        label: i18n("Auto free-spin")
+                        hint: i18n("Switches to free-spin automatically when you scroll fast, and back to tactile when you slow down (called Smart-Reel on Razer mice).")
                         checked: !!tab.perf.smart_reel
                         onToggled: on => tab.apply({ smart_reel: on })
                     }
                     Toggle {
                         visible: tab.perf.scroll_acceleration !== undefined
-                        label: "Scroll acceleration"
-                        hint: "Scrolls further the faster you spin the wheel."
+                        label: i18n("Scroll acceleration")
+                        hint: i18n("Scrolls further the faster you spin the wheel.")
                         checked: !!tab.perf.scroll_acceleration
                         onToggled: on => tab.apply({ scroll_acceleration: on })
                     }
@@ -648,28 +659,28 @@ QQC2.ScrollView {
                 // ---- Keyboard: Game Mode
                 Panel {
                     visible: tab.perfMode && tab.st.kind === "keyboard" && tab.gm !== null
-                    title: "Game Mode"
-                    help: "While on, Game Mode stops accidental key presses from leaving your game: you can disable the Meta (Windows) and Menu keys and pause desktop shortcuts like Alt+Tab. Fn+F10 toggles it on the keyboard. Turn it off to get everything back."
-                    description: "Stops keys and shortcuts that pull you out of a game. Fn+F10 on the keyboard turns it on and off too."
+                    title: i18n("Game Mode")
+                    help: i18n("While on, Game Mode stops accidental key presses from leaving your game: you can disable the Meta (Windows) and Menu keys and pause desktop shortcuts like Alt+Tab. Fn+F10 toggles it on the keyboard. Turn it off to get everything back.")
+                    description: i18n("Stops keys and shortcuts that pull you out of a game. Fn+F10 on the keyboard turns it on and off too.")
 
                     Toggle {
-                        label: "Game Mode"
+                        label: i18n("Game Mode")
                         checked: !!tab.gm && tab.gm.active
                         onToggled: on => tab.setGameMode({ active: on })
                     }
                     Toggle {
-                        label: "Disable the Windows (Meta) key"
+                        label: i18n("Disable the Windows (Meta) key")
                         checked: !!tab.gm && tab.gm.disable_win
                         onToggled: on => tab.setGameMode({ disable_win: on })
                     }
                     Toggle {
-                        label: "Disable the Menu key"
+                        label: i18n("Disable the Menu key")
                         checked: !!tab.gm && tab.gm.disable_menu
                         onToggled: on => tab.setGameMode({ disable_menu: on })
                     }
                     Toggle {
-                        label: "Block desktop shortcuts"
-                        hint: "Alt+Tab, Alt+F4, Meta shortcuts and other KDE global shortcuts (including Tsuba's own) are paused while Game Mode is on."
+                        label: i18n("Block desktop shortcuts")
+                        hint: i18n("Alt+Tab, Alt+F4, Meta shortcuts and other KDE global shortcuts (including Tsuba's own) are paused while Game Mode is on.")
                         checked: !!tab.gm && tab.gm.block_shortcuts
                         onToggled: on => tab.setGameMode({ block_shortcuts: on })
                     }
@@ -690,9 +701,9 @@ QQC2.ScrollView {
                 // ---- Power & battery (devices that report it)
                 Panel {
                     visible: !tab.perfMode && !!tab.pw && tab.pw.low_power_percent !== undefined
-                    title: "Low power mode"
-                    help: "The device switches to its low power mode when the battery falls below this level, to keep working a bit longer. Raise it to get the warning earlier."
-                    description: "Switch to low power mode when the battery drops below this level."
+                    title: i18n("Low power mode")
+                    help: i18n("The device switches to its low power mode when the battery falls below this level, to keep working a bit longer. Raise it to get the warning earlier.")
+                    description: i18n("Switch to low power mode when the battery drops below this level.")
 
                     SynSlider {
                         id: lowPower
@@ -713,9 +724,11 @@ QQC2.ScrollView {
                 Text {
                     visible: tab.result !== ""
                     text: tab.result
-                    color: tab.result.startsWith("Failed") ? Theme.warn : Theme.accent
+                    color: tab.resultFailed ? Theme.warn : Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.small
+                    wrapMode: Text.Wrap
+                    Layout.fillWidth: true
                 }
             }
         }

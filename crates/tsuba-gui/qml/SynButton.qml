@@ -8,7 +8,9 @@ QQC2.AbstractButton {
     property bool primary: false
 
     implicitHeight: 32
-    implicitWidth: Math.max(96, label.implicitWidth + 32)
+    // Grows with the label (translations differ in length); `minWidth` is the least it may shrink to.
+    property int minWidth: 96
+    implicitWidth: Math.max(minWidth, label.implicitWidth + 32)
     hoverEnabled: true
 
     background: Rectangle {
@@ -27,6 +29,7 @@ QQC2.AbstractButton {
         color: control.primary ? Theme.accentText : Theme.text
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
         opacity: control.enabled ? 1 : 0.5
     }
 }

@@ -144,11 +144,12 @@ Item {
         });
         const extra = Object.keys(neededMacros).filter(g => !picked["m:" + g]).length;
         const parts = [];
-        if (profiles) parts.push(profiles + (profiles === 1 ? " profile" : " profiles"));
-        if (macros + extra) parts.push((macros + extra) + ((macros + extra) === 1 ? " macro" : " macros"));
-        if (effects) parts.push(effects + (effects === 1 ? " effect" : " effects"));
-        if (Object.keys(deviceSettings).length) parts.push("device-wide settings for " + Object.keys(deviceSettings).length + (Object.keys(deviceSettings).length === 1 ? " device" : " devices"));
-        return parts.length ? parts.join(", ") + " selected" : "Pick what to bring over. Profiles go into each device's profile library (as many as you like); macros and effects are saved on this PC.";
+        if (profiles) parts.push(i18np("%1 profile", "%1 profiles", profiles));
+        if (macros + extra) parts.push(i18np("%1 macro", "%1 macros", macros + extra));
+        if (effects) parts.push(i18np("%1 effect", "%1 effects", effects));
+        const nd = Object.keys(deviceSettings).length;
+        if (nd) parts.push(i18np("device-wide settings for %1 device", "device-wide settings for %1 devices", nd));
+        return parts.length ? i18nc("%1 is a list such as “2 profiles, 1 macro”", "%1 selected", parts.join(i18nc("list separator", ", "))) : i18n("Pick what to bring over. Profiles go into each device's profile library (as many as you like); macros and effects are saved on this PC.");
     }
     function scrollToSection() {
         let target = null;
@@ -225,7 +226,7 @@ Item {
 
     FolderDialog {
         id: folderPick
-        title: "Choose the Windows drive or user folder"
+        title: i18n("Choose the Windows drive or user folder")
         onAccepted: {
             let p = selectedFolder.toString();
             p = decodeURIComponent(p.replace(/^file:\/\//, ""));
@@ -373,7 +374,7 @@ Item {
                     required property string modelData
                     Layout.fillWidth: true
                     textFormat: Text.PlainText
-                    text: "◇  " + modelData + "  (device-wide)"
+                    text: i18n("◇  %1  (device-wide)", modelData)
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -413,14 +414,14 @@ Item {
                 Layout.fillWidth: true
                 spacing: 12
                 Text {
-                    text: "IMPORT FROM SYNAPSE"
+                    text: i18n("IMPORT FROM SYNAPSE")
                     color: Theme.accent
                     font.family: Theme.titleFont
                     font.pixelSize: 16
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: "Profiles, macros and Lighting Studio effects from Synapse 4 on a Windows install. Its files are only read."
+                    text: i18n("Profiles, macros and Lighting Studio effects from Synapse 4 on a Windows install. Its files are only read.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -434,7 +435,7 @@ Item {
                 spacing: 10
                 enabled: dlg.phase !== "importing"
                 SectionLabel {
-                    caption: "Synapse data"
+                    caption: i18n("Synapse data")
                 }
                 SynDropdown {
                     id: storePick
@@ -452,18 +453,18 @@ Item {
                 Text {
                     visible: dlg.stores.length === 0 && dlg.storePath === ""
                     Layout.fillWidth: true
-                    text: "No mounted Windows drive with Synapse data was found. Mount the drive in your file manager, or choose its folder."
+                    text: i18n("No mounted Windows drive with Synapse data was found. Mount the drive in your file manager, or choose its folder.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
                     wrapMode: Text.Wrap
                 }
                 SynButton {
-                    text: "Choose folder…"
+                    text: i18n("Choose folder…")
                     onClicked: folderPick.open()
                 }
                 SynButton {
-                    text: "Rescan"
+                    text: i18n("Rescan")
                     visible: dlg.storePath !== ""
                     enabled: dlg.phase !== "scanning"
                     onClicked: {
@@ -488,7 +489,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
-                text: dlg.phase === "scanning" ? "Reading the Synapse data…" : (dlg.phase === "error" ? dlg.errorText : "Choose where the Synapse data is.")
+                text: dlg.phase === "scanning" ? i18n("Reading the Synapse data…") : (dlg.phase === "error" ? dlg.errorText : i18n("Choose where the Synapse data is."))
                 color: dlg.phase === "error" ? Theme.warn : Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
@@ -513,11 +514,11 @@ Item {
                     spacing: 6
 
                     SectionLabel {
-                        caption: "Device profiles"
+                        caption: i18n("Device profiles")
                     }
                     Text {
                         visible: !!dlg.view && dlg.view.devices.length === 0
-                        text: "Synapse has no device profiles here."
+                        text: i18n("Synapse has no device profiles here.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -550,16 +551,18 @@ Item {
                                     }
                                     Badge {
                                         visible: dlg.canImport(dev.modelData) && dev.chosen > 0
-                                        text: dev.chosen + " PICKED"
+                                        text: i18n("%1 PICKED", dev.chosen)
                                         tone: Theme.accent
                                     }
                                     Text {
                                         Layout.fillWidth: true
                                         textFormat: Text.PlainText
                                         text: !dev.modelData.importable ? dev.modelData.note
-                                            : !dlg.canImport(dev.modelData) ? "Tsuba isn't running, so nothing can be imported."
+                                            : !dlg.canImport(dev.modelData) ? i18n("Tsuba isn't running, so nothing can be imported.")
                                             : dev.modelData.note !== "" ? dev.modelData.note
-                                            : dev.modelData.profiles.length + (dev.modelData.profiles.length === 1 ? " profile" : " profiles") + " in Synapse → profile library" + (dev.modelData.attached ? "" : " (not connected)")
+                                            : (dev.modelData.attached
+                                                ? i18np("%1 profile in Synapse → profile library", "%1 profiles in Synapse → profile library", dev.modelData.profiles.length)
+                                                : i18np("%1 profile in Synapse → profile library (not connected)", "%1 profiles in Synapse → profile library (not connected)", dev.modelData.profiles.length))
                                         color: Theme.textDim
                                         font.family: Theme.font
                                         font.pixelSize: Theme.small
@@ -573,20 +576,20 @@ Item {
                                         focusPolicy: Qt.NoFocus
                                         onToggled: dlg.setPin(dev.modelData.pid, checked)
                                         QQC2.ToolTip.visible: hovered
-                                        QQC2.ToolTip.text: "Also write the picked profiles into the device's free on-board slots, so its profile button reaches them without Tsuba."
+                                        QQC2.ToolTip.text: i18n("Also write the picked profiles into the device's free on-board slots, so its profile button reaches them without Tsuba.")
                                     }
                                     Text {
                                         visible: dev.modelData.importable && dev.modelData.attached
-                                        text: !dev.modelData.writable ? "Pinning needs write access"
-                                            : dev.modelData.free_pins > 0 ? "Also pin to device (" + Math.min(dev.modelData.free_pins, Math.max(dev.chosen, 1)) + " of " + dev.modelData.free_pins + (dev.modelData.free_pins === 1 ? " free slot)" : " free slots)")
-                                            : "No free on-board slot to pin to"
+                                        text: !dev.modelData.writable ? i18n("Pinning needs write access")
+                                            : dev.modelData.free_pins > 0 ? i18np("Also pin to device (%2 of %1 free slot)", "Also pin to device (%2 of %1 free slots)", dev.modelData.free_pins, Math.min(dev.modelData.free_pins, Math.max(dev.chosen, 1)))
+                                            : i18n("No free on-board slot to pin to")
                                         color: dlg.canPin(dev.modelData) ? Theme.text : Theme.textDim
                                         font.family: Theme.font
                                         font.pixelSize: Theme.small
                                     }
                                     Text {
                                         visible: dev.modelData.importable && dev.modelData.attached
-                                        text: "Device-wide settings"
+                                        text: i18n("Device-wide settings")
                                         color: Theme.textDim
                                         font.family: Theme.font
                                         font.pixelSize: Theme.small
@@ -595,7 +598,7 @@ Item {
                                         visible: dev.modelData.importable && dev.modelData.attached
                                         enabled: dlg.canImport(dev.modelData) && dev.modelData.writable
                                         implicitWidth: 220
-                                        model: ["Keep Tsuba's"].concat(dev.modelData.profiles.map(p => "From “" + p.name + "”"))
+                                        model: [i18n("Keep Tsuba's")].concat(dev.modelData.profiles.map(p => i18n("From “%1”", p.name)))
                                         currentIndex: {
                                             const g = dlg.deviceSettings[dev.modelData.pid];
                                             return g ? 1 + dev.modelData.profiles.findIndex(p => p.guid === g) : 0;
@@ -610,7 +613,7 @@ Item {
                                             dlg.deviceSettings = s;
                                         }
                                         QQC2.ToolTip.visible: hovered
-                                        QQC2.ToolTip.text: "Polling rate, lighting and the command dial are one setting per device in Tsuba; pick the profile to take them from."
+                                        QQC2.ToolTip.text: i18n("Polling rate, lighting and the command dial are one setting per device in Tsuba; pick the profile to take them from.")
                                     }
                                 }
                             }
@@ -620,11 +623,17 @@ Item {
                                     required property var modelData
                                     itemKey: dlg.key("p", dev.modelData.pid, modelData.guid)
                                     title: modelData.name
-                                    tags: (modelData.active ? [["ACTIVE IN SYNAPSE", Theme.accent]] : []).concat(modelData.in_library ? [["IN LIBRARY", Theme.textDim]] : [])
+                                    tags: (modelData.active ? [[i18n("ACTIVE IN SYNAPSE"), Theme.accent]] : []).concat(modelData.in_library ? [[i18n("IN LIBRARY"), Theme.textDim]] : [])
                                     detail: {
                                         const n = modelData.summary.length, w = modelData.device_wide.length;
-                                        const own = n + (n === 1 ? " setting" : " settings");
-                                        return (w ? own + " + " + w + " device-wide" : own) + (modelData.in_library ? " · updates the library copy" : "");
+                                        if (w) {
+                                            return modelData.in_library
+                                                ? i18np("%1 setting + %2 device-wide · updates the library copy", "%1 settings + %2 device-wide · updates the library copy", n, w)
+                                                : i18np("%1 setting + %2 device-wide", "%1 settings + %2 device-wide", n, w);
+                                        }
+                                        return modelData.in_library
+                                            ? i18np("%1 setting · updates the library copy", "%1 settings · updates the library copy", n)
+                                            : i18np("%1 setting", "%1 settings", n);
                                     }
                                     lines: modelData.summary
                                     deviceLines: modelData.device_wide
@@ -638,11 +647,11 @@ Item {
                     SectionLabel {
                         id: macrosHeader
                         Layout.topMargin: 8
-                        caption: "Macros"
+                        caption: i18n("Macros")
                     }
                     Text {
                         visible: !!dlg.view && dlg.view.macros.length === 0
-                        text: "Synapse has no macros here."
+                        text: i18n("Synapse has no macros here.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -653,22 +662,24 @@ Item {
                             required property var modelData
                             itemKey: dlg.key("m", modelData.guid)
                             title: modelData.name
-                            tags: modelData.in_library ? [["IN LIBRARY", Theme.textDim]] : []
-                            detail: modelData.events + (modelData.events === 1 ? " event" : " events") + (modelData.in_library ? " · replaces the library copy" : "")
+                            tags: modelData.in_library ? [[i18n("IN LIBRARY"), Theme.textDim]] : []
+                            detail: modelData.in_library
+                                ? i18np("%1 event · replaces the library copy", "%1 events · replaces the library copy", modelData.events)
+                                : i18np("%1 event", "%1 events", modelData.events)
                             warnings: modelData.warnings
                             forcedOn: !!dlg.neededMacros[modelData.guid]
-                            forcedNote: "Imported with a selected profile that uses it"
+                            forcedNote: i18n("Imported with a selected profile that uses it")
                         }
                     }
 
                     SectionLabel {
                         id: lightingHeader
                         Layout.topMargin: 8
-                        caption: "Lighting Studio effects"
+                        caption: i18n("Lighting Studio effects")
                     }
                     Text {
                         visible: !!dlg.view && dlg.view.lighting.length === 0
-                        text: "Synapse has no Chroma Studio effects here."
+                        text: i18n("Synapse has no Chroma Studio effects here.")
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -679,8 +690,10 @@ Item {
                             required property var modelData
                             itemKey: dlg.key("l", modelData.id)
                             title: modelData.name
-                            tags: modelData.exists ? [["NAME IN USE", Theme.textDim]] : []
-                            detail: modelData.importable ? modelData.layers + (modelData.layers === 1 ? " layer on " : " layers on ") + modelData.devices.join(", ") + (modelData.exists ? " · saved under a new name" : "") : "Nothing in it maps to a Tsuba device"
+                            tags: modelData.exists ? [[i18n("NAME IN USE"), Theme.textDim]] : []
+                            detail: !modelData.importable ? i18n("Nothing in it maps to a Tsuba device")
+                                : modelData.exists ? i18np("%1 layer on %2 · saved under a new name", "%1 layers on %2 · saved under a new name", modelData.layers, modelData.devices.join(i18nc("list separator", ", ")))
+                                : i18np("%1 layer on %2", "%1 layers on %2", modelData.layers, modelData.devices.join(i18nc("list separator", ", ")))
                             warnings: modelData.warnings
                             checkable: modelData.importable
                         }
@@ -689,7 +702,7 @@ Item {
                         visible: !!dlg.view && dlg.view.errors.length > 0
                         Layout.fillWidth: true
                         Layout.topMargin: 8
-                        text: dlg.view ? dlg.view.errors.length + " Synapse record(s) couldn't be read and were left out." : ""
+                        text: dlg.view ? i18np("%1 Synapse record couldn't be read and was left out.", "%1 Synapse records couldn't be read and were left out.", dlg.view.errors.length) : ""
                         color: Theme.warn
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -712,12 +725,12 @@ Item {
                     width: parent.width - 14
                     spacing: 4
                     SectionLabel {
-                        caption: dlg.phase === "importing" ? "Importing…" : "Import finished"
+                        caption: dlg.phase === "importing" ? i18n("Importing…") : i18n("Import finished")
                     }
                     Text {
                         visible: dlg.phase === "importing"
                         Layout.fillWidth: true
-                        text: dlg.progressLines.length ? dlg.progressLines[dlg.progressLines.length - 1] : "Starting…"
+                        text: dlg.progressLines.length ? dlg.progressLines[dlg.progressLines.length - 1] : i18n("Starting…")
                         color: Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
@@ -757,8 +770,8 @@ Item {
                 spacing: 10
                 Text {
                     Layout.fillWidth: true
-                    text: dlg.phase === "done" ? (dlg.result.failed.length ? dlg.result.failed.length + " item(s) didn't import; see above." : "Everything was imported.")
-                        : dlg.backend.readonly && dlg.phase === "ready" ? "Tsuba is running read-only, so nothing can be imported."
+                    text: dlg.phase === "done" ? (dlg.result.failed.length ? i18np("%1 item didn't import; see above.", "%1 items didn't import; see above.", dlg.result.failed.length) : i18n("Everything was imported."))
+                        : dlg.backend.readonly && dlg.phase === "ready" ? i18n("Tsuba is running read-only, so nothing can be imported.")
                         : dlg.phase === "ready" ? dlg.summaryText() : ""
                     color: dlg.phase === "ready" && dlg.pickedCount > 0 && !dlg.backend.readonly ? Theme.accent : Theme.textDim
                     font.family: Theme.font
@@ -767,17 +780,18 @@ Item {
                 }
                 SynButton {
                     objectName: "synapseClose"
-                    text: dlg.phase === "done" ? "Done" : "Close"
+                    text: dlg.phase === "done" ? i18nc("button: finish", "Done") : i18nc("button: close dialog", "Close")
                     enabled: dlg.phase !== "importing"
-                    implicitWidth: 90
+                    Layout.minimumWidth: 90
                     onClicked: dlg.close()
                 }
                 SynButton {
                     objectName: "synapseImport"
                     visible: dlg.phase !== "done"
-                    text: "Import selected"
+                    text: i18n("Import selected")
+
                     primary: true
-                    implicitWidth: 150
+                    Layout.minimumWidth: 150
                     enabled: dlg.phase === "ready" && dlg.pickedCount > 0 && !dlg.backend.readonly
                     onClicked: dlg.startImport()
                 }

@@ -6,6 +6,8 @@
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../../../.." && pwd)
+# Every user-visible QML string must go through i18n() (allow-list: tools/i18n-allow.txt, `// i18n-ok`).
+python3 "$root/tools/scan-i18n.py"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 

@@ -17,11 +17,11 @@ QQC2.ScrollView {
             Layout.maximumWidth: 760
             Layout.alignment: Qt.AlignHCenter
             Layout.margins: 24
-            title: "Not supported yet"
+            title: i18n("Not supported yet")
             showHelp: false
             Text {
                 Layout.fillWidth: true
-                text: (page.support.name || "This device") + " is in Tsuba's list of known devices, but Tsuba can't change its settings yet."
+                text: page.support.name ? i18n("%1 is in Tsuba's list of known devices, but Tsuba can't change its settings yet.", page.support.name) : i18n("This device is in Tsuba's list of known devices, but Tsuba can't change its settings yet.")
                 color: Theme.text
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize

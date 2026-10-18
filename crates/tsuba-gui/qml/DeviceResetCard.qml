@@ -9,10 +9,6 @@ SynCard {
     id: card
 
     required property var host
-    // i18n() comes from KLocalizedContext in the app; the headless QML tests run without it.
-    function tr(translated, plain) {
-        return typeof i18n === "function" ? translated() : plain;
-    }
     readonly property string profilePhrase: host.feat.profile_reset_phrase || ("reset profile " + host.profile)
     readonly property string devicePhrase: host.feat.factory_reset_phrase || ""
 
@@ -20,7 +16,7 @@ SynCard {
 
     function finish(r) {
         const why = host.devb ? host.devb.status : "";
-        host.result = r === "" ? tr(() => i18n("Failed: %1", why), "Failed: " + why) : r;
+        host.setResult(r === "" ? i18n("Failed: %1", why) : r, r === "");
         if (r !== "") {
             Theme.dataRev++;
             resetDone();

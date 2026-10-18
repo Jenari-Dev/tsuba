@@ -44,6 +44,11 @@ Item {
         return KeyNames.defaultFor(isMouse, pos, layer === undefined ? keyLayer : layer);
     }
     property string resetResult: ""
+    property bool resetFailed: false
+    function setResult(text, failed) {
+        resetFailed = !!failed;
+        resetResult = text;
+    }
     property bool listView: false
     // Left-handed: swap the left and right click buttons.
     function swapHands() {
@@ -53,7 +58,8 @@ Item {
         }
         const a = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: 1, layer: keyLayer, function: r.function, data: r.data }));
         const b = a === "" ? "" : backend.set_assignment(pid, JSON.stringify({ profile: profile, key: 2, layer: keyLayer, function: l.function, data: l.data }));
-        resetResult = a !== "" && b !== "" ? "Left and right buttons swapped" : "Failed: " + backend.status;
+        const ok = a !== "" && b !== "";
+        setResult(ok ? i18n("Left and right buttons swapped") : i18n("Failed: %1", backend.status), !ok);
         load();
     }
     function resetLayer() {
@@ -67,15 +73,19 @@ Item {
             const r = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: +k, layer: keyLayer, function: d.function, data: d.data }));
             r === "" ? failed++ : n++;
         }
-        resetResult = `Reset ${n} key(s) to default` + (failed ? `, ${failed} failed` : "");
+        if (failed > 0) {
+            setResult(i18np("Reset %1 key to default, %2 failed", "Reset %1 keys to default, %2 failed", n, failed), true);
+        } else {
+            setResult(i18np("Reset %1 key to default", "Reset %1 keys to default", n), false);
+        }
         load();
     }
 
     function keyName(pos) {
         const spots = pack && pack.views && pack.views.top ? pack.views.top.hotspots : [];
         const h = spots.find(x => x.pos === pos);
-        const n = h ? h.name : "key " + pos;
-        return n === "Function" ? "Fn" : n;
+        const n = h ? h.name : i18nc("fallback name of a key", "key %1", pos);
+        return n === "Function" ? "Fn" : n;   // i18n-ok: key cap
     }
 
     function load() {
@@ -116,7 +126,7 @@ Item {
     function applyScroll(settings) {
         const r = backend.set_performance(pid, JSON.stringify(Object.assign({ profile: profile }, settings)));
         if (r === "") {
-            resetResult = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
         }
         loadScroll();
     }
@@ -149,7 +159,7 @@ Item {
         const pre = backend.env_var("TSUBA_SELECT");
         if (pre !== "") {
             selected = parseInt(pre);
-            selectedName = "Selected (" + pre + ")";
+            selectedName = i18n("Selected (%1)", pre);
         }
     }
 
@@ -211,10 +221,16 @@ Item {
                     anchors.fill: parent
                     onWidthChanged: requestPaint()
                     onHeightChanged: requestPaint()
+                    Connections {
+                        target: Theme
+                        function onDarkChanged() {
+                            requestPaint();
+                        }
+                    }
                     onPaint: {
                         const ctx = getContext("2d");
                         ctx.clearRect(0, 0, width, height);
-                        ctx.fillStyle = "#484848";
+                        ctx.fillStyle = Theme.borderSoft;
                         for (let x = 12; x < width; x += 24) {
                             for (let y = 12; y < height; y += 24) {
                                 ctx.fillRect(x, y, 2, 2);
@@ -243,22 +259,22 @@ Item {
                 visible: tab.hasScroll
                 Layout.alignment: Qt.AlignHCenter
                 Layout.maximumWidth: 900
-                title: "Scroll wheel"
-                help: "Tactile gives the wheel distinct notches; Free-spin lets it turn freely. Auto free-spin switches between them by how fast you scroll, and scroll acceleration scrolls further the faster you spin."
+                title: i18n("Scroll wheel")
+                help: i18n("Tactile gives the wheel distinct notches; Free-spin lets it turn freely. Auto free-spin switches between them by how fast you scroll, and scroll acceleration scrolls further the faster you spin.")
                 RowLayout {
                     spacing: 28
                     RowLayout {
                         visible: tab.perf.free_spin !== undefined
                         spacing: 12
                         Text {
-                            text: "Scrolling mode"
+                            text: i18n("Scrolling mode")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
                         }
                         SynPillTabs {
                             enabled: !tab.readOnly
-                            model: ["Tactile", "Free-spin"]
+                            model: [i18nc("scroll wheel mode", "Tactile"), i18nc("scroll wheel mode", "Free-spin")]
                             currentIndex: tab.perf.free_spin ? 1 : 0
                             onActivated: i => tab.applyScroll({ free_spin: i === 1 })
                         }
@@ -267,13 +283,13 @@ Item {
                         visible: tab.perf.smart_reel !== undefined
                         spacing: 12
                         Text {
-                            text: "Auto free-spin"
+                            text: i18n("Auto free-spin")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
                         }
                         Text {
-                            text: "(Smart-Reel)"
+                            text: i18nc("Razer name of the auto free-spin feature", "(Smart-Reel)")
                             color: Theme.textDim
                             font.family: Theme.font
                             font.pixelSize: Theme.small
@@ -288,7 +304,7 @@ Item {
                         visible: tab.perf.scroll_acceleration !== undefined
                         spacing: 12
                         Text {
-                            text: "Scroll acceleration"
+                            text: i18n("Scroll acceleration")
                             color: Theme.text
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSize
@@ -311,8 +327,8 @@ Item {
                     Layout.preferredWidth: 40
                     Layout.preferredHeight: 34
                     radius: 17
-                    color: lt.hovered ? "#2d2d2d" : "transparent"
-                    border.color: "#707070"
+                    color: lt.hovered ? Theme.controlFill : "transparent"
+                    border.color: Theme.controlBorder
                     Rectangle {
                         anchors.centerIn: parent
                         width: 16
@@ -337,20 +353,22 @@ Item {
                     }
                 }
                 SynPillTabs {
-                    model: ["Standard", "Shift layer"]
+                    model: [i18nc("key layer", "Standard"), i18nc("key layer", "Shift layer")]
                     currentIndex: tab.keyLayer
                     onActivated: index => tab.keyLayer = index
                 }
                 HelpButton {
                     size: 18
-                    text: "Standard is the layer you normally use. Shift layer holds a second set of assignments that are active only while you hold a key set to \"Shift layer\", so each key can do two things."
+                    text: i18n("Standard is the layer you normally use. Shift layer holds a second set of assignments that are active only while you hold a key set to “Shift layer”, so each key can do two things.")
                 }
                 // Synapse-style hint: which key turns Shift layer on.
                 Text {
                     visible: tab.keyLayer === 1
+                    Layout.maximumWidth: 520
+                    wrapMode: Text.Wrap
                     text: tab.hypershiftKeys.length
-                        ? "Hold " + tab.hypershiftKeys.join(" or ") + " and press a key to use its shift-layer assignment"
-                        : "No shift-layer key yet: pick a key on STANDARD and choose Shift layer"
+                        ? i18n("Hold %1 and press a key to use its shift-layer assignment", tab.hypershiftKeys.join(i18nc("separator between alternative keys", " or ")))
+                        : i18n("No shift-layer key yet: pick a key on STANDARD and choose Shift layer")
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -361,38 +379,43 @@ Item {
             SynCard {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.maximumWidth: 900
-                title: "Buttons"
-                help: "Reset puts this layer back to its factory assignments. The device picture can be replaced with your own photo; the buttons stay where Tsuba's drawing has them."
-                RowLayout {
+                title: i18nc("card title", "Buttons")
+                help: i18n("Reset puts this layer back to its factory assignments. The device picture can be replaced with your own photo; the buttons stay where Tsuba's drawing has them.")
+                Flow {
+                    Layout.fillWidth: true
                     spacing: 10
                     SynButton {
-                        text: "Reset layer to default"
+                        text: i18n("Reset layer to default")
                         visible: tab.keyLayer === 0
                         enabled: !tab.readOnly
                         onClicked: resetConfirm.open()
                     }
                     SynButton {
                         visible: tab.isMouse
-                        text: "Swap left / right (left-handed)"
+                        text: i18n("Swap left / right (left-handed)")
                         enabled: !tab.readOnly
                         onClicked: tab.swapHands()
                     }
                     SynButton {
-                        text: tab.isMouse ? "Mouse settings" : "Keyboard settings"
+                        text: tab.isMouse ? i18n("Mouse settings") : i18n("Keyboard settings")
                         onClicked: tab.backend.open_system_settings(tab.isMouse ? "mouse" : "keyboard")
                     }
                     Text {
                         visible: tab.resetResult !== ""
                         text: tab.resetResult
-                        color: Theme.accent
+                        height: 32
+                        verticalAlignment: Text.AlignVCenter
+                        color: tab.resetFailed ? Theme.warn : Theme.accent
                         font.family: Theme.font
                         font.pixelSize: Theme.small
                     }
                 }
                 Text {
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
                     text: tab.keyLayer === 1
-                        ? "These assignments apply only while a shift-layer key is held. Click a key to change its shift-layer assignment."
-                        : "Click a key or button to see its assignment. Remapped keys are shown in green."
+                        ? i18n("These assignments apply only while a shift-layer key is held. Click a key to change its shift-layer assignment.")
+                        : i18n("Click a key or button to see its assignment. Remapped keys are shown in green.")
                     color: Theme.textDim
                     font.family: Theme.font
                     font.pixelSize: Theme.small
@@ -402,17 +425,19 @@ Item {
                     objectName: "devicePicture"
                     backend: tab.backend
                     pid: tab.pid
-                    label: "Device picture"
+                    label: i18n("Device picture")
                 }
             }
             QQC2.Dialog {
                 id: resetConfirm
                 anchors.centerIn: parent
                 modal: true
-                title: "Reset bindings"
+                title: i18n("Reset bindings")
                 standardButtons: QQC2.Dialog.Ok | QQC2.Dialog.Cancel
                 QQC2.Label {
-                    text: "Put every key/button on this profile's STANDARD layer back to its default?"
+                    width: 360
+                    wrapMode: Text.Wrap
+                    text: i18n("Put every key/button on this profile's STANDARD layer back to its default?")
                 }
                 onAccepted: tab.resetLayer()
             }
@@ -432,7 +457,7 @@ Item {
                 readonly property var spot: tab.pack ? [].concat(...Object.values(tab.pack.views).map(v => v.hotspots || [])).find(h => h.pos === modelData) : null
                 width: ListView.view.width
                 height: 44
-                color: tab.selected === modelData ? Theme.accentTint : (lh.hovered ? "#14ffffff" : Theme.panel)
+                color: tab.selected === modelData ? Theme.accentTint : (lh.hovered ? Theme.hoverTint : Theme.panel)
                 border.color: tab.selected === modelData ? Theme.accent : Theme.borderSoft
                 Row {
                     anchors.left: parent.left
@@ -441,7 +466,8 @@ Item {
                     spacing: 16
                     Text {
                         width: 220
-                        text: (parent.parent.spot ? parent.parent.spot.name : "Button " + parent.parent.modelData).toUpperCase()
+                        elide: Text.ElideRight
+                        text: (parent.parent.spot ? parent.parent.spot.name : i18n("Button %1", parent.parent.modelData)).toUpperCase()
                         color: Theme.textDim
                         font.family: Theme.font
                         font.pixelSize: Theme.small
@@ -461,7 +487,7 @@ Item {
                 TapHandler {
                     onTapped: {
                         tab.selected = modelData;
-                        tab.selectedName = spot ? spot.name : "Button " + modelData;
+                        tab.selectedName = spot ? spot.name : i18n("Button %1", modelData);
                     }
                 }
             }

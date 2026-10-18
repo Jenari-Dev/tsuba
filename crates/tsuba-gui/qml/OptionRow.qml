@@ -13,7 +13,7 @@ Rectangle {
 
     Layout.fillWidth: true
     Layout.preferredHeight: 32
-    color: chosen ? Theme.accentTintStrong : (on ? Theme.accentTint : (oh.hovered ? "#14ffffff" : Theme.bg))
+    color: chosen ? Theme.accentTintStrong : (on ? Theme.accentTint : (oh.hovered ? Theme.hoverTint : Theme.bg))
     border.color: chosen || on ? Theme.accent : Theme.borderSoft
 
     Text {

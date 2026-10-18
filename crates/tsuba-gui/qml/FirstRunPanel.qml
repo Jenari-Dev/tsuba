@@ -170,7 +170,7 @@ QQC2.Popup {
                     }
                     SynPillTabs {
                         objectName: "welcomeLanguage"
-                        model: [i18n("System"), "English", "日本語"]
+                        model: [i18n("System"), "English", "日本語"] // i18n-ok: language names are shown in their own language
                         currentIndex: Theme.app.language === "en" ? 1 : (Theme.app.language === "ja" ? 2 : 0)
                         onActivated: i => Theme.app.language = ["system", "en", "ja"][i]
                     }

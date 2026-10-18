@@ -31,33 +31,34 @@ Rectangle {
     }
     readonly property string headline: {
         if (!gl.available) {
-            return gl.running ? "Your tsubad doesn't have game lighting yet" : "tsubad isn't running";
+            return gl.running ? i18n("Your tsubad doesn't have game lighting yet") : i18n("tsubad isn't running");
         }
         if (!gl.enabled) {
-            return "Game lighting is off";
+            return i18n("Game lighting is off");
         }
         if (controlling) {
-            return (controlling.title || "A game") + " is controlling your lighting";
+            return controlling.title ? i18n("%1 is controlling your lighting", controlling.title) : i18n("A game is controlling your lighting");
         }
         if (sessions.length) {
-            return (sessions[sessions.length - 1].title || "A game") + " is connected";
+            const t = sessions[sessions.length - 1].title;
+            return t ? i18n("%1 is connected", t) : i18n("A game is connected");
         }
-        return "Waiting for a game";
+        return i18n("Waiting for a game");
     }
     readonly property string subline: {
         if (!gl.available) {
-            return gl.running ? "Update Tsuba and restart tsubad (systemctl --user restart tsubad) to use game lighting." : "Start it with: systemctl --user start tsubad";
+            return gl.running ? i18n("Update Tsuba and restart tsubad (systemctl --user restart tsubad) to use game lighting.") : i18n("Start it with: systemctl --user start tsubad");
         }
         if (!gl.enabled) {
-            return "Games can't change your lighting. Turn it on to let them.";
+            return i18n("Games can't change your lighting. Turn it on to let them.");
         }
         if (controlling) {
-            return "Devices: " + controlling.devices_active.map(page.deviceName).join(", ") + ". Your own lighting comes back when the game closes.";
+            return i18n("Devices: %1. Your own lighting comes back when the game closes.", controlling.devices_active.map(page.deviceName).join(i18nc("list separator", ", ")));
         }
         if (sessions.length) {
-            return "None of your devices is showing its lighting right now.";
+            return i18n("None of your devices is showing its lighting right now.");
         }
-        return "Start a game that supports Razer Chroma. It takes over your lighting while it runs.";
+        return i18n("Start a game that supports Razer Chroma. It takes over your lighting while it runs.");
     }
 
     function deviceName(pid) {
@@ -98,7 +99,7 @@ Rectangle {
     function reloadPrefixes() {
         scan = JSON.parse(backend.game_lighting_prefixes() || "{}");
         if (scan.auto_installed && scan.auto_installed.length) {
-            say(true, "Installed automatically in " + scan.auto_installed.length + " new game" + (scan.auto_installed.length === 1 ? "" : "s") + ".");
+            say(true, i18np("Installed automatically in %1 new game.", "Installed automatically in %1 new games.", scan.auto_installed.length));
         }
     }
     function say(ok, text) {
@@ -112,16 +113,16 @@ Rectangle {
     }
     function stateLabel(s) {
         return ({
-            installed: "Installed",
-            not_installed: "Not installed",
-            outdated: "Update available",
-            partial: "Incomplete",
-            foreign: "Another library is installed",
-            invalid: "Not a Wine prefix"
+            installed: i18nc("status of the bridge library in a game", "Installed"),
+            not_installed: i18nc("status of the bridge library in a game", "Not installed"),
+            outdated: i18n("Update available"),
+            partial: i18n("Incomplete"),
+            foreign: i18n("Another library is installed"),
+            invalid: i18n("Not a Wine prefix")
         })[s] || s;
     }
     function sourceLabel(s) {
-        return ({ steam: "Steam", lutris: "Lutris", heroic: "Heroic", bottles: "Bottles", custom: "Added by you" })[s] || s;
+        return ({ steam: "Steam", lutris: "Lutris", heroic: "Heroic", bottles: "Bottles", custom: i18n("Added by you") })[s] || s;
     }
 
     Component.onCompleted: {
@@ -141,7 +142,7 @@ Rectangle {
         function onGame_lighting_tested(ok, message) {
             page.testing = false;
             page.testOk = ok;
-            page.testResult = ok ? message : "Test failed: " + message;
+            page.testResult = ok ? message : i18n("Test failed: %1", message);
         }
     }
     // The signal keeps the status live; this is a slow safety net (e.g. after a daemon restart).
@@ -154,13 +155,13 @@ Rectangle {
 
     FolderDialog {
         id: folderPicker
-        title: "Choose a Wine prefix (the folder with drive_c)"
+        title: i18n("Choose a Wine prefix (the folder with drive_c)")
         onAccepted: {
             const err = page.backend.game_lighting_add_prefix(selectedFolder.toString());
             if (err !== "") {
                 page.say(false, err);
             } else {
-                page.say(true, "Prefix added.");
+                page.say(true, i18n("Prefix added."));
                 page.reloadPrefixes();
             }
         }
@@ -213,7 +214,7 @@ Rectangle {
                         RowLayout {
                             spacing: 8
                             Text {
-                                text: "GAME LIGHTING"
+                                text: i18n("GAME LIGHTING")
                                 color: Theme.text
                                 font.family: Theme.font
                                 font.pixelSize: Theme.small
@@ -222,7 +223,7 @@ Rectangle {
                             }
                             HelpButton {
                                 size: 16
-                                text: "Games that support Razer Chroma can colour your keyboard, mouse and other devices while they run, for example health bars, ammo or alerts. Tsuba runs the local lighting service those games look for. Windows games in Wine or Proton also need Tsuba's bridge library inside their prefix: install it below. When the game closes, your own lighting comes back."
+                                text: i18n("Games that support Razer Chroma can colour your keyboard, mouse and other devices while they run, for example health bars, ammo or alerts. Tsuba runs the local lighting service those games look for. Windows games in Wine or Proton also need Tsuba's bridge library inside their prefix: install it below. When the game closes, your own lighting comes back.")
                             }
                         }
                         Text {
@@ -278,7 +279,7 @@ Rectangle {
                             spacing: 10
                             SynButton {
                                 objectName: "glTestButton"
-                                text: page.testing ? "Testing…" : "Test"
+                                text: page.testing ? i18n("Testing…") : i18nc("button: run a lighting test", "Test")
                                 enabled: page.gl.available && page.gl.enabled && !!(page.gl.status && page.gl.status.port) && !page.testing
                                 onClicked: {
                                     page.testing = true;
@@ -288,7 +289,7 @@ Rectangle {
                             }
                             HelpButton {
                                 size: 16
-                                text: "Sends a moving rainbow to your keyboard and mouse for three seconds, the same way a game would, then gives the lighting back."
+                                text: i18n("Sends a moving rainbow to your keyboard and mouse for three seconds, the same way a game would, then gives the lighting back.")
                             }
                             Text {
                                 Layout.fillWidth: true
@@ -323,21 +324,21 @@ Rectangle {
                 spacing: 8
                 SynCheckBox {
                     objectName: "glWeb"
-                    text: "Allow websites to control lighting"
+                    text: i18n("Allow websites to control lighting")
                     enabled: page.gl.available
                     checked: page.gl.web === true
                     onToggled: {
                         if (page.backend.set_game_lighting_web(checked)) {
                             page.gl = Object.assign({}, page.gl, { web: checked });
                         } else {
-                            page.say(false, "Couldn't change the setting.");
+                            page.say(false, i18n("Couldn't change the setting."));
                         }
                         page.reloadStatus();
                     }
                 }
                 HelpButton {
                     size: 16
-                    text: "Some lighting apps and demos run in a web browser and use the same local lighting service as games. They only work with this on. While it's on, any website you have open could change your lighting, so leave it off unless you use such an app. Games don't need it."
+                    text: i18n("Some lighting apps and demos run in a web browser and use the same local lighting service as games. They only work with this on. While it's on, any website you have open could change your lighting, so leave it off unless you use such an app. Games don't need it.")
                 }
                 Item {
                     Layout.fillWidth: true
@@ -406,7 +407,8 @@ Rectangle {
                             Text {
                                 width: parent.width
                                 textFormat: Text.PlainText
-                                text: (modelData.exe && modelData.exe !== modelData.name ? modelData.exe + " · " : "") + (modelData.connected ? i18n("connected now") : (modelData.allowed ? i18n("allowed") : i18n("blocked")))
+                                readonly property string stateText: modelData.connected ? i18n("connected now") : (modelData.allowed ? i18n("allowed") : i18n("blocked"))
+                                text: modelData.exe && modelData.exe !== modelData.name ? i18nc("program file name and its state", "%1 · %2", modelData.exe, stateText) : stateText
                                 color: modelData.connected ? Theme.accent : Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -430,39 +432,39 @@ Rectangle {
                 Layout.topMargin: 10
                 spacing: 10
                 SectionLabel {
-                    caption: "Windows games (Wine and Proton)"
+                    caption: i18n("Windows games (Wine and Proton)")
                 }
                 HelpButton {
                     size: 16
-                    text: "Each Wine or Proton game has its own Windows folder (a prefix). Installing copies Tsuba's bridge library into it so the game finds a lighting service. Tsuba never replaces a library it didn't install, and removing takes out only its own files. Restart a running game after installing. Linux-native games don't need this."
+                    text: i18n("Each Wine or Proton game has its own Windows folder (a prefix). Installing copies Tsuba's bridge library into it so the game finds a lighting service. Tsuba never replaces a library it didn't install, and removing takes out only its own files. Restart a running game after installing. Linux-native games don't need this.")
                 }
                 Item {
                     Layout.fillWidth: true
                 }
                 SynButton {
-                    text: "Add a prefix…"
+                    text: i18n("Add a prefix…")
                     onClicked: folderPicker.open()
                 }
                 SynButton {
-                    text: "Rescan"
-                    implicitWidth: 84
+                    text: i18n("Rescan")
+                    Layout.minimumWidth: 84
                     onClicked: page.reloadPrefixes()
                 }
                 SynButton {
                     objectName: "glInstallAll"
                     primary: true
-                    text: "Install for all"
+                    text: i18n("Install for all")
                     enabled: page.scan.dll_dir !== "" && page.scan.prefixes.some(p => p.state === "not_installed" || p.state === "outdated" || p.state === "partial")
                     onClicked: page.apply(["all"], true)
                 }
             }
             SynCheckBox {
                 objectName: "glAuto"
-                text: "Install automatically for new games"
+                text: i18n("Install automatically for new games")
                 checked: page.scan.auto
                 onToggled: {
                     if (!page.backend.set_game_lighting_auto(checked)) {
-                        page.say(false, "Couldn't save the setting.");
+                        page.say(false, i18n("Couldn't save the setting."));
                     }
                     page.reloadPrefixes();
                 }
@@ -470,7 +472,7 @@ Rectangle {
             Text {
                 visible: page.scan.dll_dir === ""
                 Layout.fillWidth: true
-                text: "The bridge library isn't installed on this computer (Tsuba's package puts it in /usr/share/tsuba/game-lighting), so it can't be added to games yet."
+                text: i18n("The bridge library isn't installed on this computer (Tsuba's package puts it in /usr/share/tsuba/game-lighting), so it can't be added to games yet.")
                 color: Theme.warn
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -541,7 +543,7 @@ Rectangle {
                             }
                             Text {
                                 Layout.fillWidth: true
-                                text: page.sourceLabel(modelData.source) + " · " + modelData.path
+                                text: i18nc("game source (Steam, Lutris…) and the folder path", "%1 · %2", page.sourceLabel(modelData.source), modelData.path)
                                 // Game- or file-system-supplied text: never interpreted as markup.
                                 textFormat: Text.PlainText
                                 color: Theme.textDim
@@ -552,22 +554,24 @@ Rectangle {
                         }
                         Text {
                             text: page.stateLabel(modelData.state)
+                            Layout.maximumWidth: 220
+                            elide: Text.ElideRight
                             color: modelData.state === "installed" ? Theme.accent : (modelData.state === "not_installed" ? Theme.textDim : Theme.warn)
                             font.family: Theme.font
                             font.pixelSize: Theme.small
                         }
                         SynButton {
                             visible: modelData.state === "outdated" || modelData.state === "partial"
-                            text: modelData.state === "outdated" ? "Update" : "Repair"
-                            implicitWidth: 84
+                            text: modelData.state === "outdated" ? i18nc("button: update the bridge library", "Update") : i18nc("button: repair the bridge library", "Repair")
+                            Layout.minimumWidth: 84
                             enabled: page.scan.dll_dir !== ""
                             onClicked: page.apply([modelData.id], true)
                         }
                         SynButton {
                             visible: modelData.state !== "invalid"
                             primary: !prow.ours && modelData.state !== "foreign"
-                            text: prow.ours ? "Remove" : "Install"
-                            implicitWidth: 96
+                            text: prow.ours ? i18nc("button: remove the bridge library", "Remove") : i18nc("button: install the bridge library", "Install")
+                            Layout.minimumWidth: 96
                             enabled: prow.ours || (modelData.state === "not_installed" && page.scan.dll_dir !== "")
                             onClicked: page.apply([modelData.id], !prow.ours)
                         }
@@ -580,7 +584,8 @@ Rectangle {
             Text {
                 visible: page.scan.prefixes.length === 0
                 Layout.fillWidth: true
-                text: "No Wine or Proton games found. Steam games appear here after their first launch with Proton; use \"Add a prefix…\" for others."
+                text: i18n("No Wine or Proton games found. Steam games appear here after their first launch with Proton; use “Add a prefix…” for others.")
+
                 color: Theme.textDim
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize

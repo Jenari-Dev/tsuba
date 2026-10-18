@@ -110,18 +110,18 @@ ColumnLayout {
                 return;
             }
             if (lp.call("RenameMacro", [m.guid, n]) === null) {
-                message = "Failed: " + lp.error;
+                message = i18n("Failed: %1", lp.error);
                 return;
             }
             renamed(m.guid, n);
         } else if (action === "folder") {
             if (lp.call("SetMacroGroup", [m.guid, field.text.trim()]) === null) {
-                message = "Failed: " + lp.error;
+                message = i18n("Failed: %1", lp.error);
                 return;
             }
         } else if (action === "delete") {
             if (!backend.delete_macro(m.guid)) {
-                message = "Failed: " + backend.status;
+                message = i18n("Failed: %1", backend.status);
                 return;
             }
             removed(m.guid);
@@ -132,7 +132,7 @@ ColumnLayout {
     function duplicate(m) {
         const g = lp.call("DuplicateMacro", [m.guid, i18n("%1 copy", m.name)]);
         if (g === null) {
-            message = "Failed: " + lp.error;
+            message = i18n("Failed: %1", lp.error);
             return;
         }
         message = "";
@@ -141,7 +141,7 @@ ColumnLayout {
     }
     // Where a macro is used, for the delete warning: ["Gaming (key 4)", …].
     function usesOf(m) {
-        return usage && usage.used[m.guid] ? usage.used[m.guid].map(u => u.profile + " (key " + u.key + ")") : [];
+        return usage && usage.used[m.guid] ? usage.used[m.guid].map(u => i18nc("where a macro is used: profile name and key number", "%1 (key %2)", u.profile, u.key)) : [];
     }
 
     // ---- search + filters
@@ -173,14 +173,14 @@ ColumnLayout {
         visible: !!ml.usage && ml.usage.missing.length > 0
         Layout.fillWidth: true
         implicitHeight: warnText.implicitHeight + 16
-        color: "#22fd8611"
+        color: Theme.warnTint
         border.color: Theme.warn
         Text {
             id: warnText
             anchors.fill: parent
             anchors.margins: 8
             text: ml.usage && ml.usage.missing.length > 0
-                ? ml.usage.missing.length + (ml.usage.missing.length === 1 ? " key uses" : " keys use") + " a macro that no longer exists, for example key " + ml.usage.missing[0].key + " in “" + ml.usage.missing[0].profile + "”. Bind it to another macro in the device's Customize tab."
+                ? i18np("%1 key uses a macro that no longer exists, for example key %2 in “%3”. Bind it to another macro in the device's Customize tab.", "%1 keys use a macro that no longer exists, for example key %2 in “%3”. Bind it to another macro in the device's Customize tab.", ml.usage.missing.length, ml.usage.missing[0].key, ml.usage.missing[0].profile)
                 : ""
             color: Theme.warn
             font.family: Theme.font
@@ -239,7 +239,7 @@ ColumnLayout {
                         visible: !row.isHeader
                         objectName: row.isHeader ? "" : "macroRow_" + row.m.guid
                         anchors.fill: parent
-                        color: row.active ? Theme.accentTint : (lh.hovered ? "#14ffffff" : Theme.bg)
+                        color: row.active ? Theme.accentTint : (lh.hovered ? Theme.hoverTint : Theme.bg)
                         border.color: row.active ? Theme.accent : Theme.borderSoft
                         Column {
                             anchors.left: parent.left
@@ -258,7 +258,9 @@ ColumnLayout {
                             }
                             Text {
                                 width: parent.width
-                                text: row.isHeader ? "" : row.m.events.length + i18n(" events") + (ml.placesOf(row.m.guid).length ? i18n(" · on %1", ml.placesOf(row.m.guid).join(", ")) : "")
+                                text: row.isHeader ? "" : (ml.placesOf(row.m.guid).length
+                                    ? i18np("%1 event · on %2", "%1 events · on %2", row.m.events.length, ml.placesOf(row.m.guid).join(i18nc("list separator", ", ")))
+                                    : i18np("%1 event", "%1 events", row.m.events.length))
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -296,7 +298,7 @@ ColumnLayout {
                                 height: 28
                                 radius: 2
                                 anchors.verticalCenter: parent.verticalCenter
-                                color: mh.hovered ? "#2d2d2d" : "transparent"
+                                color: mh.hovered ? Theme.panelRaised : "transparent"
                                 Text {
                                     anchors.centerIn: parent
                                     text: "•••"
@@ -362,7 +364,7 @@ ColumnLayout {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 54
                     readonly property bool active: ml.editing && ml.devView !== null && ml.devView.pid === modelData.pid && ml.devView.id === modelData.m.id
-                    color: active ? Theme.accentTint : (dh.hovered ? "#14ffffff" : Theme.bg)
+                    color: active ? Theme.accentTint : (dh.hovered ? Theme.hoverTint : Theme.bg)
                     border.color: active ? Theme.accent : Theme.borderSoft
                     HoverHandler {
                         id: dh
@@ -388,7 +390,7 @@ ColumnLayout {
                             }
                             Text {
                                 width: parent.width
-                                text: (ml.deviceNames[modelData.pid] || modelData.pid) + " · " + modelData.m.events.length + i18n(" events")
+                                text: i18np("%2 · %1 event", "%2 · %1 events", modelData.m.events.length, ml.deviceNames[modelData.pid] || modelData.pid)
                                 color: Theme.textDim
                                 font.family: Theme.font
                                 font.pixelSize: 11
@@ -398,7 +400,7 @@ ColumnLayout {
                         SynButton {
                             objectName: "importRowButton"
                             text: i18n("Import")
-                            implicitWidth: 72
+                            minWidth: 72
                             onClicked: ml.importDeviceMacro(modelData.pid, modelData.m.id)
                         }
                     }
@@ -515,8 +517,10 @@ ColumnLayout {
                 visible: ml.action === "delete"
                 Layout.fillWidth: true
                 text: ml.target ? (ml.usesOf(ml.target).length > 0
-                    ? "It is used by " + ml.usesOf(ml.target).join(", ") + ". Those keys lose it. This also removes it from your devices."
-                    : "This removes it from the library and from your devices.") : ""
+                    ? i18n("It is used by %1. Those keys lose it. This also removes it from your devices.", ml.usesOf(ml.target).join(i18nc("list separator", ", ")))
+
+                    : i18n("This removes it from the library and from your devices.")) : ""
+
                 color: Theme.text
                 font.family: Theme.font
                 font.pixelSize: Theme.small
@@ -538,14 +542,14 @@ ColumnLayout {
                 }
                 SynButton {
                     text: i18n("Cancel")
-                    implicitWidth: 80
+                    minWidth: 80
                     onClicked: ml.done()
                 }
                 SynButton {
                     objectName: "macroActionOk"
                     text: ml.action === "delete" ? i18n("Delete") : i18n("Save")
                     primary: true
-                    implicitWidth: 80
+                    minWidth: 80
                     onClicked: ml.apply()
                 }
             }

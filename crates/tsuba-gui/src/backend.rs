@@ -388,6 +388,7 @@ pub mod qobject {
     impl cxx_qt::Threading for Backend {}
 }
 
+use crate::i18n::{tr, trf};
 use std::pin::Pin;
 
 use cxx_qt::{CxxQtType, Threading};
@@ -495,7 +496,7 @@ impl qobject::Backend {
             Err(_) => {
                 self.as_mut().set_connected(false);
                 self.as_mut().set_devices(QString::from("[]"));
-                self.as_mut().set_status(QString::from("tsubad isn't running — start it with: systemctl --user start tsubad"));
+                self.as_mut().set_status(QString::from(&tr("tsubad isn't running — start it with: systemctl --user start tsubad")));
             }
         }
     }
@@ -1009,7 +1010,7 @@ impl qobject::Backend {
         match r {
             Ok(()) => true,
             Err(e) => {
-                self.as_mut().set_status(QString::from(&format!("Device picture: {e}")));
+                self.as_mut().set_status(QString::from(&trf("Device picture: %1", &[&e])));
                 false
             }
         }
@@ -1120,7 +1121,7 @@ impl qobject::Backend {
         use tsuba_core::game_lighting_install as gli;
         let raw = file_url_to_path(&path.to_string());
         let Some(pfx) = gli::resolve_prefix(std::path::Path::new(&raw)) else {
-            return QString::from("That folder isn't a Wine prefix (it has no drive_c/windows/system32).");
+            return QString::from(&tr("That folder isn't a Wine prefix (it has no drive_c/windows/system32)."));
         };
         let mut s = gli::load_settings();
         let p = pfx.display().to_string();
@@ -1129,7 +1130,7 @@ impl qobject::Backend {
         }
         match gli::save_settings(&s) {
             Ok(()) => QString::default(),
-            Err(e) => QString::from(&format!("Couldn't save the setting: {e:#}")),
+            Err(e) => QString::from(&trf("Couldn't save the setting: %1", &[&format!("{e:#}")])),
         }
     }
 
@@ -1239,7 +1240,7 @@ fn game_lighting_apply(ids_json: &str, install: bool) -> QString {
     };
     let dll_dir = gli::default_dll_dir();
     if install && dll_dir.is_none() {
-        return QString::from(&serde_json::json!({ "ok": false, "message": "The bridge files aren't installed (expected in /usr/share/tsuba/game-lighting)." }).to_string());
+        return QString::from(&serde_json::json!({ "ok": false, "message": tr("The bridge files aren't installed (expected in /usr/share/tsuba/game-lighting).") }).to_string());
     }
     let (mut changed, mut skipped, mut errors) = (0usize, Vec::new(), Vec::new());
     for p in &chosen {
@@ -1255,8 +1256,11 @@ fn game_lighting_apply(ids_json: &str, install: bool) -> QString {
             Err(e) => errors.push(format!("{}: {e:#}", p.name)),
         }
     }
-    let verb = if install { "Installed in" } else { "Removed from" };
-    let mut msg = format!("{verb} {changed} of {} game{}.", chosen.len(), if chosen.len() == 1 { "" } else { "s" });
+    let mut msg = if install {
+        trf("Installed in %1 of %2 selected.", &[&changed, &chosen.len()])
+    } else {
+        trf("Removed from %1 of %2 selected.", &[&changed, &chosen.len()])
+    };
     for line in skipped.iter().chain(errors.iter()) {
         msg.push('\n');
         msg.push_str(line);

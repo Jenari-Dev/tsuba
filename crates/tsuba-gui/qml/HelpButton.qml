@@ -38,7 +38,7 @@ Item {
         onTapped: pop.opened ? pop.close() : pop.open()
     }
     Accessible.role: Accessible.Button
-    Accessible.name: "Help"
+    Accessible.name: i18nc("button: show help", "Help")
 
     QQC2.Popup {
         id: pop

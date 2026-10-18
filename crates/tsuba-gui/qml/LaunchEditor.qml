@@ -73,7 +73,7 @@ ColumnLayout {
                 objectName: "preset_" + modelData.id
                 enabled: modelData.command !== ""
                 opacity: enabled ? 1 : 0.45
-                label: modelData.label + (modelData.command !== "" ? "  ·  " + modelData.command : i18n("  (not installed)"))
+                label: modelData.command !== "" ? i18nc("preset name and its command", "%1  ·  %2", modelData.label, modelData.command) : i18n("%1  (not installed)", modelData.label)
                 chosen: ed.panel.stagedId === "launch:" + modelData.command
                 onPicked: {
                     cmdField.text = modelData.command;
@@ -107,14 +107,15 @@ ColumnLayout {
                     required property var modelData
                     width: appList.width
                     height: 30
-                    color: ah.hovered ? "#14ffffff" : "transparent"
+                    color: ah.hovered ? Theme.hoverTint : "transparent"
                     Text {
                         anchors.left: parent.left
                         anchors.leftMargin: 10
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
-                        text: modelData.name + (modelData.terminal ? i18n("  (terminal)") : "")
+                        text: modelData.terminal ? i18n("%1  (terminal)", modelData.name) : modelData.name
+
                         color: ed.panel.stagedId === "launch:" + ed.commandFor(modelData) ? Theme.accent : Theme.text
                         font.family: Theme.font
                         font.pixelSize: Theme.small

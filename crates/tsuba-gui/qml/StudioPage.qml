@@ -64,7 +64,7 @@ Rectangle {
     ]
 
     // Named Chroma profiles.
-    property var profile: ({ name: "My Lighting", devices: {} })
+    property var profile: ({ name: i18n("My Lighting"), devices: {} })
     property string loadedName: ""
     property var profileNames: []
     property string activeName: ""
@@ -225,7 +225,7 @@ Rectangle {
         onPaint: {
             const c = getContext("2d");
             c.reset();
-            c.fillStyle = "#202020";
+            c.fillStyle = "#202020";   // device drawing: intentional (LED preview backdrop)
             c.fillRect(0, 0, width, height);
             if (w <= 0 || h <= 0 || pixels.length !== w * h * 6) {
                 return;
@@ -253,7 +253,7 @@ Rectangle {
         width: 28
         height: 24
         radius: 3
-        color: th.hovered && enabled ? "#26ffffff" : "transparent"
+        color: th.hovered && enabled ? Theme.hoverTint : "transparent"
         border.color: th.hovered && enabled ? Theme.accent : Theme.borderSoft
         opacity: enabled ? 1 : 0.35
         readonly property color ink: th.hovered && enabled ? Theme.accent : Theme.text
@@ -383,7 +383,7 @@ Rectangle {
         }
         const l = layers.slice();
         const c = JSON.parse(JSON.stringify(layers[i]));
-        c.name = c.name + " copy";
+        c.name = i18n("%1 copy", c.name);
         l.splice(i + 1, 0, c);
         layers = l;
         current = i + 1;
@@ -874,6 +874,7 @@ Rectangle {
         if (e.colours && e.colours.length) {
             return "#" + e.colours[0];
         }
+        // LED colour: intentional
         return e.type === "fire" ? "#ff7a1a" : "transparent";
     }
     // Hex pixels (RRGGBB each) for a w×h picture sampled from the loaded image item.
@@ -916,7 +917,7 @@ Rectangle {
         if (mcfg.lighting && mcfg.lighting.effect && mcfg.lighting.effect.type === "studio") {
             devs["00aa"] = { layers: mcfg.lighting.effect.studio.layers };
         }
-        profile = { name: "My Lighting", devices: devs };
+        profile = { name: i18n("My Lighting"), devices: devs };
         loadedName = "";
         dirty = layers.length > 0;
         placements = defaultPlacements();
@@ -1060,7 +1061,7 @@ Rectangle {
                             objectName: "menuNew"
                             text: i18n("New profile")
                             onTriggered: {
-                                studio.profile = { name: studio.uniqueName("Profile"), devices: {} };
+                                studio.profile = { name: studio.uniqueName(i18n("Profile")), devices: {} };
                                 studio.loadedName = "";
                                 studio.layers = [];
                                 studio.canvasLayers = [];
@@ -1077,7 +1078,7 @@ Rectangle {
                             text: i18n("Duplicate")
                             onTriggered: {
                                 const p = studio.currentProfile();
-                                studio.profile = Object.assign({}, p, { name: studio.uniqueName(studio.profile.name + " copy") });
+                                studio.profile = Object.assign({}, p, { name: studio.uniqueName(i18n("%1 copy", studio.profile.name)) });
                                 studio.loadedName = "";
                                 studio.dirty = true;
                             }
@@ -1109,7 +1110,7 @@ Rectangle {
                                 if (j.profiles.length) {
                                     studio.openProfile(j.profiles[0]);
                                 } else {
-                                    studio.profile = { name: "My Lighting", devices: {} };
+                                    studio.profile = { name: i18n("My Lighting"), devices: {} };
                                     studio.loadedName = "";
                                     studio.layers = [];
                                     studio.canvasLayers = [];
@@ -1204,7 +1205,7 @@ Rectangle {
                             readonly property var lyr: studio.layers[li]
                             width: ListView.view.width
                             height: 52
-                            color: studio.current === li ? Theme.panelRaised : (lh.hovered ? "#262626" : "transparent")
+                            color: studio.current === li ? Theme.panelRaised : (lh.hovered ? Theme.hoverFill : "transparent")
                             border.color: studio.current === li ? Theme.accent : "transparent"
                             RowLayout {
                                 anchors.fill: parent
@@ -1258,7 +1259,7 @@ Rectangle {
                                         width: parent.width
                                     }
                                     Text {
-                                        text: lyr ? studio.effectInfo(lyr.effect.type).label + " · " + studio.coverText(lyr) : ""
+                                        text: lyr ? i18n("%1 · %2", studio.effectInfo(lyr.effect.type).label, studio.coverText(lyr)) : ""
                                         color: Theme.textDim
                                         font.family: Theme.font
                                         font.pixelSize: 11
@@ -1419,7 +1420,7 @@ Rectangle {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "#3a3a3a"
+                color: Theme.pressedFill
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 20
@@ -1481,7 +1482,7 @@ Rectangle {
                         enabled: true
                         text: studio.arranging ? i18n("Done") : i18n("Arrange devices")
                         primary: studio.arranging
-                        implicitWidth: 150
+                        minWidth: 150
                         implicitHeight: 28
                         onClicked: studio.arranging = !studio.arranging
                     }
@@ -1539,7 +1540,7 @@ Rectangle {
                     SynButton {
                         objectName: "resetLayout"
                         text: i18n("Reset layout")
-                        implicitWidth: 120
+                        minWidth: 120
                         implicitHeight: 26
                         onClicked: studio.resetPlacements()
                     }
@@ -1615,8 +1616,8 @@ Rectangle {
                         y: canvasHolder.soy
                         width: studio.stageW * canvasHolder.sk
                         height: studio.stageH * canvasHolder.sk
-                        color: "#2e2e2e"
-                        border.color: studio.arranging ? Theme.accent : "#444444"
+                        color: Theme.panelRaised
+                        border.color: studio.arranging ? Theme.accent : Theme.borderSoft
                     }
                     LedKeyboard {
                         id: kbView
@@ -1665,7 +1666,7 @@ Rectangle {
                         y: canvasHolder.panY + canvasHolder.zoom * r.y
                         width: canvasHolder.zoom * r.width
                         height: canvasHolder.zoom * r.height
-                        color: "#1444d62c"
+                        color: Theme.okTint
                         border.color: Theme.accent
                         border.width: 2
                         z: 10
@@ -1730,7 +1731,7 @@ Rectangle {
                             required property var modelData
                             width: gl.implicitWidth + 22
                             height: 28
-                            color: gh.hovered ? "#1affffff" : Theme.panel
+                            color: gh.hovered ? Theme.hoverTint : Theme.panel
                             border.color: Theme.borderSoft
                             Text {
                                 id: gl
@@ -1856,7 +1857,7 @@ Rectangle {
                         SynButton {
                             objectName: "duplicateLayer"
                             text: i18n("Copy")
-                            implicitWidth: 64
+                            minWidth: 64
                             implicitHeight: 30
                             onClicked: studio.duplicateLayer(studio.current)
                             QQC2.ToolTip.visible: hovered
@@ -1865,7 +1866,7 @@ Rectangle {
                         SynButton {
                             objectName: "resetEffect"
                             text: i18n("Reset")
-                            implicitWidth: 64
+                            minWidth: 64
                             implicitHeight: 30
                             onClicked: studio.resetEffect()
                             QQC2.ToolTip.visible: hovered
@@ -1891,7 +1892,7 @@ Rectangle {
                         objectName: "spanLayer"
                         visible: studio.hasMouse && !studio.combined
                         text: i18n("Span across devices")
-                        implicitWidth: 200
+                        minWidth: 200
                         implicitHeight: 30
                         onClicked: studio.spanCurrent()
                         QQC2.ToolTip.visible: hovered
@@ -1901,7 +1902,7 @@ Rectangle {
                         objectName: "unspanLayer"
                         visible: studio.combined && !!fx.cur && !!fx.cur.targets && Object.keys(fx.cur.targets).length === 1
                         text: i18n("Move to the device's layers")
-                        implicitWidth: 240
+                        minWidth: 240
                         implicitHeight: 30
                         onClicked: studio.unspanCurrent()
                     }
@@ -2422,7 +2423,7 @@ Rectangle {
                         objectName: "chooseImage"
                         visible: fx.isImage
                         text: fx.isImage && fx.cur.effect.w > 0 ? i18n("Choose another picture…") : i18n("Choose a picture…")
-                        implicitWidth: 220
+                        minWidth: 220
                         implicitHeight: 30
                         onClicked: imageDlg.open()
                     }
@@ -2477,7 +2478,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: i18n("Save")
                         primary: true
-                        implicitWidth: 160
+                        minWidth: 160
                         enabled: !studio.backend.readonly && studio.profile.name.trim() !== ""
                         onClicked: studio.saveProfile(true)
                     }

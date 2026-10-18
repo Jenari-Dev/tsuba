@@ -29,7 +29,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "#0b0b0b"
+        color: "#0b0b0b"   // screen preview backdrop: intentional
         border.color: Theme.borderSoft
     }
 
@@ -49,7 +49,7 @@ Item {
             for (let y = 0; y < h; y++) {
                 for (let x = 0; x < w; x++) {
                     const i = (y * w + x) * 6;
-                    ctx.fillStyle = "#" + hex.substr(i, 6);
+                    ctx.fillStyle = "#" + hex.substr(i, 6);   // screen pixel: intentional
                     ctx.fillRect(Math.floor(x * cw), Math.floor(y * ch), Math.ceil(cw), Math.ceil(ch));
                 }
             }
@@ -62,7 +62,7 @@ Item {
         width: parent.width - 24
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
-        text: "Your screen appears here while Ambient is running.\nDrag to choose the area."
+        text: i18n("Your screen appears here while Ambient is running.\nDrag to choose the area.")
         color: Theme.textMuted
         font.family: Theme.font
         font.pixelSize: 11
@@ -75,10 +75,10 @@ Item {
         readonly property real t: (band.visible ? band.y : root.area[1] * height)
         readonly property real r: (band.visible ? band.x + band.width : root.area[2] * width)
         readonly property real b: (band.visible ? band.y + band.height : root.area[3] * height)
-        Rectangle { color: "#a0000000"; x: 0; y: 0; width: parent.width; height: parent.t }
-        Rectangle { color: "#a0000000"; x: 0; y: parent.b; width: parent.width; height: parent.height - parent.b }
-        Rectangle { color: "#a0000000"; x: 0; y: parent.t; width: parent.l; height: parent.b - parent.t }
-        Rectangle { color: "#a0000000"; x: parent.r; y: parent.t; width: parent.width - parent.r; height: parent.b - parent.t }
+        Rectangle { color: Theme.scrimSoft; x: 0; y: 0; width: parent.width; height: parent.t }
+        Rectangle { color: Theme.scrimSoft; x: 0; y: parent.b; width: parent.width; height: parent.height - parent.b }
+        Rectangle { color: Theme.scrimSoft; x: 0; y: parent.t; width: parent.l; height: parent.b - parent.t }
+        Rectangle { color: Theme.scrimSoft; x: parent.r; y: parent.t; width: parent.width - parent.r; height: parent.b - parent.t }
         Rectangle {
             x: parent.l
             y: parent.t

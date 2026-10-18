@@ -34,7 +34,7 @@ Item {
             visible: page.perKey
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 20
-            model: ["Quick effects", DeviceKinds.family(support.kind || (pack ? pack.kind : "")) === "keyboard" ? "Per-key" : "Per-LED"]
+            model: [i18n("Quick effects"), DeviceKinds.family(support.kind || (pack ? pack.kind : "")) === "keyboard" ? i18n("Per-key") : i18n("Per-LED")]
             currentIndex: page.mode
             onActivated: index => page.mode = index
         }

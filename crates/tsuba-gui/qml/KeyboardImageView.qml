@@ -71,7 +71,7 @@ Item {
             readonly property var a: root.assignments[modelData.pos]
             readonly property bool isSel: root.selected === modelData.pos
             readonly property bool remapped: root.isRemapped(modelData.pos, a)
-            readonly property bool round: modelData.shape === "round" || modelData.name === "Command dial" || ["Previous", "Play / Pause", "Next", "Mute"].indexOf(modelData.name) >= 0
+            readonly property bool round: modelData.shape === "round" || modelData.name === "Command dial" || ["Previous", "Play / Pause", "Next", "Mute"].indexOf(modelData.name) >= 0   // i18n-ok: device data names
 
             x: root.ox + modelData.rect[0] * root.s
             y: root.oy + modelData.rect[1] * root.s
@@ -84,7 +84,7 @@ Item {
                 radius: spot.round ? width / 2 : 4
                 color: spot.isSel ? Theme.accentTintStrong : (hov.hovered ? Theme.accentTint : "transparent")
                 border.width: spot.isSel ? 2 : (hov.hovered || spot.remapped ? 1 : 0)
-                border.color: spot.isSel || spot.remapped || hov.hovered ? Theme.accent : "#99cccccc"
+                border.color: spot.isSel || spot.remapped || hov.hovered ? Theme.accent : "#99cccccc"   // device drawing: intentional
             }
             Rectangle {
                 // New legend for a remapped key, Synapse-style tag on the keycap.

@@ -37,37 +37,37 @@ ColumnLayout {
 
     Row2 {
         objectName: "factKind"
-        caption: "Type"
-        value: DeviceKinds.kindLabel(facts.support.kind) + (facts.support.connection ? " · " + facts.support.connection : "")
+        caption: i18nc("device fact label", "Type")
+        value: facts.support.connection ? i18n("%1 · %2", DeviceKinds.kindLabel(facts.support.kind), facts.support.connection) : DeviceKinds.kindLabel(facts.support.kind)
     }
     Row2 {
         objectName: "factFeatures"
-        caption: "Features"
+        caption: i18nc("device fact label", "Features")
         value: DeviceKinds.featureList(facts.support).join(", ")
     }
     Row2 {
         objectName: "factEffects"
-        caption: "Lighting effects"
+        caption: i18nc("device fact label", "Lighting effects")
         value: DeviceKinds.effectList(facts.support).join(", ")
     }
     Row2 {
         objectName: "factDpi"
-        caption: "Sensitivity"
-        value: facts.support.max_dpi > 0 ? "Up to " + facts.support.max_dpi + " DPI" : ""
+        caption: i18nc("device fact label", "Sensitivity")
+        value: facts.support.max_dpi > 0 ? i18n("Up to %1 DPI", facts.support.max_dpi) : ""
     }
     Row2 {
         objectName: "factPolling"
-        caption: "Polling rates"
-        value: facts.support.polling_rates && facts.support.polling_rates.length ? facts.support.polling_rates.join(", ") + " Hz" : ""
+        caption: i18nc("device fact label", "Polling rates")
+        value: facts.support.polling_rates && facts.support.polling_rates.length ? i18n("%1 Hz", facts.support.polling_rates.join(", ")) : ""
     }
     Row2 {
         objectName: "factLeds"
-        caption: "Lighting zones"
+        caption: i18nc("device fact label", "Lighting zones")
         value: (facts.support.leds || []).map(l => l.replace(/_/g, " ")).join(", ")
     }
     Row2 {
         objectName: "factNotes"
-        caption: "Notes"
+        caption: i18nc("device fact label", "Notes")
         value: facts.support.notes || ""
     }
 }

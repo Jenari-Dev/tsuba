@@ -6,22 +6,45 @@ import QtQuick
 // device page shows, decided from the daemon's GetDeviceSupport JSON (kind, features, effects…).
 // Tested models (BlackWidow V4 Pro, Basilisk V3 Pro) always keep the full tab set.
 QtObject {
-    readonly property var kindLabels: ({
-        "keyboard": "Keyboard", "laptop_keyboard": "Laptop keyboard", "keypad": "Keypad", "mouse": "Mouse",
-        "mousemat": "Mousemat", "mousedock": "Mouse dock", "headset_stand": "Headset stand", "headset": "Headset",
-        "speaker": "Speaker", "egpu": "External GPU box", "monitor": "Monitor", "accessory": "Accessory", "receiver": "Wireless receiver"
-    })
+    // Singular kind name ("Mouse"); `kind` is the daemon's id.
+    function kindLabel(kind) {
+        switch (kind) {
+        case "keyboard": return i18nc("device kind", "Keyboard");
+        case "laptop_keyboard": return i18nc("device kind", "Laptop keyboard");
+        case "keypad": return i18nc("device kind", "Keypad");
+        case "mouse": return i18nc("device kind", "Mouse");
+        case "mousemat": return i18nc("device kind", "Mousemat");
+        case "mousedock": return i18nc("device kind", "Mouse dock");
+        case "headset_stand": return i18nc("device kind", "Headset stand");
+        case "headset": return i18nc("device kind", "Headset");
+        case "speaker": return i18nc("device kind", "Speaker");
+        case "egpu": return i18nc("device kind", "External GPU box");
+        case "monitor": return i18nc("device kind", "Monitor");
+        case "accessory": return i18nc("device kind", "Accessory");
+        case "receiver": return i18nc("device kind", "Wireless receiver");
+        default: return i18nc("device kind", "Device");
+        }
+    }
     // Plural group headings, in the order the supported-devices browser lists them.
     readonly property var groupOrder: ["keyboard", "laptop_keyboard", "keypad", "mouse", "mousemat", "mousedock", "headset_stand",
         "speaker", "egpu", "monitor", "accessory", "receiver", "headset"]
-    readonly property var groupLabels: ({
-        "keyboard": "Keyboards", "laptop_keyboard": "Laptop keyboards", "keypad": "Keypads", "mouse": "Mice",
-        "mousemat": "Mousemats", "mousedock": "Mouse docks", "headset_stand": "Headset stands", "headset": "Headsets",
-        "speaker": "Speakers", "egpu": "External GPU boxes", "monitor": "Monitors", "accessory": "Accessories", "receiver": "Wireless receivers"
-    })
-
-    function kindLabel(kind) {
-        return kindLabels[kind] || "Device";
+    function groupLabel(kind) {
+        switch (kind) {
+        case "keyboard": return i18nc("device group heading", "Keyboards");
+        case "laptop_keyboard": return i18nc("device group heading", "Laptop keyboards");
+        case "keypad": return i18nc("device group heading", "Keypads");
+        case "mouse": return i18nc("device group heading", "Mice");
+        case "mousemat": return i18nc("device group heading", "Mousemats");
+        case "mousedock": return i18nc("device group heading", "Mouse docks");
+        case "headset_stand": return i18nc("device group heading", "Headset stands");
+        case "headset": return i18nc("device group heading", "Headsets");
+        case "speaker": return i18nc("device group heading", "Speakers");
+        case "egpu": return i18nc("device group heading", "External GPU boxes");
+        case "monitor": return i18nc("device group heading", "Monitors");
+        case "accessory": return i18nc("device group heading", "Accessories");
+        case "receiver": return i18nc("device group heading", "Wireless receivers");
+        default: return i18nc("device group heading", "Other devices");
+        }
     }
 
     // "keyboard" (key views), "mouse" (button views), "lighting" (lighting only), "info" (nothing to control yet).
@@ -69,10 +92,22 @@ QtObject {
         return (sup.effects && sup.effects.length > 0) || !!sup.matrix || (sup.leds && sup.leds.length > 0);
     }
 
-    // Tab names for the device page, from the support JSON; `hasPower` is whether the device
+    // Display title for a tab id from tabsFor() ("Customize", "Performance", "Lighting", "Power", "Info").
+    function tabTitle(id) {
+        switch (id) {
+        case "Customize": return i18nc("device tab", "Customize");
+        case "Performance": return i18nc("device tab", "Performance");
+        case "Lighting": return i18nc("device tab", "Lighting");
+        case "Power": return i18nc("device tab", "Power");
+        case "Info": return i18nc("device tab", "Info");
+        default: return id;
+        }
+    }
+
+    // Tab ids for the device page, from the support JSON; `hasPower` is whether the device
     // answered a power query. Without support information (old daemon) the classic three tabs.
     function tabsFor(sup, hasPower) {
-        const classic = hasPower ? ["Customize", "Performance", "Lighting", "Power"] : ["Customize", "Performance", "Lighting"];
+        const classic = hasPower ? ["Customize", "Performance", "Lighting", "Power"] : ["Customize", "Performance", "Lighting"]; // i18n-ok: tab id
         if (!sup || !sup.kind) {
             return classic;
         }
@@ -84,16 +119,16 @@ QtObject {
         }
         const t = [];
         if (remaps(sup)) {
-            t.push("Customize");
+            t.push("Customize"); // i18n-ok: tab id
         }
         if (hasPerformance(sup)) {
-            t.push("Performance");
+            t.push("Performance"); // i18n-ok: tab id
         }
         if (hasLighting(sup)) {
-            t.push("Lighting");
+            t.push("Lighting"); // i18n-ok: tab id
         }
         if (hasPower || feat(sup, "battery")) {
-            t.push("Power");
+            t.push("Power"); // i18n-ok: tab id
         }
         return t.length ? t : ["Info"];
     }
@@ -104,49 +139,72 @@ QtObject {
         return ok && (!sup || !sup.effects || sup.effects.indexOf("custom_frame") >= 0);
     }
 
-    readonly property var featureLabels: ({
-        "dpi_stages": "Adjustable sensitivity (DPI) stages",
-        "battery": "Battery level",
-        "wireless": "Wireless",
-        "idle_time": "Sleep timer",
-        "charging_lights": "Charging light",
-        "scroll_modes": "Tactile / free-spin wheel",
-        "scroll_acceleration": "Scroll acceleration",
-        "smart_reel": "Auto free-spin wheel",
-        "dial": "Dial",
-        "dedicated_macro_keys": "Dedicated macro keys",
-        "onboard_macros": "On-board macros",
-        "game_mode": "Game mode",
-        "keyswitch_optical": "Optical key switches"
-    })
-    readonly property var effectLabels: ({
-        "off": "Off", "static": "Static", "breathing": "Breathing", "spectrum": "Spectrum cycling", "wave": "Wave",
-        "reactive": "Reactive", "starlight": "Starlight", "ripple": "Ripple", "wheel": "Wheel", "custom_frame": "Per-LED colours"
-    })
+    readonly property var featureIds: ["dpi_stages", "battery", "wireless", "idle_time", "charging_lights", "scroll_modes", "scroll_acceleration", "smart_reel", "dial", "dedicated_macro_keys", "onboard_macros", "game_mode", "keyswitch_optical"]
+    function featureLabel(id) {
+        switch (id) {
+        case "dpi_stages": return i18nc("device feature", "Adjustable sensitivity (DPI) stages");
+        case "battery": return i18nc("device feature", "Battery level");
+        case "wireless": return i18nc("device feature", "Wireless");
+        case "idle_time": return i18nc("device feature", "Sleep timer");
+        case "charging_lights": return i18nc("device feature", "Charging light");
+        case "scroll_modes": return i18nc("device feature", "Tactile / free-spin wheel");
+        case "scroll_acceleration": return i18nc("device feature", "Scroll acceleration");
+        case "smart_reel": return i18nc("device feature", "Auto free-spin wheel");
+        case "dial": return i18nc("device feature", "Dial");
+        case "dedicated_macro_keys": return i18nc("device feature", "Dedicated macro keys");
+        case "onboard_macros": return i18nc("device feature", "On-board macros");
+        case "game_mode": return i18nc("device feature", "Game mode");
+        case "keyswitch_optical": return i18nc("device feature", "Optical key switches");
+        default: return id;
+        }
+    }
+    function effectLabel(id) {
+        switch (id) {
+        case "off": return i18nc("lighting effect", "Off");
+        case "static": return i18nc("lighting effect", "Static");
+        case "breathing": return i18nc("lighting effect", "Breathing");
+        case "spectrum": return i18nc("lighting effect", "Spectrum cycling");
+        case "wave": return i18nc("lighting effect", "Wave");
+        case "reactive": return i18nc("lighting effect", "Reactive");
+        case "starlight": return i18nc("lighting effect", "Starlight");
+        case "ripple": return i18nc("lighting effect", "Ripple");
+        case "wheel": return i18nc("lighting effect", "Wheel");
+        case "custom_frame": return i18nc("lighting effect", "Per-LED colours");
+        default: return id;
+        }
+    }
 
     // Plain-language feature list for the facts view.
     function featureList(sup) {
         const out = [];
         const f = sup.features || {};
-        Object.keys(featureLabels).forEach(k => {
+        featureIds.forEach(k => {
             if (f[k]) {
-                out.push(featureLabels[k]);
+                out.push(featureLabel(k));
             }
         });
         if (f.macro_keys > 0) {
-            out.push(f.macro_keys + " macro keys");
+            out.push(i18np("%1 macro key", "%1 macro keys", f.macro_keys));
         }
         return out;
     }
     function effectList(sup) {
-        return (sup.effects || []).map(e => effectLabels[e] || e);
+        return (sup.effects || []).map(e => effectLabel(e));
     }
 
-    // "Tested" / "Untested" / "Not supported"
-    function statusOf(sup) {
+    // Status id: "unsupported" / "tested" / "untested" (compare this, not the label).
+    function statusId(sup) {
         if (sup.supported === false) {
-            return "Not supported";
+            return "unsupported";
         }
-        return sup.tested ? "Tested" : "Untested";
+        return sup.tested ? "tested" : "untested";
+    }
+    // The status as shown: "Tested" / "Untested" / "Not supported".
+    function statusOf(sup) {
+        switch (statusId(sup)) {
+        case "unsupported": return i18nc("device support status", "Not supported");
+        case "tested": return i18nc("device support status", "Tested");
+        default: return i18nc("device support status", "Untested");
+        }
     }
 }

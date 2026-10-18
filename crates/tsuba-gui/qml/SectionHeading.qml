@@ -7,4 +7,5 @@ Text {
     font.pixelSize: 11
     font.letterSpacing: 1
     topPadding: 6
+    elide: Text.ElideRight
 }

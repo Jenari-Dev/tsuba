@@ -17,6 +17,11 @@ SynCard {
     signal changed()
 
     property string result: ""
+    property bool resultFailed: false
+    function setResult(text, failed) {
+        resultFailed = !!failed;
+        result = text;
+    }
     property bool confirmReset: false
     readonly property int rowHeight: 50
     readonly property var slots: st.dial || []
@@ -83,7 +88,7 @@ SynCard {
             return;
         }
         const r = backend.set_assignment(pid, JSON.stringify({ profile: profile, key: dialKey, layer: 0, function: d.function, data: d.data }));
-        result = r === "" ? "Failed: " + backend.status : i18n("Dial press reset to default");
+        setResult(r === "" ? i18n("Failed: %1", backend.status) : i18n("Dial press reset to default"), r === "");
         loadDial();
         changed();
     }
@@ -94,15 +99,15 @@ SynCard {
     // Write the slot table (keeping the mode that is active now active, wherever it ended up).
     function write(list, text) {
         if (!list.some(d => d.enabled)) {
-            result = "Failed: at least one dial mode must stay on";
+            setResult(i18n("Failed: at least one dial mode must stay on"), true);
             return false;
         }
         const cur = slots.find(d => d.current);
         if (!backend.set_dial(pid, JSON.stringify(list))) {
-            result = "Failed: " + backend.status;
+            setResult(i18n("Failed: %1", backend.status), true);
             return false;
         }
-        result = text;
+        setResult(text, false);
         if (cur) {
             const i = list.findIndex(d => d.function === cur.function);
             if (i >= 0 && list[i].enabled) {
@@ -131,7 +136,7 @@ SynCard {
         confirmReset = false;
         const list = provider.json("FactoryDial", [pid], null);
         if (!list) {
-            result = "Failed: " + (provider.error !== "" ? provider.error : "the stock table isn't available");
+            setResult(i18n("Failed: %1", provider.error !== "" ? provider.error : i18n("the stock table isn't available")), true);
             return;
         }
         write(list, i18n("Dial modes are back to the stock order"));
@@ -194,7 +199,7 @@ SynCard {
                 y: index * ed.rowHeight
                 z: grip.active ? 10 : 0
                 radius: 3
-                color: modelData.current ? Theme.accentTint : (dh.hovered ? "#14ffffff" : Theme.bg)
+                color: modelData.current ? Theme.accentTint : (dh.hovered ? Theme.hoverTint : Theme.bg)
                 border.color: grip.active ? Theme.accent : (modelData.current ? Theme.accent : Theme.borderSoft)
                 transform: Translate { y: grip.active ? grip.translation.y : 0 }
                 RowLayout {
@@ -256,7 +261,7 @@ SynCard {
                         Layout.preferredWidth: 22
                         Layout.preferredHeight: 22
                         radius: 11
-                        color: "#" + slotRow.modelData.colour
+                        color: "#" + slotRow.modelData.colour   // LED colour: intentional
                         border.color: sw.hovered ? Theme.textBright : Theme.border
                         opacity: slotRow.modelData.enabled ? 1 : 0.35
                         HoverHandler {
@@ -301,10 +306,10 @@ SynCard {
                     enabled: slotRow.modelData.enabled && !slotRow.modelData.current && !ed.readOnly
                     onTapped: {
                         if (ed.backend.set_dial_mode(ed.pid, slotRow.index)) {
-                            ed.result = slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2") + i18n(" is the active dial mode");
+                            ed.setResult(i18n("%1 is the active dial mode", slotRow.modelData.function.replace(/([a-z])([A-Z])/g, "$1 $2")), false);
                             ed.changed();
                         } else {
-                            ed.result = "Failed: " + ed.backend.status;
+                            ed.setResult(i18n("Failed: %1", ed.backend.status), true);
                         }
                     }
                 }
@@ -333,7 +338,7 @@ SynCard {
         SynButton {
             visible: ed.confirmReset
             text: i18n("Cancel")
-            implicitWidth: 80
+            minWidth: 80
             onClicked: ed.confirmReset = false
         }
         SynButton {
@@ -341,7 +346,7 @@ SynCard {
             visible: ed.confirmReset
             text: i18n("Reset")
             primary: true
-            implicitWidth: 80
+            minWidth: 80
             onClicked: ed.resetModes()
         }
     }
@@ -349,7 +354,7 @@ SynCard {
         objectName: "dialResult"
         visible: ed.result !== ""
         text: ed.result
-        color: ed.result.startsWith("Failed") ? Theme.warn : Theme.accent
+        color: ed.resultFailed ? Theme.warn : Theme.accent
         font.family: Theme.font
         font.pixelSize: Theme.small
     }

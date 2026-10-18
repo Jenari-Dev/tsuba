@@ -40,7 +40,8 @@ ColumnLayout {
                 width: Math.max(40, label.implicitWidth + 16)
                 height: 30
                 radius: 2
-                color: sel ? Theme.accentTintStrong : (ch.hovered ? "#1affffff" : Theme.bg)
+                color: sel ? Theme.accentTintStrong : (ch.hovered ? Theme.hoverTint : Theme.bg)
+
                 border.color: sel || ch.hovered ? Theme.accent : Theme.borderSoft
                 Text {
                     id: label

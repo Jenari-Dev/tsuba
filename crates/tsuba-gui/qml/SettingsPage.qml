@@ -24,7 +24,8 @@ Rectangle {
     property bool serviceEnabled: false
     property var notif: ({})
     readonly property bool daemonUp: backend.connected
-    readonly property string launchLanguage: Theme.app.language
+    // The language the app started with (a change only needs a restart when it differs).
+    property string launchLanguage: ""
     property bool languageChanged: false
     property string diagNote: ""
     property bool diagOk: true
@@ -42,7 +43,10 @@ Rectangle {
         const r = app.set_notification_settings(JSON.stringify(next));
         notif = r === "" ? notif : JSON.parse(r);
     }
-    Component.onCompleted: reload()
+    Component.onCompleted: {
+        launchLanguage = Theme.app.language;
+        reload();
+    }
     onDaemonUpChanged: reload()
 
     Connections {

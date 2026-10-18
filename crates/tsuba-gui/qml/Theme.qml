@@ -75,7 +75,7 @@ QtObject {
     readonly property color borderSoft: dark ? "#383838" : "#d3d9dc"
     readonly property color text: dark ? "#d3d3d3" : "#2b3135"
     readonly property color textBright: dark ? "#ffffff" : "#000000"
-    readonly property color textDim: dark ? "#707070" : "#5b666c"
+    readonly property color textDim: dark ? "#8c8c8c" : "#5b666c"
     readonly property color textMuted: dark ? "#5d5d5d" : "#78838a"
     // Greyed switch / checkbox and hover surfaces shared by the Syn* controls.
     readonly property color inactive: dark ? "#4a4a4a" : "#b4bcc1"
@@ -85,7 +85,7 @@ QtObject {
     readonly property color navText: dark ? "#a0a0a0" : "#4a5358"
     // In the light scheme a pale accent gets darker so it stays readable as text on white.
     readonly property color userAccent: prefs.accent
-    readonly property color accent: dark ? userAccent : Qt.hsla(userAccent.hslHue, userAccent.hslSaturation, Math.min(userAccent.hslLightness, 0.36), 1)
+    readonly property color accent: dark ? userAccent : Qt.hsla(userAccent.hslHue, userAccent.hslSaturation, Math.min(userAccent.hslLightness, 0.30), 1)
     readonly property color accentHover: Qt.darker(accent, 1.12)
     // Translucent accent for selected rows / chips.
     readonly property color accentTint: Qt.rgba(accent.r, accent.g, accent.b, 0.10)

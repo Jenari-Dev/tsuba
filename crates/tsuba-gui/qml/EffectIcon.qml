@@ -115,6 +115,20 @@ Canvas {
             ctx.arc(12, 12, 10.5, Math.PI - 0.7, Math.PI + 0.7);
             ctx.stroke();
             break;
+        case "gradient":   // box fading left to right (stripes of growing weight)
+            ctx.strokeRect(3, 5, 18, 14);
+            ctx.globalAlpha = 0.35;
+            line([7, 8, 7, 16], false);
+            ctx.globalAlpha = 0.65;
+            line([12, 8, 12, 16], false);
+            ctx.globalAlpha = 1.0;
+            line([17, 8, 17, 16], false);
+            break;
+        case "image":      // picture frame with a hill and a sun
+            ctx.strokeRect(3, 5, 18, 14);
+            line([3, 17, 9, 11, 13, 15, 16, 12, 21, 17], false);
+            circle(16.5, 8.5, 1.6, true);
+            break;
         case "battery":
             ctx.strokeRect(3, 8, 16, 9);
             line([21, 11, 21, 14], false);

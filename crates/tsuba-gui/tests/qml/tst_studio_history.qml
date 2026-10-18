@@ -16,6 +16,7 @@ Item {
         function env_var(n) { return ""; }
         function preview_start(p, j) { return true; }
         function preview_frame() { return "{}"; }
+        function preview_frame_for(p) { return "{}"; }
         function set_effect(p, j, b) { return true; }
     }
     StudioPage {

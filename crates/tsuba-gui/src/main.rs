@@ -2,6 +2,7 @@
 
 mod backend;
 mod i18n;
+mod studio_api;
 mod synapse;
 
 use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QQuickStyle, QString, QUrl};

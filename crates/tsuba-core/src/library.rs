@@ -853,7 +853,7 @@ mod tests {
         assert!(!serde_json::to_string(&old).unwrap().contains("lighting"));
         // A duplicate keeps the lighting; an export carries it.
         assert_eq!(p.duplicate("Copy").lighting, p.lighting);
-        assert_eq!(import("028d", &export("028d", &p).unwrap()).unwrap().lighting, p.lighting);
+        assert_eq!(import("028d", &export("028d", &p).unwrap(), "").unwrap().profile.lighting, p.lighting);
     }
 
     #[test]
@@ -884,10 +884,10 @@ mod tests {
         assert_eq!(DeviceLibrary::load(&dir, "00aa").unwrap().profiles.len(), 1);
         // Export / import.
         let text = export("00aa", &b).unwrap();
-        let back = import("00ab", &text).unwrap();
+        let back = import("00ab", &text, "").unwrap().profile;
         assert_ne!(back.id, b.id);
         assert_eq!(back.name, "Bee");
-        assert!(import("028d", &text).is_err(), "a mouse profile doesn't fit the keyboard");
+        assert!(import("028d", &text, "").is_err(), "a mouse profile doesn't fit the keyboard");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

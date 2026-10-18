@@ -48,10 +48,10 @@ fn lighting_is_stored_with_a_profile_applied_on_activation_and_follows_edits() {
     mgr.store_lighting("028d", blue()).unwrap();
     mgr.library_activate("028d", &b).unwrap();
     assert_eq!(saved_lighting(&mgr, "028d"), Some(blue()));
-    // Switching to A brings its lighting back (the simulated device can't show it: a warning).
+    // Switching to A brings its lighting back (the simulated device answers lighting commands).
     let act = mgr.library_activate("028d", &a).unwrap();
     assert_eq!(saved_lighting(&mgr, "028d"), Some(red()), "the profile's lighting became the device's lighting");
-    assert!(act.warnings.iter().any(|w| w.starts_with("lighting:")), "{:?}", act.warnings);
+    assert!(!act.warnings.iter().any(|w| w.starts_with("lighting:")), "{:?}", act.warnings);
 
     // The user changes the lighting while A is active: A keeps the change; B (no lighting) doesn't grow one.
     mgr.save_lighting("028d", blue()).unwrap();

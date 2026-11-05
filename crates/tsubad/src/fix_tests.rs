@@ -265,3 +265,34 @@ fn saving_from_the_devices_keeps_game_mode_and_zones() {
     let on_disk = tsuba_core::Config::load(&mgr.config_path).unwrap();
     assert_eq!(on_disk.device("00aa").unwrap().game_mode.as_ref(), Some(&gm));
 }
+
+fn fails_first_binds(n: usize, tries: std::sync::Arc<std::sync::atomic::AtomicUsize>) -> crate::library::tests::Hook {
+    std::sync::Arc::new(move |cmd, _| {
+        (cmd == tsuba_proto::commands::SET_SINGLE_BUTTON_ASSIGNMENT && tries.fetch_add(1, SeqCst) < n)
+            .then(|| tsuba_hid::HidError::Proto(tsuba_proto::ProtoError::Status(tsuba_proto::Status::Fail)))
+    })
+}
+
+fn bind(mgr: &crate::manager::Manager) -> anyhow::Result<tsuba_proto::decode::Assignment> {
+    let x = tsuba_proto::decode::Assignment { profile: 1, key: 15, layer: 0, function: 5, data: vec![0x2d, 0x5f] };
+    mgr.with_device("00aa", |dev, model| mgr.write_macro_binding("00aa", dev, model, &x))
+}
+
+#[test]
+fn a_macro_bind_retries_a_momentary_fail() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let tries = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let (mgr, _sim) = crate::library::tests::rig_hooked("00aa", 1, fails_first_binds(1, tries.clone()));
+    let back = bind(&mgr).unwrap();
+    assert_eq!((back.function, back.data), (5, vec![0x2d, 0x5f]));
+    assert_eq!(tries.load(SeqCst), 2);
+}
+
+#[test]
+fn a_macro_bind_gives_up_on_a_lasting_fail() {
+    let _s = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
+    let tries = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let (mgr, _sim) = crate::library::tests::rig_hooked("00aa", 1, fails_first_binds(usize::MAX, tries.clone()));
+    assert!(format!("{:#}", bind(&mgr).unwrap_err()).contains("Fail"));
+    assert_eq!(tries.load(SeqCst), 4);
+}

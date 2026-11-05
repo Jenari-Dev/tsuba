@@ -4,6 +4,13 @@ All notable changes to Tsuba are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-11-06
+
+### Fixed
+
+- Binding a macro to a key or button no longer stops at a momentary "device returned Fail": the bind is
+  retried a few times, and a lasting failure now says whether storing the macro or binding it failed.
+
 ## [0.1.0] - 2026-10-18
 
 First public release. Early software: see [docs/STATUS.md](docs/STATUS.md) for what has been verified on

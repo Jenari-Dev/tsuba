@@ -366,7 +366,7 @@ impl Manager {
                                 }
                             };
                             let (function, data) = tsuba_core::macros::binding(id, b.playback, b.count);
-                            self.write_assignment(pid, dev, model, &decode::Assignment { profile: slot, key: b.key, layer: b.layer, function, data })?;
+                            self.write_macro_binding(pid, dev, model, &decode::Assignment { profile: slot, key: b.key, layer: b.layer, function, data })?;
                             Ok((id, uploaded))
                         })
                     };

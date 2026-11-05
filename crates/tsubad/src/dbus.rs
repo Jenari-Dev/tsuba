@@ -499,10 +499,10 @@ impl Tsuba {
                 let mac = mgr.library()?.get(&b.guid).cloned().context("no such macro in the library")?;
                 let held = mgr.lib_lock.lock().unwrap();
                 mgr.with_device(&pid, |dev, model| {
-                    let id = macros::ensure_on_device(dev, &mac)?;
+                    let id = macros::ensure_on_device(dev, &mac).context("store the macro on the device")?;
                     let (function, data) = macros::binding(id, b.playback, b.count);
                     let x = tsuba_proto::decode::Assignment { profile: b.profile, key: b.key, layer: b.layer, function, data };
-                    let back = mgr.write_assignment(&pid, dev, model, &x)?;
+                    let back = mgr.write_macro_binding(&pid, dev, model, &x).context("bind the macro to the button")?;
                     Ok(format!("{} ({})", mac.name, tsuba_proto::decode::describe(back.function, &back.data)))
                 })
                 .and_then(|r| {

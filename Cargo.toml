@@ -3,7 +3,7 @@ resolver = "2"
 members = ["crates/tsuba-proto", "crates/tsuba-hid", "crates/tsuba-core", "crates/tsuba", "crates/tsubad", "crates/tsuba-gui"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["JenAriDev"]
 rust-version = "1.85"

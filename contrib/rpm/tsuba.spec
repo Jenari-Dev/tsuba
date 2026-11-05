@@ -1,9 +1,9 @@
 # RPM spec for Fedora and derivatives. Build from a checkout:
-#   tar --transform 's|^|tsuba-0.1.0/|' --exclude=target -czf ~/rpmbuild/SOURCES/tsuba-0.1.0.tar.gz .
+#   tar --transform 's|^|tsuba-0.1.1/|' --exclude=target -czf ~/rpmbuild/SOURCES/tsuba-0.1.1.tar.gz .
 #   rpmbuild -ba contrib/rpm/tsuba.spec
 # Not yet tried on a Fedora system: check the package names against your release before publishing.
 Name:           tsuba
-Version:        0.1.0
+Version:        0.1.1
 Release:        1%{?dist}
 Summary:        Open-source configuration for Razer keyboards and mice
 License:        GPL-2.0-or-later

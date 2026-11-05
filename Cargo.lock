@@ -1588,7 +1588,7 @@ dependencies = [
 
 [[package]]
 name = "tsuba"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -1600,7 +1600,7 @@ dependencies = [
 
 [[package]]
 name = "tsuba-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "dirs",
@@ -1616,7 +1616,7 @@ dependencies = [
 
 [[package]]
 name = "tsuba-gui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cxx",
  "cxx-qt",
@@ -1632,7 +1632,7 @@ dependencies = [
 
 [[package]]
 name = "tsuba-hid"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "libc",
  "serde",
@@ -1643,14 +1643,14 @@ dependencies = [
 
 [[package]]
 name = "tsuba-proto"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "tsubad"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",

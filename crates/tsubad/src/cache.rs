@@ -16,8 +16,8 @@ use std::time::{Duration, Instant};
 use anyhow::Result;
 use tracing::{debug, info};
 use tsuba_core::state::{self, AssignmentState};
-use tsuba_hid::{Device, Domain, Model, WriteCounters};
-use tsuba_proto::{decode, events};
+use tsuba_hid::{Device, Domain, HidError, Model, WriteCounters};
+use tsuba_proto::{decode, events, ProtoError, Status};
 
 use crate::manager::Manager;
 
@@ -164,6 +164,20 @@ impl Manager {
         Ok(json)
     }
 
+    /// Bind a key to a macro. The firmware can answer Fail for a moment after a macro was
+    /// uploaded (seen once on the Basilisk V3 Pro; the same bind went through seconds later),
+    /// so a Fail is retried a few times. Anything else is reported straight away.
+    pub fn write_macro_binding(&self, pid: &str, dev: &Device, model: &Model, x: &decode::Assignment) -> Result<decode::Assignment> {
+        const TRIES: u32 = 4;
+        for _ in 1..TRIES {
+            match self.write_assignment(pid, dev, model, x) {
+                Err(e) if is_device_fail(&e) => std::thread::sleep(Duration::from_millis(150)),
+                r => return r,
+            }
+        }
+        self.write_assignment(pid, dev, model, x)
+    }
+
     /// Write one assignment inside a device operation and keep the cached tables current
     /// instead of throwing them away: the written key is patched into its table.
     pub fn write_assignment(&self, pid: &str, dev: &Device, model: &Model, x: &decode::Assignment) -> Result<decode::Assignment> {
@@ -299,6 +313,10 @@ fn patch_table(json: &str, key: u8, new: &serde_json::Value) -> Option<String> {
         None => list.push(new.clone()),
     }
     serde_json::to_string(&v).ok()
+}
+
+fn is_device_fail(e: &anyhow::Error) -> bool {
+    e.chain().any(|c| matches!(c.downcast_ref::<HidError>(), Some(HidError::Proto(ProtoError::Status(Status::Fail)))))
 }
 
 #[cfg(test)]
